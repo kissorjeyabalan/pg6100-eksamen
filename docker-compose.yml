@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+    #serviceName:
+        #build:
+            #context: ./moduleFolderName
+            #dockerfile: Dockerfile
+        #ports:
+        # - "externalPort":"containerPort"
+        #depends_on:
+        # - "serviceName of dependency"
