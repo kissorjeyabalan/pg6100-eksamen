@@ -21,3 +21,12 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# frontend & jetbrains specific
+**/node_modules
+**/.idea/
+*.iml
+**/out
+*.iws
+**/target
+bundle.js
