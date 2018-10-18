@@ -28,7 +28,7 @@
             <version>${version.kotlin}</version>
         </dependency>
         <dependency>
-            <groupId>org.hetbrains.kotlin</groupId>
+            <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${version.kotlin}</version>
         </dependency>
