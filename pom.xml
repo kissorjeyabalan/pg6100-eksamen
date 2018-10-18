@@ -206,7 +206,7 @@
                     </dependency>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-mavne-noarg</artifactId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
                         <version>${version.kotlin}</version>
                     </dependency>
                 </dependencies>
