@@ -6,8 +6,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>common</module>
-        <module>ticket-service</module>
     </modules>
 
     <properties>
