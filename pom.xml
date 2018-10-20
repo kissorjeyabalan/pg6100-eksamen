@@ -10,7 +10,6 @@
         <module>ticket-service</module>
         <module>kino-service</module>
         <module>user-service</module>
-        <module>gateway</module>
     </modules>
 
     <properties>
@@ -40,7 +39,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- SpringBoot and Cloud -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
@@ -57,7 +55,29 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${version.springboot}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${version.springboot}</version>
+            </dependency>
+            <!-- SpringBoot and Cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-zuul</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
+                <version>${version.springboot}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-core</artifactId>
                 <version>${version.springboot}</version>
             </dependency>
             <dependency>
