@@ -19,5 +19,4 @@ data class TicketDto (
 
         @ApiModelProperty("The id of the ticket")
         var id: String? = null
-
 )
