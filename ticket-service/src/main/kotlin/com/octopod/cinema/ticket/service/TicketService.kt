@@ -33,8 +33,37 @@ class TicketService {
         return result
     }
 
-    fun createTicket(buyer: String, movieName: String, movieStartTime: ZonedDateTime): Long? {
-        val ticket = Ticket(buyer, movieName, ZonedDateTime.now(), movieStartTime)
+    fun getTicketsByScreeningIdAndUserId(limit: Int, userId: String, screeningId: String) : List<Ticket> {
+        val query: TypedQuery<Ticket> =
+                em.createQuery(
+                        "select t from Ticket t where t.userId=?1 and t.screeningId=?2",
+                        Ticket::class.java)
+
+        query.setParameter(1, userId)
+        query.setParameter(2, screeningId)
+
+        query.maxResults = limit
+        val result = query.resultList
+
+        return result
+    }
+
+    fun getTicketsByUserId(limit: Int, userId: String) : List<Ticket> {
+        val query: TypedQuery<Ticket> =
+                em.createQuery(
+                        "select t from Ticket t where t.userId=?1",
+                        Ticket::class.java)
+
+        query.setParameter(1, userId)
+
+        query.maxResults = limit
+        val result = query.resultList
+
+        return result
+    }
+
+    fun createTicket(buyer: String, movieName: String, screeningId: String, movieStartTime: ZonedDateTime): Long? {
+        val ticket = Ticket(buyer, movieName, screeningId,  ZonedDateTime.now(), movieStartTime)
 
         em.persist(ticket)
         return ticket.id

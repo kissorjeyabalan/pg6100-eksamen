@@ -6,10 +6,13 @@ import java.time.ZonedDateTime
 data class TicketDto (
 
         @ApiModelProperty("The name of the person who bought the ticket")
-        var buyer: String? = null,
+        var userId: String? = null,
 
         @ApiModelProperty("The name of the movie being shown")
         var movieName: String? = null,
+
+        @ApiModelProperty("The id of the screening")
+        var screeningId: String? = null,
 
         @ApiModelProperty("The time when the ticket was bought")
         var timeOfPurchase: ZonedDateTime? = null,

@@ -5,20 +5,24 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.validation.constraints.NotBlank
 import java.time.ZonedDateTime
+import javax.validation.constraints.NotNull
 
 @Entity
 class Ticket (
 
         @get:NotBlank
-        var buyer: String,
+        var userId: String,
 
         @get:NotBlank
         var movieName: String,
 
         @get:NotBlank
+        var screeningId: String,
+
+        @get:NotNull
         var timeOfPurchase: ZonedDateTime,
 
-        @get:NotBlank
+        @get:NotNull
         var movieStartTime: ZonedDateTime,
 
         @get:Id @get:GeneratedValue
