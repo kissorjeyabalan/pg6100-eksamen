@@ -11,10 +11,13 @@ import javax.validation.constraints.NotNull
 class Ticket (
 
         @get:NotBlank
-        var buyer: String,
+        var userId: String,
 
         @get:NotBlank
         var movieName: String,
+
+        @get:NotBlank
+        var screeningId: String,
 
         @get:NotNull
         var timeOfPurchase: ZonedDateTime,

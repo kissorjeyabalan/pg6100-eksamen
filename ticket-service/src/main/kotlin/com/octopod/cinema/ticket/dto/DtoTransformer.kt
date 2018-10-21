@@ -7,8 +7,9 @@ import kotlin.streams.toList
 object DtoTransformer {
 
     fun transform(ticket: Ticket) : TicketDto {
-        return TicketDto(ticket.buyer,
+        return TicketDto(ticket.userId,
                          ticket.movieName,
+                         ticket.screeningId,
                          ticket.timeOfPurchase,
                          ticket.movieStartTime,
                          ticket.id.toString())

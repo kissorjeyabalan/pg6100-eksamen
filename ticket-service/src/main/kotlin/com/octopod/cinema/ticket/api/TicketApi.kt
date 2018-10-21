@@ -29,17 +29,12 @@ class TicketApi {
     @GetMapping
     fun getTickets(
 
-            //TODO: change name of visning
-            @ApiParam("the id of the Visning")
-            @RequestParam("visningsId", required = false)
-            visningsId: String?,
+            @ApiParam("the id of the Screening")
+            @RequestParam("screeningId", required = false)
+            screeningId: String?,
 
-            @ApiParam("the name of the buyer")
-            @RequestParam("name", required = false)
-            name: String?,
-
-            @ApiParam("the name of the buyer")
-            @RequestParam("name", required = false)
+            @ApiParam("the name of the user who bought the ticket")
+            @RequestParam("userId", required = false)
             userId: String?,
 
             @ApiParam("offset")
@@ -60,7 +55,17 @@ class TicketApi {
 
         val ticketList: List<Ticket>
 
-        ticketList = service.getTickets(maxFromDB)
+
+        ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
+            println("dwadwa")
+            service.getTickets(maxFromDB)
+
+        } else if ( !screeningId.isNullOrBlank() && !userId.isNullOrBlank()) {
+            service.getTicketsByScreeningIdAndUserId(maxFromDB, userId!!, screeningId!!)
+        } else {
+            service.getTicketsByUserId(maxFromDB, userId!!)
+        }
+
 
         if (offset != 0 && offset >= ticketList.size) {
             return ResponseEntity.status(400).build()
@@ -100,11 +105,11 @@ class TicketApi {
     @PostMapping
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
 
-        if(dto.buyer == null || dto.movieName == null || dto.movieStartTime == null) {
+        if(dto.userId == null || dto.movieName == null || dto.screeningId == null || dto.movieStartTime == null) {
             return ResponseEntity.status(400).build()
         }
 
-        val id = service.createTicket(dto.buyer!!, dto.movieName!!, dto.movieStartTime!!)
+        val id = service.createTicket(dto.userId!!, dto.movieName!!, dto.screeningId!!, dto.movieStartTime!!)
 
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
