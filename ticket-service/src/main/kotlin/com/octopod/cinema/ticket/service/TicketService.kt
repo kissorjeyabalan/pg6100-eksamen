@@ -39,5 +39,4 @@ class TicketService {
         em.persist(ticket)
         return ticket.id
     }
-
 }
