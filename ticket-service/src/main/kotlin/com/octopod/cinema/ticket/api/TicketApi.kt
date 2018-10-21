@@ -11,15 +11,12 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 
-@Api(value = "ticket", description = "handling of tickets")
+@Api(value = "tickets", description = "handling of tickets")
 @RequestMapping(
-        path = ["/ticket"]
+        path = ["/tickets"]
 )
 @RestController
 class TicketApi {
@@ -40,6 +37,10 @@ class TicketApi {
             @ApiParam("the name of the buyer")
             @RequestParam("name", required = false)
             name: String?,
+
+            @ApiParam("the name of the buyer")
+            @RequestParam("name", required = false)
+            userId: String?,
 
             @ApiParam("offset")
             @RequestParam("offset", defaultValue = "0")
@@ -93,5 +94,23 @@ class TicketApi {
 
         return ResponseEntity.ok(dto)
     }
+
+
+    @ApiOperation("create a new ticket")
+    @PostMapping
+    fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
+
+        if(dto.buyer == null || dto.movieName == null || dto.movieStartTime == null) {
+            return ResponseEntity.status(400).build()
+        }
+
+        val id = service.createTicket(dto.buyer!!, dto.movieName!!, dto.movieStartTime!!)
+
+        return ResponseEntity.created(UriComponentsBuilder
+                .fromPath("/tickets/$id").build().toUri()
+        ).build()
+    }
+
 }
+
 
