@@ -10,12 +10,15 @@ class Show (
 
         //TODO: Ta en vurdering på om dette burde være en annen type variabel
         @get:NotBlank
-        var startTime: Int,
+        var startTime : Int,
 
         @get:NotBlank
-        var movie: String,
+        var movie : String,
+
+        @get:NotBlank
+        var cinema : String,
 
         @get:Id @get:GeneratedValue
-        var id: Long? = null
+        var id : Long? = null
 
 )

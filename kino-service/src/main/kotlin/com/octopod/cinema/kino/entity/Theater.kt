@@ -9,15 +9,15 @@ import javax.validation.constraints.NotBlank
 class Theater (
 
     @get:NotBlank
-    var name: String,
+    var name : String,
 
     @get:NotBlank
-    var seatsMax: Int,
+    var seatsMax : Int,
 
     @get:NotBlank
-    var seatsEmpty: Int,
+    var seatsEmpty : Int,
 
     @get:Id @get:GeneratedValue
-    var id: Long? = null
+    var id : Long? = null
 
 )
