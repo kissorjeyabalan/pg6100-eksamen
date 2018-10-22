@@ -1,5 +1,6 @@
 package com.octopod.cinema.kino.service
 
+import com.octopod.cinema.kino.entity.Show
 import com.octopod.cinema.kino.entity.Theater
 import org.springframework.stereotype.Service
 import javax.persistence.EntityManager
@@ -29,7 +30,7 @@ class TheaterService {
         return seatsEmpty
     }
 
-    fun getShows(theater : Theater) : List<Theater> {
+    fun getShows(theater : Theater) : List<Show> {
         return shows
     }
 
