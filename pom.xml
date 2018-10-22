@@ -7,8 +7,6 @@
 
     <modules>
         <module>common</module>
-        <module>ticket-service</module>
-        <module>kino-service</module>
         <module>user-service</module>
     </modules>
 
