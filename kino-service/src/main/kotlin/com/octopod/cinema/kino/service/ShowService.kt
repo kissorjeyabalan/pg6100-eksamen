@@ -45,9 +45,9 @@ class ShowService {
         return shows
     }
 
-    fun createShow(startTime : Int, movie : String, cinema : String) : Long? {
+    fun createShow(startTime : Int, movieName : String, cinemaName : String) : Long? {
 
-        val show = Show(startTime, movie, cinema)
+        val show = Show(startTime, movieName, cinemaName)
 
         em.persist(show)
         return show.id

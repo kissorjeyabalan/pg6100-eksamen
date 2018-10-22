@@ -13,10 +13,10 @@ class Show (
         var startTime : Int,
 
         @get:NotBlank
-        var movie : String,
+        var movieName : String,
 
         @get:NotBlank
-        var cinema : String,
+        var cinemaName : String,
 
         @get:Id @get:GeneratedValue
         var id : Long? = null
