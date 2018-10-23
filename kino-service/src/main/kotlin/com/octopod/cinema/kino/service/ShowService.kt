@@ -31,6 +31,7 @@ class ShowService {
         return shows
     }
 
+    //TODO: Vurder om denne trengs eller ikke
     fun getShows(limit : Int, theater : Theater) : List<Show> {
 
         val query : TypedQuery<Show> = em.createQuery(

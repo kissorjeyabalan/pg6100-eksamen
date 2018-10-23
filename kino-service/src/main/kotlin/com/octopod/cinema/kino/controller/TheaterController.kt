@@ -1,17 +1,16 @@
 package com.octopod.cinema.kino.controller
 
+import com.octopod.cinema.kino.converter.TheaterConverter
 import com.octopod.cinema.kino.dto.TheaterDto
 import com.octopod.cinema.kino.service.TheaterService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import javax.xml.ws.Service
+import dto.WrappedResponse
 
 @Api(value = "theater", description = "Handling theaters")
 @RequestMapping(
@@ -39,5 +38,34 @@ class TheaterController {
                 .build()
                 .toUri()
         ).build()
+    }
+
+    @ApiOperation("Get all theaters")
+    @GetMapping
+    fun getTheaters(
+
+        @RequestParam("limit", defaultValue = "10")
+        limit : Int
+
+    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+
+        if (limit < 1) {
+            return ResponseEntity.status(400).body(
+                    WrappedResponse<TheaterDto>(
+                            code = 400,
+                            message = "Malformed limit supplied"
+                    ).validated()
+            )
+        }
+
+        val entryList = service.getTheaters(limit).toList()
+        val dto = TheaterConverter.transform(entryList, limit)
+
+        return ResponseEntity.ok(
+                WrappedResponse(
+                        code = 200,
+                        dara = dto
+                ).validated()
+        )
     }
 }
