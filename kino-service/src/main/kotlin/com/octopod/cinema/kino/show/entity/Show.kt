@@ -1,4 +1,4 @@
-package com.octopod.cinema.kino.entity
+package com.octopod.cinema.kino.show.entity
 
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -6,16 +6,17 @@ import javax.persistence.Id
 import javax.validation.constraints.NotBlank
 
 @Entity
-class Theater (
+class Show (
+
+        //TODO: Ta en vurdering på om dette burde være en annen type variabel
+        @get:NotBlank
+        var startTime: Int,
 
         @get:NotBlank
-        var name: String,
+        var movieName: String,
 
         @get:NotBlank
-        var seatsMax: Int,
-
-        @get:NotBlank
-        var seatsEmpty: Int,
+        var cinemaName: String,
 
         @get:Id @get:GeneratedValue
         var id: Long? = null

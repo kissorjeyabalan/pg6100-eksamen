@@ -1,8 +1,8 @@
-package com.octopod.cinema.kino.controller
+package com.octopod.cinema.kino.show.controller
 
-import com.octopod.cinema.kino.converter.ShowConverter
-import com.octopod.cinema.kino.dto.ShowDto
-import com.octopod.cinema.kino.service.ShowService
+import com.octopod.cinema.kino.show.converter.ShowConverter
+import com.octopod.cinema.kino.show.dto.ShowDto
+import com.octopod.cinema.kino.show.service.ShowService
 import dto.WrappedResponse
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation

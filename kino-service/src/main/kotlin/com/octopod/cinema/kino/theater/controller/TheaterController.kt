@@ -1,18 +1,15 @@
-package com.octopod.cinema.kino.controller
+package com.octopod.cinema.kino.show.controller
 
-import com.octopod.cinema.kino.converter.TheaterConverter
-import com.octopod.cinema.kino.dto.TheaterDto
-import com.octopod.cinema.kino.service.TheaterService
+import com.octopod.cinema.kino.show.converter.TheaterConverter
+import com.octopod.cinema.kino.show.dto.TheaterDto
+import com.octopod.cinema.kino.show.service.TheaterService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import javax.xml.ws.Service
 import dto.WrappedResponse
-import org.springframework.web.util.UriBuilder
-import org.springframework.web.util.UriComponents
 
 @Api(value = "theater", description = "Handling theaters")
 @RequestMapping(

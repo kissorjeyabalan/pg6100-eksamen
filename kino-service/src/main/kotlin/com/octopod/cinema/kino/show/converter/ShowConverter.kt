@@ -1,8 +1,7 @@
-package com.octopod.cinema.kino.converter
+package com.octopod.cinema.kino.show.converter
 
-import com.octopod.cinema.kino.dto.ShowDto
-import com.octopod.cinema.kino.entity.Show
-import org.springframework.data.mapping.context.PersistentEntities
+import com.octopod.cinema.kino.show.dto.ShowDto
+import com.octopod.cinema.kino.show.entity.Show
 import kotlin.streams.toList
 
 class ShowConverter {
