@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import javax.xml.ws.Service
 import dto.WrappedResponse
+import org.springframework.web.util.UriBuilder
+import org.springframework.web.util.UriComponents
 
 @Api(value = "theater", description = "Handling theaters")
 @RequestMapping(
@@ -47,11 +49,11 @@ class TheaterController {
         @RequestParam("limit", defaultValue = "10")
         limit : Int
 
-    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+    ) : ResponseEntity<WrappedResponse<List<TheaterDto>>>? {
 
         if (limit < 1) {
             return ResponseEntity.status(400).body(
-                    WrappedResponse<TheaterDto>(
+                    WrappedResponse<List<TheaterDto>>(
                             code = 400,
                             message = "Malformed limit supplied"
                     ).validated()
@@ -61,10 +63,12 @@ class TheaterController {
         val entryList = service.getTheaters(limit).toList()
         val dto = TheaterConverter.transform(entryList, limit)
 
+        val UriBuilder = UriComponentsBuilder.fromPath("/theaters")
+
         return ResponseEntity.ok(
                 WrappedResponse(
                         code = 200,
-                        dara = dto
+                        data = dto
                 ).validated()
         )
     }
