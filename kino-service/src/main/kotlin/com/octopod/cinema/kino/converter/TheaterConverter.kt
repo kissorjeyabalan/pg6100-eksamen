@@ -20,7 +20,7 @@ class TheaterConverter {
             return theater.map { transform(it) }
         }
 
-        fun transform(entities : List<Theater>, limit : Int) : List<TheaterDto> {
+        fun transform(entities: List<Theater>, limit: Int): List<TheaterDto> {
             val dtoList : MutableList<TheaterDto> = entities.stream()
                     .limit(limit.toLong())
                     .map { transform(it) }

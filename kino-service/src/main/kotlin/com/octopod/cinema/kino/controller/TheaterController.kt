@@ -22,11 +22,15 @@ import org.springframework.web.util.UriComponents
 class TheaterController {
 
     @Autowired
-    private lateinit var service : TheaterService
+    private lateinit var service: TheaterService
 
     @ApiOperation("create a new ticket")
     @PostMapping
-    fun createTheater(@RequestBody dto : TheaterDto) : ResponseEntity<Void> {
+    fun createTheater(
+
+            @RequestBody dto: TheaterDto
+
+    ): ResponseEntity<Void> {
 
         if (dto.id == null || dto.name == null || dto.seatsMax == null) {
             return ResponseEntity.status(400).build()
@@ -36,9 +40,9 @@ class TheaterController {
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                .fromPath("/theaters/$id")
-                .build()
-                .toUri()
+                        .fromPath("/theaters/$id")
+                        .build()
+                        .toUri()
         ).build()
     }
 
@@ -47,9 +51,9 @@ class TheaterController {
     fun getTheaters(
 
         @RequestParam("limit", defaultValue = "10")
-        limit : Int
+        limit: Int
 
-    ) : ResponseEntity<WrappedResponse<List<TheaterDto>>>? {
+    ): ResponseEntity<WrappedResponse<List<TheaterDto>>> {
 
         if (limit < 1) {
             return ResponseEntity.status(400).body(
@@ -63,7 +67,26 @@ class TheaterController {
         val entryList = service.getTheaters(limit).toList()
         val dto = TheaterConverter.transform(entryList, limit)
 
-        val UriBuilder = UriComponentsBuilder.fromPath("/theaters")
+        return ResponseEntity.ok(
+                WrappedResponse(
+                        code = 200,
+                        data = dto
+                ).validated()
+        )
+    }
+
+    @ApiOperation("Get ticket with specific id")
+    @GetMapping
+    fun getTheater(
+
+            @RequestParam("id")
+            id: String
+
+    ): ResponseEntity<WrappedResponse<TheaterDto>> {
+
+        //Finne ut om dette er riktig måte å gjøre det fra long til string og omvendt
+        val entryObject = service.getTheater(id.toLong())
+        val dto = TheaterConverter.transform(entryObject)
 
         return ResponseEntity.ok(
                 WrappedResponse(

@@ -13,18 +13,18 @@ import javax.transaction.Transactional
 class ShowService {
 
     @PersistenceContext
-    private lateinit var em : EntityManager
+    private lateinit var em: EntityManager
 
-    fun getShow(id : Long) : Show? {
+    fun getShow(id: Long): Show {
 
         val show = em.find(Show::class.java, id)
 
         return show
     }
 
-    fun getShows(limit : Int) : List<Show> {
+    fun getShows(limit: Int): List<Show> {
 
-        val query : TypedQuery<Show> = em.createQuery("SELECT s FROM Show s", Show::class.java)
+        val query: TypedQuery<Show> = em.createQuery("SELECT s FROM Show s", Show::class.java)
         query.maxResults = limit
         val shows = query.resultList
 
@@ -32,21 +32,21 @@ class ShowService {
     }
 
     //TODO: Vurder om denne trengs eller ikke
-    fun getShows(limit : Int, theater : Theater) : List<Show> {
+    fun getShowsByTheater(limit: Int, theater: String): List<Show> {
 
-        val query : TypedQuery<Show> = em.createQuery(
+        val query: TypedQuery<Show> = em.createQuery(
                 "SELECT s FROM Show s WHERE s.cinema=?1",
                 Show::class.java
         )
 
-        query.setParameter(1, theater.name)
+        query.setParameter(1, theater)
         query.maxResults = limit
         val shows = query.resultList
 
         return shows
     }
 
-    fun createShow(startTime : Int, movieName : String, cinemaName : String) : Long? {
+    fun createShow(startTime: Int, movieName: String, cinemaName: String): Long? {
 
         val show = Show(startTime, movieName, cinemaName)
 
