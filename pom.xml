@@ -8,6 +8,7 @@
     <modules>
         <module>common</module>
         <module>user-service</module>
+        <module>kino-service</module>
     </modules>
 
     <properties>

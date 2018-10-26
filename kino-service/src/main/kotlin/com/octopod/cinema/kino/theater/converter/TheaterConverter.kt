@@ -1,7 +1,7 @@
 package com.octopod.cinema.kino.show.converter
 
-import com.octopod.cinema.kino.show.dto.TheaterDto
-import com.octopod.cinema.kino.show.entity.Theater
+import com.octopod.cinema.kino.theater.dto.TheaterDto
+import com.octopod.cinema.kino.theater.entity.Theater
 import kotlin.streams.toList
 
 class TheaterConverter {

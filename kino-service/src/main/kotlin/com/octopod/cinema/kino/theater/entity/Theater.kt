@@ -1,4 +1,4 @@
-package com.octopod.cinema.kino.show.entity
+package com.octopod.cinema.kino.theater.entity
 
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue

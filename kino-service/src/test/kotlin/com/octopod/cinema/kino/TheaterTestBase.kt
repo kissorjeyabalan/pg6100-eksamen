@@ -1,6 +1,6 @@
 package com.octopod.cinema.kino
 
-import com.octopod.cinema.kino.show.dto.TheaterDto
+import com.octopod.cinema.kino.theater.dto.TheaterDto
 import com.octopod.cinema.kino.theater.TheaterApplication
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
@@ -25,10 +25,9 @@ abstract class TheaterTestBase {
 
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
-        RestAssured.basePath = "/cinema/api/theater"
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
-        /*val list = given().accept(ContentType.JSON).get()
+        val list = given().accept(ContentType.JSON).get("/theater")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -45,7 +44,7 @@ abstract class TheaterTestBase {
         given().get()
                 .then()
                 .statusCode(200)
-                .body("size()", equalTo(0))*/
+                .body("size()", equalTo(0))
 
     }
 }

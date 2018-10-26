@@ -1,8 +1,8 @@
-package com.octopod.cinema.kino.show.controller
+package com.octopod.cinema.kino.theater.controller
 
 import com.octopod.cinema.kino.show.converter.TheaterConverter
-import com.octopod.cinema.kino.show.dto.TheaterDto
-import com.octopod.cinema.kino.show.service.TheaterService
+import com.octopod.cinema.kino.theater.dto.TheaterDto
+import com.octopod.cinema.kino.theater.service.TheaterService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
