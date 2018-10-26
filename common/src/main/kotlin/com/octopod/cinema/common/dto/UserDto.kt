@@ -1,4 +1,4 @@
-package dto
+package com.octopod.cinema.common.dto
 
 import java.time.ZonedDateTime
 

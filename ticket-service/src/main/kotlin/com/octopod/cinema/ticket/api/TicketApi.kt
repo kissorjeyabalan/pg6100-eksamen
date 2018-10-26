@@ -1,7 +1,7 @@
 package com.octopod.cinema.ticket.api
 
 import com.octopod.cinema.ticket.dto.DtoTransformer
-import com.octopod.cinema.ticket.dto.TicketDto
+import com.octopod.cinema.common.dto.TicketDto
 import com.octopod.cinema.ticket.entity.Ticket
 import com.octopod.cinema.ticket.hal.HalLink
 import com.octopod.cinema.ticket.hal.PageDto
@@ -114,6 +114,13 @@ class TicketApi {
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
         ).build()
+    }
+
+    @ApiOperation("delete a ticket")
+    @DeleteMapping(path = ["/{id}"])
+    fun deleteTicket(@PathVariable("id") ticketId: Long ) : ResponseEntity<Void> {
+        service.deleteTicket(ticketId)
+        return ResponseEntity.status(204).build()
     }
 
 }

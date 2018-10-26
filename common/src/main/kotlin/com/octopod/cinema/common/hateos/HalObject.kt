@@ -1,4 +1,4 @@
-package hateos
+package com.octopod.cinema.common.hateos
 
 import io.swagger.annotations.ApiModelProperty
 

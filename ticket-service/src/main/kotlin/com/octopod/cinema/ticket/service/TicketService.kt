@@ -68,4 +68,11 @@ class TicketService {
         em.persist(ticket)
         return ticket.id
     }
+
+    fun deleteTicket(ticketId: Long) {
+        val ticket = em.find(Ticket::class.java, ticketId)
+        if(ticket != null) {
+            em.remove(ticket)
+        }
+    }
 }

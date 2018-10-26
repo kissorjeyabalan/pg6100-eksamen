@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import dto.WrappedResponse
 import org.springframework.http.MediaType
+import com.octopod.cinema.common.dto.WrappedResponse
 
-@Api(value = "theater", description = "Handling theaters")
+@Api(value = "theater", description = "Handling theaters") 
 @RequestMapping(
         path = ["/theaters"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]

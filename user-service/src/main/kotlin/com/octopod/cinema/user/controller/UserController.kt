@@ -2,11 +2,11 @@ package com.octopod.cinema.user.controller
 
 import com.octopod.cinema.user.converter.UserConverter
 import com.octopod.cinema.user.repository.UserRepository
-import dto.UserDto
-import dto.WrappedResponse
-import hateos.Format
-import hateos.HalLink
-import hateos.HalPage
+import com.octopod.cinema.common.dto.UserDto
+import com.octopod.cinema.common.dto.WrappedResponse
+import com.octopod.cinema.common.hateos.Format
+import com.octopod.cinema.common.hateos.HalLink
+import com.octopod.cinema.common.hateos.HalPage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

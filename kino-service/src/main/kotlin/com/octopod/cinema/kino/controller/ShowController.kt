@@ -3,7 +3,7 @@ package com.octopod.cinema.kino.controller
 import com.octopod.cinema.kino.converter.ShowConverter
 import com.octopod.cinema.kino.dto.ShowDto
 import com.octopod.cinema.kino.service.ShowService
-import dto.WrappedResponse
+import com.octopod.cinema.common.dto.WrappedResponse
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired

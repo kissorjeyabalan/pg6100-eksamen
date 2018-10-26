@@ -1,5 +1,6 @@
 package com.octopod.cinema.ticket.dto
 
+import com.octopod.cinema.common.dto.TicketDto
 import com.octopod.cinema.ticket.entity.Ticket
 import com.octopod.cinema.ticket.hal.PageDto
 import kotlin.streams.toList
@@ -8,11 +9,11 @@ object DtoTransformer {
 
     fun transform(ticket: Ticket) : TicketDto {
         return TicketDto(ticket.userId,
-                         ticket.movieName,
-                         ticket.screeningId,
-                         ticket.timeOfPurchase,
-                         ticket.movieStartTime,
-                         ticket.id.toString())
+                ticket.movieName,
+                ticket.screeningId,
+                ticket.timeOfPurchase,
+                ticket.movieStartTime,
+                ticket.id.toString())
     }
 
     fun transform(ticketList: List<Ticket>,
