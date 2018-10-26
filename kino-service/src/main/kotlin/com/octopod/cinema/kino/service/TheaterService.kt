@@ -1,6 +1,6 @@
-package com.octopod.cinema.kino.theater.service
+package com.octopod.cinema.kino.service
 
-import com.octopod.cinema.kino.theater.entity.Theater
+import com.octopod.cinema.kino.entity.Theater
 import org.springframework.stereotype.Service
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext

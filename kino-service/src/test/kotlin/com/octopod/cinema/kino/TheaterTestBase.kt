@@ -1,7 +1,6 @@
 package com.octopod.cinema.kino
 
-import com.octopod.cinema.kino.theater.dto.TheaterDto
-import com.octopod.cinema.kino.theater.TheaterApplication
+import com.octopod.cinema.kino.dto.TheaterDto
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType

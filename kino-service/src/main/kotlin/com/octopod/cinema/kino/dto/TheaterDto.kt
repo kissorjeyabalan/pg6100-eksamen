@@ -1,4 +1,4 @@
-package com.octopod.cinema.kino.theater.dto
+package com.octopod.cinema.kino.dto
 
 import io.swagger.annotations.ApiModelProperty
 

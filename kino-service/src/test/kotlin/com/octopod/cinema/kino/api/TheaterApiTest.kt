@@ -1,7 +1,7 @@
 package com.octopod.cinema.kino.api
 
 import com.octopod.cinema.kino.TheaterTestBase
-import com.octopod.cinema.kino.theater.dto.TheaterDto
+import com.octopod.cinema.kino.dto.TheaterDto
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType

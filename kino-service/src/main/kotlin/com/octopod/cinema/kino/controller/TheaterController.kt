@@ -1,8 +1,8 @@
-package com.octopod.cinema.kino.theater.controller
+package com.octopod.cinema.kino.controller
 
-import com.octopod.cinema.kino.show.converter.TheaterConverter
-import com.octopod.cinema.kino.theater.dto.TheaterDto
-import com.octopod.cinema.kino.theater.service.TheaterService
+import com.octopod.cinema.kino.converter.TheaterConverter
+import com.octopod.cinema.kino.dto.TheaterDto
+import com.octopod.cinema.kino.service.TheaterService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -73,16 +73,27 @@ class TheaterController {
     }
 
     @ApiOperation("Get ticket with specific id")
-    @GetMapping
+    @GetMapping(path = ["/{id}"])
     fun getTheater(
 
-            @RequestParam("id")
+            @PathVariable("id")
             id: String
 
     ): ResponseEntity<WrappedResponse<TheaterDto>> {
 
-        //Finne ut om dette er riktig måte å gjøre det fra long til string og omvendt
-        val entryObject = service.getTheater(id.toLong())
+        //Finne ut om dette er riktig måte å gjøre det fra long til string og
+        val pathId: Long
+        try {
+            pathId = id!!.toLong()
+        } catch (e: Exception) {
+            /*
+                invalid id. But here we return 404 instead of 400,
+                as in the API we defined the id as string instead of long
+             */
+            return ResponseEntity.status(404).build()
+        }
+
+        val entryObject = service.getTheater(pathId)
         val dto = TheaterConverter.transform(entryObject)
 
         return ResponseEntity.ok(

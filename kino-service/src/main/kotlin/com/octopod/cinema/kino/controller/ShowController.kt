@@ -1,8 +1,8 @@
-package com.octopod.cinema.kino.show.controller
+package com.octopod.cinema.kino.controller
 
-import com.octopod.cinema.kino.show.converter.ShowConverter
-import com.octopod.cinema.kino.show.dto.ShowDto
-import com.octopod.cinema.kino.show.service.ShowService
+import com.octopod.cinema.kino.converter.ShowConverter
+import com.octopod.cinema.kino.dto.ShowDto
+import com.octopod.cinema.kino.service.ShowService
 import dto.WrappedResponse
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -41,7 +41,7 @@ class ShowController {
     }
 
     @ApiOperation("Get all shows")
-    @PostMapping
+    @GetMapping
     fun getShows(
 
             @RequestParam("limit", defaultValue = "10")
@@ -70,10 +70,10 @@ class ShowController {
     }
 
     @ApiOperation("Get show with specific id")
-    @GetMapping
+    @GetMapping(path = ["/{id}"])
     fun getShow(
 
-            @RequestParam("id")
+            @PathVariable("id")
             id: String
 
     ): ResponseEntity<WrappedResponse<ShowDto>> {
@@ -90,13 +90,13 @@ class ShowController {
     }
 
     @ApiOperation("Get all shows for a specific theater")
-    @GetMapping
+    @GetMapping(path = ["/{theater}"])
     fun getShowsByTheater(
 
             @RequestParam("limit", defaultValue = "10")
             limit: Int,
 
-            @RequestParam("theater")
+            @PathVariable("theater")
             theater: String
 
     ): ResponseEntity<WrappedResponse<List<ShowDto>>> {
