@@ -1,4 +1,4 @@
-package hateos
+package com.octopod.cinema.common.hateos
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 

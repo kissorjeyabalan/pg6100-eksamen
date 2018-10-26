@@ -1,4 +1,4 @@
-package com.octopod.cinema.ticket.dto
+package com.octopod.cinema.common.dto
 
 import io.swagger.annotations.ApiModelProperty
 import java.time.ZonedDateTime

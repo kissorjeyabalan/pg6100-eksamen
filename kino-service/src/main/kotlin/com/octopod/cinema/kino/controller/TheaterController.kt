@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import dto.WrappedResponse
+import com.octopod.cinema.common.dto.WrappedResponse
 
 @Api(value = "theater", description = "Handling theaters")
 @RequestMapping(

@@ -1,8 +1,8 @@
 package com.octopod.cinema.user.converter
 
 import com.octopod.cinema.user.entity.UserEntity
-import dto.UserDto
-import hateos.HalPage
+import com.octopod.cinema.common.dto.UserDto
+import com.octopod.cinema.common.hateos.HalPage
 import kotlin.streams.toList
 
 class UserConverter {

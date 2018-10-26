@@ -1,7 +1,7 @@
 package com.octopod.cinema.ticket.api
 
 import com.octopod.cinema.ticket.dto.DtoTransformer
-import com.octopod.cinema.ticket.dto.TicketDto
+import com.octopod.cinema.common.dto.TicketDto
 import com.octopod.cinema.ticket.entity.Ticket
 import com.octopod.cinema.ticket.hal.HalLink
 import com.octopod.cinema.ticket.hal.PageDto
