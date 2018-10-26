@@ -1,5 +1,6 @@
 package com.octopod.cinema.user.entity
 
+import com.octopod.cinema.common.dto.TicketDto
 import java.time.ZonedDateTime
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -17,6 +18,9 @@ data class UserEntity
 
         @get:NotBlank @get:Size(max = 120)
         var email: String? = null,
+
+        @get:NotBlank @get:Size(max = 128)
+        var name: String? = null,
 
         @get:NotNull
         var creationTime: ZonedDateTime,
