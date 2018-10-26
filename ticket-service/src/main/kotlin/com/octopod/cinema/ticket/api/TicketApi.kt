@@ -116,6 +116,13 @@ class TicketApi {
         ).build()
     }
 
+    @ApiOperation("delete a ticket")
+    @DeleteMapping(path = ["/{id}"])
+    fun deleteTicket(@PathVariable("id") ticketId: Long ) : ResponseEntity<Void> {
+        service.deleteTicket(ticketId)
+        return ResponseEntity.status(204).build()
+    }
+
 }
 
 
