@@ -14,16 +14,10 @@ class Ticket (
         var userId: String,
 
         @get:NotBlank
-        var movieName: String,
-
-        @get:NotBlank
         var screeningId: String,
 
         @get:NotNull
         var timeOfPurchase: ZonedDateTime,
-
-        @get:NotNull
-        var movieStartTime: ZonedDateTime,
 
         @get:Id @get:GeneratedValue
         var id: Long? = null

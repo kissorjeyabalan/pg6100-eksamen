@@ -5,6 +5,7 @@ import com.octopod.cinema.common.dto.TicketDto
 import com.octopod.cinema.ticket.entity.Ticket
 import com.octopod.cinema.ticket.hal.HalLink
 import com.octopod.cinema.ticket.hal.PageDto
+import com.octopod.cinema.ticket.repository.TicketRepository
 import com.octopod.cinema.ticket.service.TicketService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -22,7 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder
 class TicketApi {
 
     @Autowired
-    private lateinit var service: TicketService
+    private lateinit var repo: TicketRepository
 
 
     @ApiOperation("Get all tickets")
@@ -51,19 +52,17 @@ class TicketApi {
             return ResponseEntity.status(400).build()
         }
 
-        val maxFromDB = 50
 
         val ticketList: List<Ticket>
 
 
         ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
-            println("dwadwa")
-            service.getTickets(maxFromDB)
+            repo.findAll().toList()
 
         } else if ( !screeningId.isNullOrBlank() && !userId.isNullOrBlank()) {
-            service.getTicketsByScreeningIdAndUserId(maxFromDB, userId!!, screeningId!!)
+            repo.findAllByScreeningIdAndUserId(userId!!, screeningId!!)
         } else {
-            service.getTicketsByUserId(maxFromDB, userId!!)
+            repo.findAllByUserId(userId!!)
         }
 
 
@@ -105,11 +104,11 @@ class TicketApi {
     @PostMapping
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
 
-        if(dto.userId == null || dto.movieName == null || dto.screeningId == null || dto.movieStartTime == null) {
+        if(dto.userId == null || dto.screeningId == null) {
             return ResponseEntity.status(400).build()
         }
 
-        val id = service.createTicket(dto.userId!!, dto.movieName!!, dto.screeningId!!, dto.movieStartTime!!)
+        val id = repo.createTicket(dto.userId!!, dto.screeningId!!)
 
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
@@ -118,8 +117,20 @@ class TicketApi {
 
     @ApiOperation("delete a ticket")
     @DeleteMapping(path = ["/{id}"])
-    fun deleteTicket(@PathVariable("id") ticketId: Long ) : ResponseEntity<Void> {
-        service.deleteTicket(ticketId)
+    fun deleteTicket(@PathVariable("id") ticketId: String? ) : ResponseEntity<Void> {
+
+        val id: Long
+        try {
+            id = ticketId!!.toLong()
+        } catch (e: Exception) {
+            return ResponseEntity.status(400).build()
+        }
+
+        if (!repo.existsById(id)) {
+            return ResponseEntity.status(404).build()
+        }
+
+        repo.deleteById(id)
         return ResponseEntity.status(204).build()
     }
 
