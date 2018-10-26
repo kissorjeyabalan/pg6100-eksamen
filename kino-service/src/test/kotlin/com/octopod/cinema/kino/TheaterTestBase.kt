@@ -22,13 +22,13 @@ abstract class TheaterTestBase {
     //Taken fram arcuri82 - NRv2 test
     @Before
     fun clean() {
-        
+
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
         RestAssured.basePath = "/cinema/api/theater"
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
-        val list = given().accept(ContentType.JSON).get()
+        /*val list = given().accept(ContentType.JSON).get()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -45,7 +45,7 @@ abstract class TheaterTestBase {
         given().get()
                 .then()
                 .statusCode(200)
-                .body("size()", equalTo(0))
+                .body("size()", equalTo(0))*/
 
     }
 }
