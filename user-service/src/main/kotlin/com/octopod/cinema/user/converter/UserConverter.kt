@@ -11,8 +11,17 @@ class UserConverter {
             return UserDto(
                     phone = entity.phone.toString(),
                     email = entity.email.toString(),
+                    name = entity.name.toString(),
                     created = entity.creationTime,
                     updated = entity.updatedTime
+            )
+        }
+
+        fun transform(dto: UserDto): UserEntity {
+            return UserEntity(
+                    dto.phone,
+                    dto.email,
+                    dto.name
             )
         }
 
