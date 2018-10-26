@@ -2,6 +2,7 @@ package com.octopod.cinema.kino.controller
 
 import com.octopod.cinema.kino.converter.TheaterConverter
 import com.octopod.cinema.kino.dto.TheaterDto
+import com.octopod.cinema.kino.repository.TheaterRepository
 import com.octopod.cinema.kino.service.TheaterService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -10,16 +11,21 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import dto.WrappedResponse
+import org.springframework.http.MediaType
 
 @Api(value = "theater", description = "Handling theaters")
 @RequestMapping(
-        path = ["/theater"]
+        path = ["/theaters"],
+        produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
 @RestController
 class TheaterController {
 
     @Autowired
     private lateinit var service: TheaterService
+
+    @Autowired
+    lateinit var repo: TheaterRepository
 
     @ApiOperation("create a new ticket")
     @PostMapping
@@ -29,11 +35,11 @@ class TheaterController {
 
     ): ResponseEntity<Void> {
 
-        if (dto.id == null || dto.name == null || dto.seatsMax == null) {
+        if (dto.name == null || dto.seatsMax == null) {
             return ResponseEntity.status(400).build()
         }
 
-        val id = service.createTheater(dto.name!!, dto.seatsMax!!, dto.seatsMax!!)
+        val id = repo.createTheater(dto.name!!, dto.seatsMax!!, dto.seatsMax!!)
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -61,8 +67,10 @@ class TheaterController {
             )
         }
 
-        val entryList = service.getTheaters(limit).toList()
-        val dto = TheaterConverter.transform(entryList, limit)
+        /*val entryList = repo.getTheaters(limit).toList()
+        val dto = TheaterConverter.transform(entryList, limit)*/
+        val entryList = repo.findAll().toList()
+        val dto = TheaterConverter.transform(entryList, 100)
 
         return ResponseEntity.ok(
                 WrappedResponse(
@@ -93,14 +101,11 @@ class TheaterController {
             return ResponseEntity.status(404).build()
         }
 
-        val entryObject = service.getTheater(pathId)
-        val dto = TheaterConverter.transform(entryObject)
-
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
-        )
+        val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
+        val dto = TheaterConverter.transform(entity)
+        return ResponseEntity.ok(WrappedResponse(
+                code = 200,
+                data = dto
+        ).validated())
     }
 }

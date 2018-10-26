@@ -4,18 +4,19 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 @Entity
 class Theater (
 
         @get:NotBlank
-        var name: String,
+        var name: String? = null,
 
-        @get:NotBlank
-        var seatsMax: Int,
+        @get:NotNull
+        var seatsMax: Int? = null,
 
-        @get:NotBlank
-        var seatsEmpty: Int,
+        @get:NotNull
+        var seatsEmpty: Int? = null,
 
         @get:Id @get:GeneratedValue
         var id: Long? = null

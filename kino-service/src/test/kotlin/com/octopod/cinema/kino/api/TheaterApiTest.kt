@@ -13,9 +13,9 @@ class TheaterApiTest: TheaterTestBase() {
     @Test
     fun testCleanDB() {
 
-        RestAssured.given().get("/theater").then()
+        RestAssured.given().get("/theaters").then()
                 .statusCode(200)
-                .body("size()", equalTo(0))
+                .body("data.size()", equalTo(0))
     }
 
     @Test
@@ -26,24 +26,26 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsEmpty = 10
         val dto = TheaterDto(name, seatsMax, seatsEmpty, null)
 
-        given().get("/theater").then().statusCode(200).body("size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
 
-        val id = given().contentType(ContentType.JSON)
+
+        val path = given().contentType(ContentType.JSON)
                 .body(dto)
-                .post("/theater")
+                .post("/theaters")
                 .then()
                 .statusCode(201)
-                .extract().asString()
+                .extract().header("Location")
 
-        given().get("/theater").then().statusCode(200).body("size()", equalTo(1))
 
-        given().pathParam("id", id)
-                .get("/id/{id}")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(id))
-                .body("name", equalTo(name))
-                .body("seatsMax", equalTo(seatsMax))
-                .body("seatsEmpty", equalTo(seatsEmpty))
+
+        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+
+        given()
+            .get(path)
+            .then()
+            .statusCode(200)
+            .body("data.name", equalTo(dto.name))
+            .body("data.seatsMax", equalTo(seatsMax))
+            .body("data.seatsEmpty", equalTo(seatsEmpty))
     }
 }

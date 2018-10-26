@@ -5,13 +5,13 @@ import io.swagger.annotations.ApiModelProperty
 data class TheaterDto (
 
         @ApiModelProperty("Name of the theater")
-        var name: String,
+        var name: String? = null,
 
         @ApiModelProperty("Number of seats in the theater")
-        var seatsMax: Int,
+        var seatsMax: Int? = null,
 
         @ApiModelProperty("Current number of empty seats")
-        var seatsEmpty: Int,
+        var seatsEmpty: Int? = null,
 
         @ApiModelProperty("Id for the theater")
         var id: String? = null

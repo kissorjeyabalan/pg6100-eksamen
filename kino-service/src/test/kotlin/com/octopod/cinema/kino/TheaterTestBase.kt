@@ -1,12 +1,14 @@
 package com.octopod.cinema.kino
 
 import com.octopod.cinema.kino.dto.TheaterDto
+import com.octopod.cinema.kino.repository.TheaterRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Before
 import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.junit4.SpringRunner
@@ -18,6 +20,9 @@ abstract class TheaterTestBase {
 
     @LocalServerPort private var port = 0
 
+    @Autowired
+    private lateinit var crud: TheaterRepository
+
     //Taken fram arcuri82 - NRv2 test
     @Before
     fun clean() {
@@ -26,6 +31,8 @@ abstract class TheaterTestBase {
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
+        crud.deleteAll()
+        /*
         val list = given().accept(ContentType.JSON).get("/theater")
                 .then()
                 .statusCode(200)
@@ -44,6 +51,6 @@ abstract class TheaterTestBase {
                 .then()
                 .statusCode(200)
                 .body("size()", equalTo(0))
-
+*/
     }
 }
