@@ -1,5 +1,6 @@
 package com.octopod.cinema.kino.controller
 
+import com.google.common.base.Throwables
 import com.octopod.cinema.kino.converter.TheaterConverter
 import com.octopod.cinema.kino.dto.TheaterDto
 import com.octopod.cinema.kino.repository.TheaterRepository
@@ -13,6 +14,8 @@ import org.springframework.web.util.UriComponentsBuilder
 import org.springframework.http.MediaType
 import com.octopod.cinema.common.dto.WrappedResponse
 import com.octopod.cinema.kino.entity.Theater
+import io.swagger.annotations.ApiParam
+import javax.validation.ConstraintViolationException
 
 @Api(value = "theaters", description = "Handling theaters")
 @RequestMapping(
@@ -131,6 +134,58 @@ class TheaterController {
         }
 
         repo.deleteById(pathId)
+
+        return ResponseEntity.status(204).build()
+    }
+
+    @ApiOperation("Update spesific theater")
+    @PutMapping(path = ["/{id}"])
+    fun updateTheater(
+
+            @PathVariable("id")
+            id: String,
+
+            @ApiParam("The theater that will replace the old one. Cannot change id")
+            @RequestBody
+            dto: TheaterDto
+
+    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+
+        val pathId: Long
+        val dtoId: Long
+        try {
+            pathId = id!!.toLong()
+            dtoId = dto.id!!.toLong()
+        } catch (e: Exception) {
+            /*
+                invalid id. But here we return 404 instead of 400,
+                as in the API we defined the id as string instead of long
+             */
+            return ResponseEntity.status(404).build()
+        }
+
+        if (dtoId != pathId) {
+            return ResponseEntity.status(409).build()
+        }
+
+        if (!repo.existsById(dtoId)) {
+            return ResponseEntity.status(404).build()
+        }
+
+        if (dto.name == null || dto.seatsMax == null || dto.seatsEmpty == null) {
+            return ResponseEntity.status(400).build()
+        }
+
+        val theater = TheaterConverter.transform(dto)
+
+        try {
+            repo.save(theater)
+        } catch (e: Exception) {
+            if(Throwables.getRootCause(e) is ConstraintViolationException) {
+                return ResponseEntity.status(400).build()
+            }
+            throw e
+        }
 
         return ResponseEntity.status(204).build()
     }

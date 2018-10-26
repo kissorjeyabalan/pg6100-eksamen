@@ -15,6 +15,15 @@ class TheaterConverter {
             )
         }
 
+        fun transform(theaterdto: TheaterDto): Theater {
+            return Theater(
+                    name = theaterdto.name,
+                    seatsMax = theaterdto.seatsMax,
+                    seatsEmpty = theaterdto.seatsEmpty,
+                    id = theaterdto.id!!.toLong()
+            )
+        }
+
         fun transform(theater: Iterable<Theater>): List<TheaterDto> {
             return theater.map { transform(it) }
         }
