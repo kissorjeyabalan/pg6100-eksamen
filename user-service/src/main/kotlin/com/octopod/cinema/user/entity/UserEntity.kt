@@ -23,10 +23,10 @@ data class UserEntity
         var name: String? = null,
 
         @get:NotNull
-        var creationTime: ZonedDateTime,
+        var creationTime: ZonedDateTime? = null,
 
         @get:NotNull
-        var updatedTime: ZonedDateTime
+        var updatedTime: ZonedDateTime? = null
 ) {
     @PrePersist
     fun onCreate() {
