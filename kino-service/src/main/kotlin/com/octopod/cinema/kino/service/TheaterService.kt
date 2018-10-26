@@ -23,7 +23,7 @@ class TheaterService {
 
     fun getTheaters(limit: Int): List<Theater> {
 
-        val query: TypedQuery<Theater> = em.createQuery("SELECT t FROM Theater t", Theater::class.java)
+        val query: TypedQuery<Theater> = em.createQuery("SELECT t FROM Theaters t", Theater::class.java)
         query.maxResults = limit
         val theaters = query.resultList
 

@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import org.springframework.http.MediaType
 import com.octopod.cinema.common.dto.WrappedResponse
+import com.octopod.cinema.kino.entity.Theater
 
-@Api(value = "theater", description = "Handling theaters") 
+@Api(value = "theaters", description = "Handling theaters")
 @RequestMapping(
         path = ["/theaters"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
@@ -39,11 +40,11 @@ class TheaterController {
             return ResponseEntity.status(400).build()
         }
 
-        val id = repo.createTheater(dto.name!!, dto.seatsMax!!, dto.seatsMax!!)
+        val created = repo.save(Theater(dto.name!!, dto.seatsMax!!, dto.seatsMax!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/theaters/$id")
+                        .fromPath("/theaters/${created.id!!}")
                         .build()
                         .toUri()
         ).build()

@@ -23,7 +23,7 @@ class ShowService {
 
     fun getShows(limit: Int): List<Show> {
 
-        val query: TypedQuery<Show> = em.createQuery("SELECT s FROM Show s", Show::class.java)
+        val query: TypedQuery<Show> = em.createQuery("SELECT s FROM Shows s", Show::class.java)
         query.maxResults = limit
         val shows = query.resultList
 
