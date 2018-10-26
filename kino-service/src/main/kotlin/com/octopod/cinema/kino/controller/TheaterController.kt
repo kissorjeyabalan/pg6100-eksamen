@@ -109,4 +109,29 @@ class TheaterController {
                 data = dto
         ).validated())
     }
+
+    @ApiOperation("Delete theater with specific id")
+    @DeleteMapping(path = ["/{id}"])
+    fun deleteTheaterById(
+
+            @PathVariable("id")
+            id: String
+
+    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+
+        val pathId: Long
+        try {
+            pathId = id!!.toLong()
+        } catch (e: Exception) {
+            /*
+                invalid id. But here we return 404 instead of 400,
+                as in the API we defined the id as string instead of long
+             */
+            return ResponseEntity.status(404).build()
+        }
+
+        repo.deleteById(pathId)
+
+        return ResponseEntity.status(204).build()
+    }
 }

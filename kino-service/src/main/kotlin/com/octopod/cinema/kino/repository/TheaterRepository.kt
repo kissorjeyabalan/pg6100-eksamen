@@ -8,8 +8,9 @@ import javax.persistence.EntityManager
 import javax.transaction.Transactional
 
 @Repository
-interface TheaterRepository : CrudRepository<Theater, Long>, TheaterRepositoryCustom
-
+interface TheaterRepository : CrudRepository<Theater, Long>, TheaterRepositoryCustom {
+    fun deleteAllById(ids: List<Long>)
+}
 @Transactional
 interface TheaterRepositoryCustom {
     fun createTheater(name: String, seatsMax: Int, seatsEmpty: Int): Long
