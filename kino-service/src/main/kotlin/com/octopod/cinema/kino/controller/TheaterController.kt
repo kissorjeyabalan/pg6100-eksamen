@@ -1,5 +1,7 @@
 package com.octopod.cinema.kino.controller
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Throwables
 import com.octopod.cinema.kino.converter.TheaterConverter
 import com.octopod.cinema.kino.dto.TheaterDto
@@ -15,6 +17,7 @@ import org.springframework.http.MediaType
 import com.octopod.cinema.common.dto.WrappedResponse
 import com.octopod.cinema.kino.entity.Theater
 import io.swagger.annotations.ApiParam
+import org.omg.CORBA.Object
 import javax.validation.ConstraintViolationException
 
 @Api(value = "theaters", description = "Handling theaters")
@@ -138,7 +141,7 @@ class TheaterController {
         return ResponseEntity.status(204).build()
     }
 
-    @ApiOperation("Update spesific theater")
+    @ApiOperation("Update the theater")
     @PutMapping(path = ["/{id}"])
     fun updateTheater(
 
@@ -187,6 +190,94 @@ class TheaterController {
             throw e
         }
 
+        return ResponseEntity.status(204).build()
+    }
+
+    @ApiOperation("Update a field in theater")
+    @PatchMapping(path = ["/{id}"])
+    fun patchTheater(
+
+            @PathVariable("id")
+            id: String,
+
+            @ApiParam("The theater that will replace the old one. Cannot change id")
+            @RequestBody
+            json: String
+    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+
+        val pathId: Long
+        try {
+            pathId = id!!.toLong()
+        } catch (e: Exception) {
+            /*
+                invalid id. But here we return 404 instead of 400,
+                as in the API we defined the id as string instead of long
+             */
+            return ResponseEntity.status(404).build()
+        }
+
+        val originalDto = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).body(
+                WrappedResponse<TheaterDto>(
+                        code = 404,
+                        message = "Resource not found"
+                ).validated()
+        )
+
+        //taken from arcuri82 CounterRestPatch
+        val mapper = ObjectMapper()
+
+        val jsonNode: JsonNode
+        try {
+            jsonNode = mapper.readValue(json, JsonNode::class.java)
+        } catch (e: Exception) {
+            //Invalid JSON data as input
+            return ResponseEntity.status(400).build()
+        }
+
+        if (jsonNode.has("id")) {
+            //shouldn't be allowed to modify the counter id
+            return ResponseEntity.status(409).build()
+        }
+
+        var newName = originalDto.name
+        var newSeatsMax = originalDto.seatsMax
+        var newSeatsEmpty = originalDto.seatsEmpty
+
+        if (jsonNode.has("name")) {
+            val nameNode = jsonNode.get("name")
+            newName = when {
+                nameNode.isNull -> return ResponseEntity.status(400).build()
+                nameNode.isTextual -> nameNode.asText()
+                else -> //Invalid JSON. Non-string name
+                    return ResponseEntity.status(400).build()
+            }
+        }
+
+        if (jsonNode.has("seatsMax")) {
+            val maxNode = jsonNode.get("seatsMax")
+            newSeatsMax = when {
+                maxNode.isNull -> return ResponseEntity.status(400).build()
+                maxNode.isNumber -> maxNode.asInt()
+                else -> //Invalid JSON. Non-string name
+                    return ResponseEntity.status(400).build()
+            }
+        }
+
+        if (jsonNode.has("seatsEmpty")) {
+            val emptyNode = jsonNode.get("seatsEmpty")
+            newSeatsEmpty = when {
+                emptyNode.isNull -> null
+                emptyNode.isNumber -> emptyNode.asInt()
+                else -> //Invalid JSON. Non-string name
+                    return ResponseEntity.status(400).build()
+            }
+        }
+
+        originalDto.name = newName
+        originalDto.seatsMax = newSeatsMax
+        originalDto.seatsEmpty = newSeatsEmpty
+
+        repo.save(originalDto)
         return ResponseEntity.status(204).build()
     }
 }

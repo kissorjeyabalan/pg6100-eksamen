@@ -1,6 +1,5 @@
-package com.octopod.cinema.kino.api
+package com.octopod.cinema.kino.controller
 
-import com.octopod.cinema.common.dto.WrappedResponse
 import com.octopod.cinema.kino.TheaterTestBase
 import com.octopod.cinema.kino.dto.TheaterDto
 import io.restassured.RestAssured
@@ -8,8 +7,6 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Test
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
 class TheaterApiTest: TheaterTestBase() {
 
@@ -90,12 +87,45 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsEmpty1 = 10
         val dto1 = TheaterDto(name1, seatsMax1, seatsEmpty1, null)
 
-        /*
-        val name2 = "theater"
-        val seatsMax2 = 10
-        val seatsEmpty2 = 10
-        val dto2 = TheaterDto(name2, seatsMax2, seatsEmpty2, null)
-*/
+        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+
+        val path = given().contentType(ContentType.JSON)
+                .body(dto1)
+                .post("/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val dto = given().get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        dto.name = "another name"
+
+        given().contentType(ContentType.JSON)
+                .body(dto)
+                .put(path)
+                .then()
+                .statusCode(204)
+
+        given().get(path).then().statusCode(200)
+                .body("data.name", equalTo(dto.name))
+                .body("data.seatsMax", equalTo(dto.seatsMax))
+                .body("data.seatsEmpty", equalTo(dto.seatsEmpty))
+    }
+
+    @Test
+    fun patchTheater() {
+
+        val name1 = "theater"
+        val seatsMax1 = 10
+        val seatsEmpty1 = 10
+        val dto1 = TheaterDto(name1, seatsMax1, seatsEmpty1, null)
 
         given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
 
@@ -106,25 +136,28 @@ class TheaterApiTest: TheaterTestBase() {
                 .statusCode(201)
                 .extract().header("Location")
 
-        val wrappedResponse = given().get(path)
+        val dto = given().get(path)
                 .then()
                 .statusCode(200)
                 .extract()
-                .`as`(JsonNode::class.java)
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
 
-        val mapper = ObjectMapper()
-        val dto = mapper.readValue(
-                mapper.treeAsTokens(wrappedResponse),
-
-        )
-
-        val dto = wrappedResponseData as TheaterDto
+        val name = "new name"
+        val body = "{\"name\":\"$name\"}"
 
         given().contentType(ContentType.JSON)
-                .body(dto)
-                .put(path)
+                .body(body)
+                .patch(path)
                 .then()
                 .statusCode(204)
-                .body("data.name", equalTo(dto.name))
+
+        given().get(path).then().statusCode(200)
+                .body("data.name", equalTo(name))
+                .body("data.seatsMax", equalTo(dto.seatsMax))
+                .body("data.seatsEmpty", equalTo(dto.seatsEmpty))
+
     }
 }
