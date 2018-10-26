@@ -10,11 +10,9 @@ import com.octopod.cinema.common.hateos.HalPage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
+import java.net.URI
 
 @RequestMapping(
         path = ["/users"],
@@ -23,6 +21,43 @@ import org.springframework.web.util.UriComponentsBuilder
 @RestController
 class UserController {
     @Autowired lateinit var repo: UserRepository
+
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun createUserInfo(@RequestBody userInfo: UserDto): ResponseEntity<Void> {
+        if (userInfo.phone.isNullOrEmpty() || userInfo.name.isNullOrEmpty() ||userInfo.email.isNullOrEmpty()) {
+            return ResponseEntity.status(400).build()
+        }
+        val entity = UserConverter.transform(userInfo)
+
+        if (repo.existsById(userInfo.phone!!)) {
+            return ResponseEntity.status(400).build()
+        }
+
+        val saved = repo.save(entity)
+        return ResponseEntity.created(URI.create("/users/${saved.name}")).build()
+    }
+
+    @GetMapping(path = ["/{id}"])
+    fun getById(
+            @PathVariable("id")
+            id: String
+    ): ResponseEntity<WrappedResponse<UserDto>> {
+        val userInfo = repo.findById(id).orElse(null) ?:
+        return ResponseEntity.status(404).body(
+                WrappedResponse<UserDto>(
+                        code = 404,
+                        message = "Resource not found"
+                ).validated()
+        )
+
+        val dto = UserConverter.transform(userInfo)
+
+        return ResponseEntity.ok(WrappedResponse(
+                code = 200,
+                data = dto
+        ).validated())
+    }
+
 
     @GetMapping(produces = [Format.HAL_V1])
     fun getAll(
