@@ -2,22 +2,24 @@ package com.octopod.cinema.ticket.api
 
 import com.octopod.cinema.ticket.dto.DtoTransformer
 import com.octopod.cinema.common.dto.TicketDto
+import com.octopod.cinema.common.dto.WrappedResponse
 import com.octopod.cinema.ticket.entity.Ticket
 import com.octopod.cinema.ticket.hal.HalLink
 import com.octopod.cinema.ticket.hal.PageDto
 import com.octopod.cinema.ticket.repository.TicketRepository
-import com.octopod.cinema.ticket.service.TicketService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 
 @Api(value = "tickets", description = "handling of tickets")
 @RequestMapping(
-        path = ["/tickets"]
+        path = ["/tickets"],
+        produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
 @RestController
 class TicketApi {
@@ -46,7 +48,7 @@ class TicketApi {
             @RequestParam("limit", defaultValue = "10")
             limit: Int
 
-    ): ResponseEntity<PageDto<TicketDto>> {
+    ): ResponseEntity<WrappedResponse<PageDto<TicketDto>>> {
 
         if (offset < 0 || limit < 1) {
             return ResponseEntity.status(400).build()
@@ -96,12 +98,15 @@ class TicketApi {
                     .build().toString())
         }
 
-        return ResponseEntity.ok(dto)
+        return ResponseEntity.ok(WrappedResponse(
+                code = 200,
+                data = dto
+        ).validated())
     }
 
 
     @ApiOperation("create a new ticket")
-    @PostMapping
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
 
         if(dto.userId == null || dto.screeningId == null) {
