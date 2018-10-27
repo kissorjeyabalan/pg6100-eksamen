@@ -27,7 +27,6 @@ class TicketApi {
     @Autowired
     private lateinit var repo: TicketRepository
 
-
     @ApiOperation("Get all tickets")
     @GetMapping
     fun getTickets(
@@ -54,9 +53,7 @@ class TicketApi {
             return ResponseEntity.status(400).build()
         }
 
-
         val ticketList: List<Ticket>
-
 
         ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
             repo.findAll().toList()
@@ -115,6 +112,7 @@ class TicketApi {
 
         val id = repo.createTicket(dto.userId!!, dto.screeningId!!)
 
+        //TODO wrap response
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
         ).build()
@@ -136,8 +134,36 @@ class TicketApi {
         }
 
         repo.deleteById(id)
+
+        //TODO wrap response
         return ResponseEntity.status(204).build()
     }
+
+    @ApiOperation("update an existing ticket")
+    @PutMapping(path = ["/id"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun update(
+            @ApiParam("The id of the ticket to be updated")
+            @PathVariable("id")
+            pathId: String?,
+            @ApiParam("The new ticket values")
+            @RequestBody
+            dto: TicketDto
+    ) : ResponseEntity<Any> {
+
+        if (!repo.existsById(dto.id!!.toLong())) {
+            return ResponseEntity.status(404).build()
+        }
+
+        if (dto.userId == null || dto.screeningId == null || dto.timeOfPurchase == null) {
+            return ResponseEntity.status(400).build()
+        }
+
+        repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!)
+
+        //TODO wrap response
+        return ResponseEntity.status(204).build()
+    }
+
 
 }
 

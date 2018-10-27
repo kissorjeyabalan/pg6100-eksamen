@@ -23,6 +23,8 @@ interface TicketRepositoryCustom {
 
     fun createTicket(userId: String, screeningId: String): Long
 
+    fun updateTicket(ticketId: Long, userId: String, screeningId: String, timeOfPurchase: ZonedDateTime) : Boolean
+
 }
 
 @Repository
@@ -36,6 +38,17 @@ class TicketRepositoryImpl : TicketRepositoryCustom {
         val entity = Ticket(userId, screeningId, ZonedDateTime.now())
         em.persist(entity)
         return entity.id!!
+    }
+
+    override fun updateTicket(ticketId: Long,
+                        userId: String,
+                        screeningId: String,
+                        timeOfPurchase: ZonedDateTime): Boolean {
+        val ticket = em.find(Ticket::class.java, ticketId) ?: return false
+        ticket.userId = userId
+        ticket.screeningId = screeningId
+        ticket.timeOfPurchase = timeOfPurchase
+        return true
     }
 
 
