@@ -52,15 +52,17 @@ class TheaterController {
     }
 
     @ApiOperation("Get all theaters")
-    @GetMapping(path = ["/{id}"])
-    fun getTheaters(
+    @GetMapping
+    fun getAllTheaters(
 
         @RequestParam("limit", defaultValue = "10")
-        limit: Int
+        limit: String
 
     ): ResponseEntity<WrappedResponse<List<TheaterDto>>> {
 
-        if (limit < 1) {
+        val limitInt = limit.toInt()
+
+        if (limitInt < 1) {
             return ResponseEntity.status(400).body(
                     WrappedResponse<List<TheaterDto>>(
                             code = 400,
@@ -69,7 +71,7 @@ class TheaterController {
             )
         }
 
-        /*val entryList = repo.getTheaters(limit).toList()
+        /*val entryList = repo.getAllTheaters(limit).toList()
         val dto = TheaterConverter.transform(entryList, limit)*/
         val entryList = repo.findAll().toList()
         val dto = TheaterConverter.transform(entryList, 100)

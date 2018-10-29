@@ -64,7 +64,7 @@ class TheaterApiTest: TheaterTestBase() {
                 .statusCode(400)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
     }
 
     @Test
@@ -89,10 +89,21 @@ class TheaterApiTest: TheaterTestBase() {
         given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
 
         given()
-                .formParam("limit", 0)
-                .get(path)
+                .param("limit", "0")
+                .get("/theaters")
                 .then()
                 .statusCode(400)
+    }
+
+    @Test
+    fun testGetWithMalformedId() {
+
+        val id = "a"
+
+        given()
+                .get("/theaters/$id")
+                .then()
+                .statusCode(404)
     }
 
     @Test
@@ -144,9 +155,10 @@ class TheaterApiTest: TheaterTestBase() {
 
         given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
 
+        val id = "a"
+
         given()
-                .body("a")
-                .delete()
+                .delete("/theaters/$id")
                 .then()
                 .statusCode(404)
 
@@ -154,7 +166,7 @@ class TheaterApiTest: TheaterTestBase() {
     }
 
     @Test
-    fun updateTheater() {
+    fun testUpdateTheater() {
 
         val name1 = "theater"
         val seatsMax1 = 10
@@ -192,7 +204,7 @@ class TheaterApiTest: TheaterTestBase() {
     }
 
     @Test
-    fun patchTheater() {
+    fun testPatchTheater() {
 
         val name1 = "theater"
         val seatsMax1 = 10
