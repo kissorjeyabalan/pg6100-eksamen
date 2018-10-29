@@ -2,8 +2,9 @@ package com.octopod.cinema.kino.controller
 
 import com.octopod.cinema.kino.converter.ShowConverter
 import com.octopod.cinema.kino.dto.ShowDto
-import com.octopod.cinema.kino.service.ShowService
 import com.octopod.cinema.common.dto.WrappedResponse
+import com.octopod.cinema.kino.entity.Show
+import com.octopod.cinema.kino.repository.ShowRepository
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder
 class ShowController {
 
     @Autowired
-    private lateinit var service: ShowService
+    private lateinit var repo: ShowRepository
 
     @ApiOperation("create a new show")
     @PostMapping
@@ -30,11 +31,11 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val id = service.createShow(dto.startTime!!, dto.movieName!!, dto.cinemaName!!)
+        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaName!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/shows/$id")
+                        .fromPath("/shows/${created.id}")
                         .build()
                         .toUri()
         ).build()
@@ -58,7 +59,7 @@ class ShowController {
             )
         }
 
-        val entryList = service.getShows(limit).toList()
+        val entryList = repo.findAll().toList()
         val dto = ShowConverter.transform(entryList, limit)
 
         return ResponseEntity.ok(
@@ -78,7 +79,7 @@ class ShowController {
 
     ): ResponseEntity<WrappedResponse<ShowDto>> {
 
-        val entryObject = service.getShow(id.toLong())
+        val entryObject = repo.findById(id.toLong()).orElse(null) ?: return ResponseEntity.status(404).build()
         val dto = ShowConverter.transform(entryObject)
 
         return ResponseEntity.ok(
@@ -88,7 +89,7 @@ class ShowController {
                 ).validated()
         )
     }
-
+/*
     @ApiOperation("Get all shows for a specific theater")
     @GetMapping(path = ["/{theater}"])
     fun getShowsByTheater(
@@ -119,5 +120,5 @@ class ShowController {
                         data = dto
                 ).validated()
         )
-    }
+    }*/
 }

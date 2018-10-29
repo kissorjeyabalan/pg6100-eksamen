@@ -15,9 +15,6 @@ class Theater (
         @get:NotNull
         var seatsMax: Int? = null,
 
-        @get:NotNull
-        var seatsEmpty: Int? = null,
-
         @get:Id @get:GeneratedValue
         var id: Long? = null
 

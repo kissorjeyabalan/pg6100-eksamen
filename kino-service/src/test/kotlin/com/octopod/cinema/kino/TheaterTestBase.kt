@@ -32,25 +32,5 @@ abstract class TheaterTestBase {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
         crud.deleteAll()
-        /*
-        val list = given().accept(ContentType.JSON).get("/theater")
-                .then()
-                .statusCode(200)
-                .extract()
-                .`as`(Array<TheaterDto>::class.java)
-                .toList()
-
-        list.stream().forEach {
-            given().pathParam("id", it.id)
-                    .delete("/{id}")
-                    .then()
-                    .statusCode(204)
-        }
-
-        given().get()
-                .then()
-                .statusCode(200)
-                .body("size()", equalTo(0))
-*/
     }
 }

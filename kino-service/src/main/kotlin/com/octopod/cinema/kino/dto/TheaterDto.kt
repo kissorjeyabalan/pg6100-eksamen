@@ -10,9 +10,6 @@ data class TheaterDto (
         @ApiModelProperty("Number of seats in the theater")
         var seatsMax: Int? = null,
 
-        @ApiModelProperty("Current number of empty seats")
-        var seatsEmpty: Int? = null,
-
         @ApiModelProperty("Id for the theater")
         var id: String? = null
 )
