@@ -14,7 +14,7 @@ interface TheaterRepository : CrudRepository<Theater, Long>, TheaterRepositoryCu
 }
 @Transactional
 interface TheaterRepositoryCustom {
-    fun createTheater(name: String, seatsMax: Int, seatsEmpty: Int): Long
+    fun createTheater(name: String, seatsMax: Int): Long
 }
 
 @Repository
@@ -23,8 +23,8 @@ class TheaterRepositoryImpl : TheaterRepositoryCustom {
     @Autowired
     private lateinit var em: EntityManager
 
-    override fun createTheater(name: String, seatsMax: Int, seatsEmpty: Int): Long {
-        val theater = Theater(name, seatsMax, seatsEmpty)
+    override fun createTheater(name: String, seatsMax: Int): Long {
+        val theater = Theater(name, seatsMax)
 
         em.persist(theater)
         return theater.id!!

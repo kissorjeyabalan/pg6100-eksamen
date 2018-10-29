@@ -10,7 +10,6 @@ class TheaterConverter {
             return TheaterDto(
                     name = theater.name,
                     seatsMax = theater.seatsMax,
-                    seatsEmpty = theater.seatsEmpty,
                     id = theater.id.toString()
             )
         }
@@ -19,7 +18,6 @@ class TheaterConverter {
             return Theater(
                     name = theaterdto.name,
                     seatsMax = theaterdto.seatsMax,
-                    seatsEmpty = theaterdto.seatsEmpty,
                     id = theaterdto.id!!.toLong()
             )
         }

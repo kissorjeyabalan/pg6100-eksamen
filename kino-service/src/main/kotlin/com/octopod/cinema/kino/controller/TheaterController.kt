@@ -6,7 +6,6 @@ import com.google.common.base.Throwables
 import com.octopod.cinema.kino.converter.TheaterConverter
 import com.octopod.cinema.kino.dto.TheaterDto
 import com.octopod.cinema.kino.repository.TheaterRepository
-import com.octopod.cinema.kino.service.TheaterService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +16,6 @@ import org.springframework.http.MediaType
 import com.octopod.cinema.common.dto.WrappedResponse
 import com.octopod.cinema.kino.entity.Theater
 import io.swagger.annotations.ApiParam
-import org.omg.CORBA.Object
 import javax.validation.ConstraintViolationException
 
 @Api(value = "theaters", description = "Handling theaters")
@@ -27,9 +25,6 @@ import javax.validation.ConstraintViolationException
 )
 @RestController
 class TheaterController {
-
-    @Autowired
-    private lateinit var service: TheaterService
 
     @Autowired
     lateinit var repo: TheaterRepository
@@ -46,7 +41,7 @@ class TheaterController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(Theater(dto.name!!, dto.seatsMax!!, dto.seatsMax!!))
+        val created = repo.save(Theater(dto.name!!, dto.seatsMax!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -58,14 +53,16 @@ class TheaterController {
 
     @ApiOperation("Get all theaters")
     @GetMapping
-    fun getTheaters(
+    fun getAllTheaters(
 
         @RequestParam("limit", defaultValue = "10")
-        limit: Int
+        limit: String
 
     ): ResponseEntity<WrappedResponse<List<TheaterDto>>> {
 
-        if (limit < 1) {
+        val limitInt = limit.toInt()
+
+        if (limitInt < 1) {
             return ResponseEntity.status(400).body(
                     WrappedResponse<List<TheaterDto>>(
                             code = 400,
@@ -74,7 +71,7 @@ class TheaterController {
             )
         }
 
-        /*val entryList = repo.getTheaters(limit).toList()
+        /*val entryList = repo.getAllTheaters(limit).toList()
         val dto = TheaterConverter.transform(entryList, limit)*/
         val entryList = repo.findAll().toList()
         val dto = TheaterConverter.transform(entryList, 100)
@@ -175,7 +172,7 @@ class TheaterController {
             return ResponseEntity.status(404).build()
         }
 
-        if (dto.name == null || dto.seatsMax == null || dto.seatsEmpty == null) {
+        if (dto.name == null || dto.seatsMax == null) {
             return ResponseEntity.status(400).build()
         }
 
@@ -203,6 +200,7 @@ class TheaterController {
             @ApiParam("The theater that will replace the old one. Cannot change id")
             @RequestBody
             json: String
+
     ) : ResponseEntity<WrappedResponse<TheaterDto>> {
 
         val pathId: Long
@@ -241,7 +239,6 @@ class TheaterController {
 
         var newName = originalDto.name
         var newSeatsMax = originalDto.seatsMax
-        var newSeatsEmpty = originalDto.seatsEmpty
 
         if (jsonNode.has("name")) {
             val nameNode = jsonNode.get("name")
@@ -263,19 +260,8 @@ class TheaterController {
             }
         }
 
-        if (jsonNode.has("seatsEmpty")) {
-            val emptyNode = jsonNode.get("seatsEmpty")
-            newSeatsEmpty = when {
-                emptyNode.isNull -> null
-                emptyNode.isNumber -> emptyNode.asInt()
-                else -> //Invalid JSON. Non-string name
-                    return ResponseEntity.status(400).build()
-            }
-        }
-
         originalDto.name = newName
         originalDto.seatsMax = newSeatsMax
-        originalDto.seatsEmpty = newSeatsEmpty
 
         repo.save(originalDto)
         return ResponseEntity.status(204).build()

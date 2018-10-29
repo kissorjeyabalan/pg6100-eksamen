@@ -15,8 +15,13 @@ class ShowConverter {
             )
         }
 
-        fun transform(shows: Iterable<Show>): List<ShowDto> {
-            return shows.map { transform(it) }
+        fun transform(showdto: ShowDto): Show {
+            return Show(
+                    startTime = showdto.startTime,
+                    movieName = showdto.movieName,
+                    cinemaName = showdto.cinemaName,
+                    id = showdto.id!!.toLong()
+            )
         }
 
         fun transform(entities: List<Show>, limit: Int): List<ShowDto> {
