@@ -16,7 +16,7 @@ class TheaterApiTest: TheaterTestBase() {
 
         RestAssured.given().get("/theaters").then()
                 .statusCode(200)
-                .body("data.size()", equalTo(0))
+                .body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -26,7 +26,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax = 10
         val dto = TheaterDto(name, seatsMax, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
 
         val path = given().contentType(ContentType.JSON)
@@ -38,7 +38,7 @@ class TheaterApiTest: TheaterTestBase() {
 
 
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
             .get(path)
@@ -55,7 +55,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax = null
         val dto = TheaterDto(name, seatsMax, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -64,7 +64,7 @@ class TheaterApiTest: TheaterTestBase() {
                 .statusCode(400)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -74,7 +74,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax = 10
         val dto = TheaterDto(name, seatsMax, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
 
         val path = given().contentType(ContentType.JSON)
@@ -86,7 +86,7 @@ class TheaterApiTest: TheaterTestBase() {
 
 
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
                 .param("limit", "0")
@@ -113,7 +113,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax = 10
         val dto = TheaterDto(name, seatsMax, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
 
         val path = given().contentType(ContentType.JSON)
@@ -125,14 +125,14 @@ class TheaterApiTest: TheaterTestBase() {
 
 
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
                 .delete(path)
                 .then()
                 .statusCode(204)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -142,7 +142,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax = 10
         val dto = TheaterDto(name, seatsMax, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -153,7 +153,7 @@ class TheaterApiTest: TheaterTestBase() {
 
 
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         val id = "a"
 
@@ -162,7 +162,7 @@ class TheaterApiTest: TheaterTestBase() {
                 .then()
                 .statusCode(404)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(1))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
     }
 
     @Test
@@ -172,7 +172,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax1 = 10
         val dto1 = TheaterDto(name1, seatsMax1, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto1)
@@ -210,7 +210,7 @@ class TheaterApiTest: TheaterTestBase() {
         val seatsMax1 = 10
         val dto1 = TheaterDto(name1, seatsMax1, null)
 
-        given().get("/theaters").then().statusCode(200).body("data.size()", equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto1)

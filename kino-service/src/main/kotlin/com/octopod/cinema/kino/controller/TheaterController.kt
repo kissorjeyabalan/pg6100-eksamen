@@ -16,6 +16,9 @@ import org.springframework.http.MediaType
 import com.octopod.cinema.common.dto.WrappedResponse
 import com.octopod.cinema.kino.entity.Theater
 import io.swagger.annotations.ApiParam
+import com.octopod.cinema.common.hateos.Format
+import com.octopod.cinema.common.hateos.HalLink
+import com.octopod.cinema.common.hateos.HalPage
 import javax.validation.ConstraintViolationException
 
 @Api(value = "theaters", description = "Handling theaters")
@@ -52,19 +55,22 @@ class TheaterController {
     }
 
     @ApiOperation("Get all theaters")
-    @GetMapping
+    @GetMapping(produces = [Format.HAL_V1])
     fun getAllTheaters(
 
+        @RequestParam("page", defaultValue = "1")
+        page: String,
         @RequestParam("limit", defaultValue = "10")
         limit: String
 
-    ): ResponseEntity<WrappedResponse<List<TheaterDto>>> {
+    ): ResponseEntity<WrappedResponse<HalPage<TheaterDto>>> {
 
+        val pageInt = page.toInt()
         val limitInt = limit.toInt()
 
-        if (limitInt < 1) {
+        if (pageInt < 1 || limitInt < 1) {
             return ResponseEntity.status(400).body(
-                    WrappedResponse<List<TheaterDto>>(
+                    WrappedResponse<HalPage<TheaterDto>>(
                             code = 400,
                             message = "Malformed limit supplied"
                     ).validated()
@@ -74,7 +80,27 @@ class TheaterController {
         /*val entryList = repo.getAllTheaters(limit).toList()
         val dto = TheaterConverter.transform(entryList, limit)*/
         val entryList = repo.findAll().toList()
-        val dto = TheaterConverter.transform(entryList, 100)
+        val dto = TheaterConverter.transform(entryList, pageInt, limitInt)
+
+        val uriBuilder = UriComponentsBuilder.fromPath("/theaters")
+        dto._self = HalLink(uriBuilder.cloneBuilder()
+                .queryParam("page", page)
+                .queryParam("limit", limit)
+                .build().toString())
+
+        if (!entryList.isEmpty() && pageInt > 1) {
+            dto.previous = HalLink(uriBuilder.cloneBuilder()
+                    .queryParam("page", (pageInt - 1).toString())
+                    .queryParam("limit", limit)
+                    .build().toString())
+        }
+
+        if (((pageInt) * limitInt) < entryList.size) {
+            dto.next = HalLink(uriBuilder.cloneBuilder()
+                    .queryParam("page", (pageInt + 1).toString())
+                    .queryParam("limit", limit)
+                    .build().toString())
+        }
 
         return ResponseEntity.ok(
                 WrappedResponse(
