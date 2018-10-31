@@ -1,6 +1,6 @@
 package com.octopod.cinema.kino
 
-import com.octopod.cinema.kino.repository.TheaterRepository
+import com.octopod.cinema.kino.repository.ShowRepository
 import io.restassured.RestAssured
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -10,14 +10,14 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
-@SpringBootTest(classes = [(TheaterApplication::class)],
+@SpringBootTest(classes = [(ShowApplication::class)],
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class TheaterTestBase {
+abstract class ShowTestBase {
 
     @LocalServerPort private var port = 0
 
     @Autowired
-    private lateinit var crud: TheaterRepository
+    private lateinit var crud: ShowRepository
 
     @Before
     fun clean() {
