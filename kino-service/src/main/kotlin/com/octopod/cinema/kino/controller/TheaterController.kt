@@ -77,8 +77,7 @@ class TheaterController {
             )
         }
 
-        /*val entryList = repo.getAllTheaters(limit).toList()
-        val dto = TheaterConverter.transform(entryList, limit)*/
+
         val entryList = repo.findAll().toList()
         val dto = TheaterConverter.transform(entryList, pageInt, limitInt)
 
@@ -119,7 +118,6 @@ class TheaterController {
 
     ): ResponseEntity<WrappedResponse<TheaterDto>> {
 
-        //Finne ut om dette er riktig måte å gjøre det fra long til string og
         val pathId: Long
         try {
             pathId = id!!.toLong()
@@ -133,6 +131,7 @@ class TheaterController {
 
         val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
         val dto = TheaterConverter.transform(entity)
+
         return ResponseEntity.ok(WrappedResponse(
                 code = 200,
                 data = dto
