@@ -1,7 +1,6 @@
 package com.octopod.cinema.kino.repository
 
 import com.octopod.cinema.kino.entity.Show
-import com.octopod.cinema.kino.entity.Theater
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
