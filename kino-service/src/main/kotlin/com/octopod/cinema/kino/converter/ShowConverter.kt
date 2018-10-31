@@ -11,7 +11,7 @@ class ShowConverter {
             return ShowDto(
                     startTime = show.startTime,
                     movieName = show.movieName,
-                    cinemaName = show.cinemaName,
+                    cinemaName = show.cinemaId,
                     id = show.id.toString()
             )
         }
@@ -20,7 +20,7 @@ class ShowConverter {
             return Show(
                     startTime = showdto.startTime,
                     movieName = showdto.movieName,
-                    cinemaName = showdto.cinemaName,
+                    cinemaId = showdto.cinemaName,
                     id = showdto.id!!.toLong()
             )
         }

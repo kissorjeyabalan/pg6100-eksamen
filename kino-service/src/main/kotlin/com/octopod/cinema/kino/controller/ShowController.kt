@@ -142,25 +142,51 @@ class ShowController {
     @GetMapping(path = ["/{show}"])
     fun getShowsByTheater(
 
+            @RequestParam("page", defaultValue = "1")
+            page: String,
             @RequestParam("limit", defaultValue = "10")
-            limit: Int,
+            limit: String,
 
             @PathVariable("theater")
-            theater: String
+            theaterId: String
 
-    ): ResponseEntity<WrappedResponse<List<ShowDto>>> {
+    ): ResponseEntity<WrappedResponse<HalPage<ShowDto>>> {
 
-        if (limit < 1) {
+        val pageInt = page.toInt()
+        val limitInt = limit.toInt()
+
+        if (pageInt < 1 || limitInt < 1) {
             return ResponseEntity.status(400).body(
-                    WrappedResponse<List<ShowDto>>(
+                    WrappedResponse<HalPage<ShowDto>>(
                             code = 400,
-                            message = "Malformed limit supplied"
+                            message = "Malformed limit or page number supplied"
                     ).validated()
             )
         }
 
-        //val entryList = repo.getShows(limit, theater).toList()
-        //val dto = ShowConverter.transform(entryList, limit)
+        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId }
+        val dto = ShowConverter.transform(entryList, pageInt, limitInt)
+
+        val uriBuilder = UriComponentsBuilder.fromPath("/shows")
+        dto._self = HalLink(uriBuilder.cloneBuilder()
+                .queryParam("page", page)
+                .queryParam("limit", limit)
+                .build().toString())
+
+        if (!entryList.isEmpty() && pageInt > 1) {
+            dto.previous = HalLink(uriBuilder.cloneBuilder()
+                    .queryParam("page", (pageInt - 1).toString())
+                    .queryParam("limit", limit)
+                    .build().toString())
+        }
+
+        if (((pageInt) * limitInt) < entryList.size) {
+            dto.next = HalLink(uriBuilder.cloneBuilder()
+                    .queryParam("page", (pageInt + 1).toString())
+                    .queryParam("limit", limit)
+                    .build().toString())
+        }
+
         return ResponseEntity.ok(
                 WrappedResponse(
                         code = 200,
@@ -294,7 +320,7 @@ class ShowController {
         }
 
         var newStartTime = originalDto.startTime
-        var newCinemaName = originalDto.cinemaName
+        var newCinemaName = originalDto.cinemaId
         var newMovieName = originalDto.movieName
 
         if (jsonNode.has("startTime")) {
@@ -307,8 +333,8 @@ class ShowController {
             }
         }
 
-        if (jsonNode.has("cinemaName")) {
-            val cinemaNameNode = jsonNode.get("cinemaName")
+        if (jsonNode.has("cinemaId")) {
+            val cinemaNameNode = jsonNode.get("cinemaId")
             newCinemaName = when {
                 cinemaNameNode.isNull -> return ResponseEntity.status(400).build()
                 cinemaNameNode.isTextual -> cinemaNameNode.asText()
@@ -328,7 +354,7 @@ class ShowController {
         }
 
         originalDto.startTime = newStartTime
-        originalDto.cinemaName = newCinemaName
+        originalDto.cinemaId = newCinemaName
         originalDto.movieName = newMovieName
 
         repo.save(originalDto)

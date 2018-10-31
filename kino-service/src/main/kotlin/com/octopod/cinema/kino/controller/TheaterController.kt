@@ -72,7 +72,7 @@ class TheaterController {
             return ResponseEntity.status(400).body(
                     WrappedResponse<HalPage<TheaterDto>>(
                             code = 400,
-                            message = "Malformed limit supplied"
+                            message = "Malformed limit og page number supplied"
                     ).validated()
             )
         }

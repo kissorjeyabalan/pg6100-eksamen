@@ -16,7 +16,7 @@ class Show (
         var movieName: String? = null,
 
         @get:NotBlank
-        var cinemaName: String? = null,
+        var cinemaId: String? = null,
 
         @get:Id @get:GeneratedValue
         var id: Long? = null
