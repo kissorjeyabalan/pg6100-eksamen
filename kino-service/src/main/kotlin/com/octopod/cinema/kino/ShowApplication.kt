@@ -12,7 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 
 @SpringBootApplication
 @EnableSwagger2
-class TheaterApplication {
+class ShowApplication {
 
     @Bean
     fun swaggerApi(): Docket {
@@ -24,7 +24,7 @@ class TheaterApplication {
 
     private fun apiInfo(): ApiInfo {
         return ApiInfoBuilder()
-                .title("API for Theater")
+                .title("Api for Show")
                 .description("Some description")
                 .version("1.0.0")
                 .build()
@@ -32,5 +32,5 @@ class TheaterApplication {
 }
 
 fun main(args: Array<String>) {
-    SpringApplication.run(TheaterApplication::class.java, *args)
+    SpringApplication.run(ShowApplication::class.java, *args)
 }
