@@ -11,5 +11,5 @@ data class TheaterDto (
         var seatsMax: Int? = null,
 
         @ApiModelProperty("Id for the theater")
-        var id: String? = null
+        var id: Long? = null
 )

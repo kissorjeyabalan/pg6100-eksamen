@@ -12,12 +12,12 @@ import org.springframework.test.context.junit4.SpringRunner
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [(TheaterApplication::class)],
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class TheaterTestBase {
+abstract class ApiTestBase {
 
     @LocalServerPort private var port = 0
 
     @Autowired
-    private lateinit var crud: TheaterRepository
+    private lateinit var crudTheater: TheaterRepository
 
     @Before
     fun clean() {
@@ -26,6 +26,6 @@ abstract class TheaterTestBase {
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
-        crud.deleteAll()
+        crudTheater.deleteAll()
     }
 }

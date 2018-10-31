@@ -18,11 +18,13 @@ import io.swagger.annotations.ApiParam
 import com.octopod.cinema.common.hateos.Format
 import com.octopod.cinema.common.hateos.HalLink
 import com.octopod.cinema.common.hateos.HalPage
+import org.springframework.http.MediaType
 import javax.validation.ConstraintViolationException
 
 @Api(value = "shows", description = "handling of shows")
 @RequestMapping(
-        path = ["/shows"]
+        path = ["/shows"],
+        produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
 
 @RestController
@@ -39,15 +41,15 @@ class ShowController {
 
     ): ResponseEntity<Void> {
 
-        if (dto.id == null || dto.movieName == null || dto.cinemaName == null || dto.startTime == null) {
+        if (dto.movieName == null || dto.cinemaId == null || dto.startTime == null) {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaName!!))
+        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/shows/${created.id}")
+                        .fromPath("/shows/${created.id!!}")
                         .build()
                         .toUri()
         ).build()
@@ -164,7 +166,7 @@ class ShowController {
             )
         }
 
-        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId }
+        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId.toLong() }
         val dto = ShowConverter.transform(entryList, pageInt, limitInt)
 
         val uriBuilder = UriComponentsBuilder.fromPath("/shows")
@@ -254,7 +256,7 @@ class ShowController {
             return ResponseEntity.status(404).build()
         }
 
-        if (dto.startTime == null || dto.cinemaName == null || dto.movieName == null) {
+        if (dto.startTime == null || dto.cinemaId == null || dto.movieName == null) {
             return ResponseEntity.status(400).build()
         }
 
@@ -337,7 +339,7 @@ class ShowController {
             val cinemaNameNode = jsonNode.get("cinemaId")
             newCinemaName = when {
                 cinemaNameNode.isNull -> return ResponseEntity.status(400).build()
-                cinemaNameNode.isTextual -> cinemaNameNode.asText()
+                cinemaNameNode.isTextual -> cinemaNameNode.asLong()
                 else -> //Invalid JSON. Non-string name
                     return ResponseEntity.status(400).build()
             }

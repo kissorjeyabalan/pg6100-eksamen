@@ -8,22 +8,22 @@ import javax.persistence.EntityManager
 import javax.transaction.Transactional
 
 @Repository
-interface ShowRepository : CrudRepository<Show, Long>, ShowRepositoryCustom {
+interface ShowRepository: CrudRepository<Show, Long>, ShowRepositoryCustom {
     fun deleteAllById(ids: List<Long>)
 }
 @Transactional
 interface ShowRepositoryCustom {
-    fun createShow(startTime: Int, movieName: String, cinemaName: String): Long
+    fun createShow(startTime: Int, movieName: String, cinemaId: Long): Long
 }
 
 @Repository
 @Transactional
-class ShowRepositoryImpl : ShowRepositoryCustom {
+class ShowRepositoryImpl: ShowRepositoryCustom {
     @Autowired
     private lateinit var em: EntityManager
 
-    override fun createShow(startTime: Int, movieName: String, cinemaName: String): Long {
-        val show = Show(startTime, movieName, cinemaName)
+    override fun createShow(startTime: Int, movieName: String, cinemaId: Long): Long {
+        val show = Show(startTime, movieName, cinemaId)
 
         em.persist(show)
         return show.id!!

@@ -1,15 +1,14 @@
 package com.octopod.cinema.kino.controller
 
-import com.octopod.cinema.kino.TheaterTestBase
+import com.octopod.cinema.kino.ApiTestBase
 import com.octopod.cinema.kino.dto.TheaterDto
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Test
 
-class TheaterApiTest: TheaterTestBase() {
+class TheaterApiTest: ApiTestBase() {
 
     @Test
     fun testCleanDB() {
