@@ -120,23 +120,39 @@ class TicketApi {
 
     @ApiOperation("delete a ticket")
     @DeleteMapping(path = ["/{id}"])
-    fun deleteTicket(@PathVariable("id") ticketId: String? ) : ResponseEntity<Void> {
+    fun deleteTicket(@PathVariable("id") ticketId: String? ) : ResponseEntity<WrappedResponse<TicketDto>> {
 
         val id: Long
         try {
             id = ticketId!!.toLong()
         } catch (e: Exception) {
-            return ResponseEntity.status(400).build()
+            return ResponseEntity.status(400).body(
+                    WrappedResponse(
+                            code = 400,
+                            message = "Id is missing or malformed"
+                    )
+            )
         }
 
         if (!repo.existsById(id)) {
-            return ResponseEntity.status(404).build()
+            return ResponseEntity.status(404).body(
+                    WrappedResponse(
+                            code = 404,
+                            message = "No entity with given id exists"
+                    )
+            )
         }
 
         repo.deleteById(id)
 
-        //TODO wrap response
-        return ResponseEntity.status(204).build()
+        return ResponseEntity.status(204).body(
+                WrappedResponse(
+                        code = 204
+                )
+        )
+
+
+
     }
 
     @ApiOperation("update an existing ticket")
@@ -148,7 +164,7 @@ class TicketApi {
             @ApiParam("The new ticket values")
             @RequestBody
             dto: TicketDto
-    ) : ResponseEntity<Any> {
+    ) : ResponseEntity<WrappedResponse<TicketDto>> {
 
         if (!repo.existsById(dto.id!!.toLong())) {
             return ResponseEntity.status(404).build()
@@ -160,8 +176,11 @@ class TicketApi {
 
         repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!)
 
-        //TODO wrap response
-        return ResponseEntity.status(204).build()
+        return ResponseEntity.status(204).body(
+                WrappedResponse(
+                        code = 204
+                )
+        )
     }
 
 
