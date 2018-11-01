@@ -13,7 +13,7 @@ interface ShowRepository: CrudRepository<Show, Long>, ShowRepositoryCustom {
 }
 @Transactional
 interface ShowRepositoryCustom {
-    fun createShow(startTime: Int, movieName: String, cinemaId: String): Long
+    fun createShow(show: Show): Long
 }
 
 @Repository
@@ -22,8 +22,7 @@ class ShowRepositoryImpl: ShowRepositoryCustom {
     @Autowired
     private lateinit var em: EntityManager
 
-    override fun createShow(startTime: Int, movieName: String, cinemaId: String): Long {
-        val show = Show(startTime, movieName, cinemaId)
+    override fun createShow(show: Show): Long {
 
         em.persist(show)
         return show.id!!

@@ -31,7 +31,7 @@ import javax.validation.ConstraintViolationException
 class ShowController {
 
     @Autowired
-    private lateinit var repo: ShowRepository
+    lateinit var repo: ShowRepository
 
     @ApiOperation("create a new show")
     @PostMapping
@@ -45,11 +45,11 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
+        val created = repo.createShow(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/shows/${created.id!!}")
+                        .fromPath("/shows/${created!!}")
                         .build()
                         .toUri()
         ).build()
