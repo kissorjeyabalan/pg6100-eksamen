@@ -1,5 +1,7 @@
 package com.octopod.cinema.ticket.api
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.octopod.cinema.ticket.dto.DtoTransformer
 import com.octopod.cinema.common.dto.TicketDto
 import com.octopod.cinema.common.dto.WrappedResponse
@@ -101,7 +103,6 @@ class TicketApi {
         ).validated())
     }
 
-
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
@@ -127,32 +128,29 @@ class TicketApi {
             id = ticketId!!.toLong()
         } catch (e: Exception) {
             return ResponseEntity.status(400).body(
-                    WrappedResponse(
+                    WrappedResponse<TicketDto>(
                             code = 400,
                             message = "Id is missing or malformed"
-                    )
+                    ).validated()
             )
         }
 
         if (!repo.existsById(id)) {
             return ResponseEntity.status(404).body(
-                    WrappedResponse(
+                    WrappedResponse<TicketDto>(
                             code = 404,
                             message = "No entity with given id exists"
-                    )
+                    ).validated()
             )
         }
 
         repo.deleteById(id)
 
         return ResponseEntity.status(204).body(
-                WrappedResponse(
+                WrappedResponse<TicketDto>(
                         code = 204
-                )
+                ).validated()
         )
-
-
-
     }
 
     @ApiOperation("update an existing ticket")
@@ -167,23 +165,53 @@ class TicketApi {
     ) : ResponseEntity<WrappedResponse<TicketDto>> {
 
         if (!repo.existsById(dto.id!!.toLong())) {
-            return ResponseEntity.status(404).build()
+            return ResponseEntity.status(404).body(
+                    WrappedResponse<TicketDto>(
+                            code = 404,
+                            message = "No entity with given id exists"
+                    ).validated()
+            )
         }
 
         if (dto.userId == null || dto.screeningId == null || dto.timeOfPurchase == null) {
-            return ResponseEntity.status(400).build()
+            return ResponseEntity.status(400).body(
+                    WrappedResponse<TicketDto>(
+                            code = 400,
+                            message = "Id is missing or malformed"
+                    ).validated()
+            )
         }
 
         repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!)
 
         return ResponseEntity.status(204).body(
-                WrappedResponse(
+                WrappedResponse<TicketDto>(
                         code = 204
-                )
+                ).validated()
         )
     }
 
+    @ApiOperation("Modify the fields of a ticket")
+    @PatchMapping( path = ["/{id}"])
+    fun mergePatch( @ApiParam("the id of the ticket")
+                    @PathVariable("id")
+                    id: Long?,
+                    @ApiParam("The partial patch")
+                    @RequestBody
+                    jsonPatch: String
+    ) : ResponseEntity<WrappedResponse<TicketDto>> {
 
+        val jackson = ObjectMapper()
+
+        val jsonNode: JsonNode
+
+        return ResponseEntity.status(400).body(
+                WrappedResponse<TicketDto>(
+                        code = 400,
+                        message = "not finished here yet"
+                ).validated()
+        )
+    }
 }
 
 
