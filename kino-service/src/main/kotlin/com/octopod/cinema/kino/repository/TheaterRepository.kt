@@ -9,7 +9,7 @@ import javax.persistence.Id
 import javax.transaction.Transactional
 
 @Repository
-interface TheaterRepository : CrudRepository<Theater, Long>, TheaterRepositoryCustom {
+interface TheaterRepository: CrudRepository<Theater, Long>, TheaterRepositoryCustom {
     fun deleteAllById(ids: List<Long>)
 }
 @Transactional
@@ -19,7 +19,7 @@ interface TheaterRepositoryCustom {
 
 @Repository
 @Transactional
-class TheaterRepositoryImpl : TheaterRepositoryCustom {
+class TheaterRepositoryImpl: TheaterRepositoryCustom {
     @Autowired
     private lateinit var em: EntityManager
 

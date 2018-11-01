@@ -11,7 +11,7 @@ class TheaterConverter {
             return TheaterDto(
                     name = theater.name,
                     seatsMax = theater.seatsMax,
-                    id = theater.id.toString()
+                    id = theater.id
             )
         }
 
