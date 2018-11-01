@@ -166,7 +166,7 @@ class ShowController {
             )
         }
 
-        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId.toLong() }
+        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId }
         val dto = ShowConverter.transform(entryList, pageInt, limitInt)
 
         val uriBuilder = UriComponentsBuilder.fromPath("/shows")
@@ -339,7 +339,7 @@ class ShowController {
             val cinemaNameNode = jsonNode.get("cinemaId")
             newCinemaName = when {
                 cinemaNameNode.isNull -> return ResponseEntity.status(400).build()
-                cinemaNameNode.isTextual -> cinemaNameNode.asLong()
+                cinemaNameNode.isTextual -> cinemaNameNode.asText()
                 else -> //Invalid JSON. Non-string name
                     return ResponseEntity.status(400).build()
             }

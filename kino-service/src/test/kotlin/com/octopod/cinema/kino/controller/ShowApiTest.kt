@@ -38,7 +38,7 @@ class ShowApiTest: ApiTestBase() {
         val movieName = "movie"
 
         val intToLong = 1
-        val cinemaId = intToLong.toLong()
+        val cinemaId = "1"
         val dto = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))

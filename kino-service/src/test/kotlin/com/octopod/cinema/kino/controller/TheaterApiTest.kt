@@ -2,13 +2,24 @@ package com.octopod.cinema.kino.controller
 
 import com.octopod.cinema.kino.ApiTestBase
 import com.octopod.cinema.kino.dto.TheaterDto
+import com.octopod.cinema.kino.repository.TheaterRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.equalTo
+import org.junit.Before
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 
 class TheaterApiTest: ApiTestBase() {
+
+    @Autowired
+    private lateinit var crudTheater: TheaterRepository
+
+    @Before
+    fun before() {
+        crudTheater.deleteAll()
+    }
 
     @Test
     fun testCleanDB() {
