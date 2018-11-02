@@ -1,5 +1,6 @@
-
-
+spring:
+  application:
+    name: kino-service
 eureka:
   instance:
     preferIpAddress: true
@@ -8,6 +9,3 @@ eureka:
       enabled: true
     serviceUrl:
       defaultZone: http://eureka:8761/eureka/
-spring:
-  application:
-    name: kino-service
