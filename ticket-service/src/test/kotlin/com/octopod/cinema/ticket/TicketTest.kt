@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner
 
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,6 +55,46 @@ class TicketTest {
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(1))
+
+
+
+    }
+
+
+    @Test
+    fun testDeleteById() {
+        val ticketId = "1"
+        val userId = "1"
+        val screeningId = "1"
+
+        val dto = TicketDto(userId, screeningId,null, ticketId)
+
+        given().get()
+                .then()
+                .statusCode(200)
+                .body("data.list.size()", equalTo(0))
+
+
+        given().contentType(ContentType.JSON)
+                .body(dto)
+                .post()
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().get()
+                .then()
+                .statusCode(200)
+                .body("data.list.size()", equalTo(1))
+
+        given().delete(ticketId)
+                .then()
+                .statusCode(204)
+
+        given().get()
+                .then()
+                .statusCode(200)
+                .body("data.list.size()", equalTo(0))
 
     }
 
