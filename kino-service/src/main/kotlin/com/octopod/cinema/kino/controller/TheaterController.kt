@@ -32,10 +32,11 @@ class TheaterController {
     @Autowired
     lateinit var repo: TheaterRepository
 
-    @ApiOperation("create a new ticket")
+    @ApiOperation("Create a new theater")
     @PostMapping
     fun createTheater(
 
+            @ApiParam("Show dto")
             @RequestBody dto: TheaterDto
 
     ): ResponseEntity<Void> {
@@ -58,8 +59,11 @@ class TheaterController {
     @GetMapping(produces = [Format.HAL_V1])
     fun getAllTheaters(
 
+        @ApiParam("Page number")
         @RequestParam("page", defaultValue = "1")
         page: String,
+
+        @ApiParam("Limit")
         @RequestParam("limit", defaultValue = "10")
         limit: String
 
@@ -113,6 +117,7 @@ class TheaterController {
     @GetMapping(path = ["/{id}"])
     fun getTheater(
 
+            @ApiParam("Theater id")
             @PathVariable("id")
             id: String
 
@@ -142,6 +147,7 @@ class TheaterController {
     @DeleteMapping(path = ["/{id}"])
     fun deleteTheaterById(
 
+            @ApiParam("Theater id")
             @PathVariable("id")
             id: String
 
@@ -167,10 +173,11 @@ class TheaterController {
     @PutMapping(path = ["/{id}"])
     fun updateTheater(
 
+            @ApiParam("Theater id")
             @PathVariable("id")
             id: String,
 
-            @ApiParam("The theater that will replace the old one. Cannot change id")
+            @ApiParam("New theater dto")
             @RequestBody
             dto: TheaterDto
 
@@ -219,10 +226,11 @@ class TheaterController {
     @PatchMapping(path = ["/{id}"])
     fun patchTheater(
 
+            @ApiParam("Theater id")
             @PathVariable("id")
             id: String,
 
-            @ApiParam("The theater that will replace the old one. Cannot change id")
+            @ApiParam("New theater JSON")
             @RequestBody
             json: String
 

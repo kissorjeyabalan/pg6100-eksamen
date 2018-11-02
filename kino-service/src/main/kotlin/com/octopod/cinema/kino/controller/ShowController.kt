@@ -37,6 +37,7 @@ class ShowController {
     @PostMapping
     fun createShow(
 
+            @ApiParam("Show dto")
             @RequestBody dto: ShowDto
 
     ): ResponseEntity<Void> {
@@ -59,10 +60,15 @@ class ShowController {
     @GetMapping(produces = [Format.HAL_V1])
     fun getShows(
 
+            @ApiParam("Page number")
             @RequestParam("page", defaultValue = "1")
             page: String,
+
+            @ApiParam("Limit")
             @RequestParam("limit", defaultValue = "10")
             limit: String,
+
+            @ApiParam("Theater id")
             @RequestParam("theater", required = false)
             theater: String?
 
@@ -128,6 +134,7 @@ class ShowController {
     @GetMapping(path = ["/{id}"])
     fun getShow(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String
 
@@ -155,69 +162,11 @@ class ShowController {
         )
     }
 
-    /*
-    @ApiOperation("Get all shows for a specific theater")
-    @GetMapping(path = ["/{show}"])
-    fun getShowsByTheater(
-
-            @RequestParam("page", defaultValue = "1")
-            page: String,
-            @RequestParam("limit", defaultValue = "10")
-            limit: String,
-
-            @PathVariable("theater")
-            theaterId: String
-
-    ): ResponseEntity<WrappedResponse<HalPage<ShowDto>>> {
-
-        val pageInt = page.toInt()
-        val limitInt = limit.toInt()
-
-        if (pageInt < 1 || limitInt < 1) {
-            return ResponseEntity.status(400).body(
-                    WrappedResponse<HalPage<ShowDto>>(
-                            code = 400,
-                            message = "Malformed limit or page number supplied"
-                    ).validated()
-            )
-        }
-
-        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId }
-        val dto = ShowConverter.transform(entryList, pageInt, limitInt)
-
-        val uriBuilder = UriComponentsBuilder.fromPath("/shows")
-        dto._self = HalLink(uriBuilder.cloneBuilder()
-                .queryParam("page", page)
-                .queryParam("limit", limit)
-                .build().toString())
-
-        if (!entryList.isEmpty() && pageInt > 1) {
-            dto.previous = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("page", (pageInt - 1).toString())
-                    .queryParam("limit", limit)
-                    .build().toString())
-        }
-
-        if (((pageInt) * limitInt) < entryList.size) {
-            dto.next = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("page", (pageInt + 1).toString())
-                    .queryParam("limit", limit)
-                    .build().toString())
-        }
-
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
-        )
-    }
-    */
-
     @ApiOperation("Delete show with specific id")
     @DeleteMapping(path = ["/{id}"])
     fun deleteShowById(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String
 
@@ -243,10 +192,11 @@ class ShowController {
     @PutMapping(path = ["/{id}"])
     fun updateShow(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String,
 
-            @ApiParam("The show that will replace the old one. Cannot change id")
+            @ApiParam("New show dto")
             @RequestBody
             dto: ShowDto
 
@@ -295,10 +245,11 @@ class ShowController {
     @PatchMapping(path = ["/{id}"])
     fun patchShow(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String,
 
-            @ApiParam("The show that will replace the old one. Cannot change id")
+            @ApiParam("New show JSON")
             @RequestBody
             json: String
 
