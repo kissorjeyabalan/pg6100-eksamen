@@ -1,5 +1,7 @@
 package com.octopod.cinema.ticket.api
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.octopod.cinema.ticket.dto.DtoTransformer
 import com.octopod.cinema.common.dto.TicketDto
 import com.octopod.cinema.common.dto.WrappedResponse
@@ -53,9 +55,7 @@ class TicketApi {
             return ResponseEntity.status(400).build()
         }
 
-        val ticketList: List<Ticket>
-
-        ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
+        val ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
             repo.findAll().toList()
 
         } else if ( !screeningId.isNullOrBlank() && !userId.isNullOrBlank()) {
@@ -101,7 +101,6 @@ class TicketApi {
         ).validated())
     }
 
-
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
@@ -127,32 +126,29 @@ class TicketApi {
             id = ticketId!!.toLong()
         } catch (e: Exception) {
             return ResponseEntity.status(400).body(
-                    WrappedResponse(
+                    WrappedResponse<TicketDto>(
                             code = 400,
                             message = "Id is missing or malformed"
-                    )
+                    ).validated()
             )
         }
 
         if (!repo.existsById(id)) {
             return ResponseEntity.status(404).body(
-                    WrappedResponse(
+                    WrappedResponse<TicketDto>(
                             code = 404,
                             message = "No entity with given id exists"
-                    )
+                    ).validated()
             )
         }
 
         repo.deleteById(id)
 
         return ResponseEntity.status(204).body(
-                WrappedResponse(
+                WrappedResponse<TicketDto>(
                         code = 204
-                )
+                ).validated()
         )
-
-
-
     }
 
     @ApiOperation("update an existing ticket")
@@ -167,23 +163,118 @@ class TicketApi {
     ) : ResponseEntity<WrappedResponse<TicketDto>> {
 
         if (!repo.existsById(dto.id!!.toLong())) {
-            return ResponseEntity.status(404).build()
+            return ResponseEntity.status(404).body(
+                    WrappedResponse<TicketDto>(
+                            code = 404,
+                            message = "No entity with given id exists"
+                    ).validated()
+            )
         }
 
         if (dto.userId == null || dto.screeningId == null || dto.timeOfPurchase == null) {
-            return ResponseEntity.status(400).build()
+            return ResponseEntity.status(400).body(
+                    WrappedResponse<TicketDto>(
+                            code = 400,
+                            message = "Id is missing or malformed"
+                    ).validated()
+            )
         }
 
         repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!)
 
         return ResponseEntity.status(204).body(
-                WrappedResponse(
+                WrappedResponse<TicketDto>(
                         code = 204
-                )
+                ).validated()
         )
     }
 
 
+
+
+    // Copied from CounterRest class in package org.tsdes.advanced.rest.patch
+    @ApiOperation("Modify the fields of a ticket")
+    @PatchMapping( path = ["/{id}"],
+                   consumes = ["application/merge-patch+json"])
+    fun mergePatch( @ApiParam("the id of the ticket")
+                    @PathVariable("id")
+                    id: Long?,
+                    @ApiParam("The partial patch")
+                    @RequestBody
+                    jsonPatch: String
+    ) : ResponseEntity<WrappedResponse<TicketDto>> {
+
+        if (!repo.existsById(id!!)) {
+            return ResponseEntity.status(404).body(
+                    WrappedResponse<TicketDto>(
+                            code = 404,
+                            message = "No entity with given id exists"
+                    ).validated()
+            )
+        }
+
+        val ticketOptional = repo.findById(id)
+        val ticket = ticketOptional.get()
+        val ticketDto = DtoTransformer.transform(ticket)
+
+        val jackson = ObjectMapper()
+
+        val jsonNode: JsonNode
+
+        try {
+            jsonNode = jackson.readValue(jsonPatch, JsonNode::class.java)
+        } catch (e: Exception) {
+            //Invalid JSON data as input
+            return ResponseEntity.status(400).build()
+        }
+
+        if (jsonNode.has("id")) {
+            //shouldn't be allowed to modify the counter id
+            return ResponseEntity.status(409).build()
+        }
+
+        //do not alter dto till all data is validated. A PATCH has to be atomic,
+        //either all modifications are done, or none.
+        var newUserId = ticketDto.userId
+        var newScreeningId = ticketDto.screeningId
+
+        if (jsonNode.has("userId")) {
+            val userIdNode = jsonNode.get("userId")
+            if (userIdNode.isNull) {
+                newUserId = null
+            } else if (userIdNode.isTextual) {
+                newUserId = userIdNode.asText()
+            } else {
+                //Invalid JSON. Non-string name
+                return ResponseEntity.status(400).build()
+            }
+        }
+
+        if (jsonNode.has("screeningId")) {
+            val screeningIdNode = jsonNode.get("screeningId")
+            if (screeningIdNode.isNull) {
+                newScreeningId = null
+            } else if (screeningIdNode.isTextual) {
+                newScreeningId = screeningIdNode.asText()
+            } else {
+                //Invalid JSON. Non-string name
+                return ResponseEntity.status(400).build()
+            }
+        }
+
+
+
+        //now that the input is validated, do the update
+        ticketDto.userId = newUserId
+        ticketDto.screeningId = newScreeningId
+
+
+        return ResponseEntity.status(204).body(
+                WrappedResponse<TicketDto>(
+                        code = 204
+                ).validated()
+        )
+    }
 }
 
 

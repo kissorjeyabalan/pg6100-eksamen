@@ -137,7 +137,11 @@ class TicketTest {
                 .statusCode(200)
                 .body("data.userId", equalTo("2"))
 
-
     }
 
+
+    @Test
+    fun testPatchTicket() {
+        // TODO finish test
+    }
 }
