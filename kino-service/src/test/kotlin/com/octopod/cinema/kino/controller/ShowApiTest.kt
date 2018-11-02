@@ -1,7 +1,6 @@
 package com.octopod.cinema.kino.controller
 
 import com.octopod.cinema.kino.ApiTestBase
-import com.octopod.cinema.kino.ShowApplication
 import com.octopod.cinema.kino.dto.ShowDto
 import com.octopod.cinema.kino.dto.TheaterDto
 import com.octopod.cinema.kino.repository.ShowRepository
@@ -18,10 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.junit4.SpringRunner
 
-@RunWith(SpringRunner::class)
-@SpringBootTest(classes = [(ShowApplication::class)],
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ShowApiTest {
+
+class ShowApiTest: ApiTestBase() {
 
     @Autowired
     private lateinit var crudShow: ShowRepository
@@ -70,6 +67,7 @@ class ShowApiTest {
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
+                .param("theater", cinemaId)
                 .get(path)
                 .then()
                 .statusCode(200)

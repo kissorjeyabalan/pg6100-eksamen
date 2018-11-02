@@ -49,7 +49,7 @@ class ShowController {
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/shows/${created!!}")
+                        .fromPath("/shows/$created")
                         .build()
                         .toUri()
         ).build()
@@ -62,7 +62,9 @@ class ShowController {
             @RequestParam("page", defaultValue = "1")
             page: String,
             @RequestParam("limit", defaultValue = "10")
-            limit: String
+            limit: String,
+            @RequestParam("theater", required = false)
+            theater: String?
 
     ): ResponseEntity<WrappedResponse<HalPage<ShowDto>>> {
 
@@ -78,7 +80,20 @@ class ShowController {
             )
         }
 
-        val entryList = repo.findAll().toList()
+        val entryList: List<Show>
+
+        if ( theater.isNullOrBlank()) {
+            entryList = repo.findAll().toList()
+        } else {
+            val theaterId: Long
+            try {
+                theaterId = theater!!.toLong()
+            } catch (e: Exception) {
+                return ResponseEntity.status(400).build()
+            }
+            entryList = repo.findAllByCinemaId(theaterId)
+        }
+
         val dto = ShowConverter.transform(entryList, pageInt, limitInt)
 
         val uriBuilder = UriComponentsBuilder.fromPath("/shows")
@@ -120,7 +135,7 @@ class ShowController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -140,6 +155,7 @@ class ShowController {
         )
     }
 
+    /*
     @ApiOperation("Get all shows for a specific theater")
     @GetMapping(path = ["/{show}"])
     fun getShowsByTheater(
@@ -196,6 +212,7 @@ class ShowController {
                 ).validated()
         )
     }
+    */
 
     @ApiOperation("Delete show with specific id")
     @DeleteMapping(path = ["/{id}"])
@@ -208,7 +225,7 @@ class ShowController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -238,7 +255,7 @@ class ShowController {
         val pathId: Long
         val dtoId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
             dtoId = dto.id!!.toLong()
         } catch (e: Exception) {
             /*
@@ -289,7 +306,7 @@ class ShowController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,

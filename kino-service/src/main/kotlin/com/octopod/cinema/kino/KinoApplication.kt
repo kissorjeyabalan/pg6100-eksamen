@@ -26,7 +26,7 @@ class TheaterApplication {
 
     private fun apiInfo(): ApiInfo {
         return ApiInfoBuilder()
-                .title("API for Theater")
+                .title("API for Kino")
                 .description("Some description")
                 .version("1.0.0")
                 .build()

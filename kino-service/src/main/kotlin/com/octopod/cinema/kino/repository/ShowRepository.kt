@@ -10,6 +10,7 @@ import javax.transaction.Transactional
 @Repository
 interface ShowRepository: CrudRepository<Show, Long>, ShowRepositoryCustom {
     fun deleteAllById(ids: List<Long>)
+    fun findAllByCinemaId(id: Long): List<Show>
 }
 @Transactional
 interface ShowRepositoryCustom {

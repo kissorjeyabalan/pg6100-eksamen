@@ -120,7 +120,7 @@ class TheaterController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -149,7 +149,7 @@ class TheaterController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -179,7 +179,7 @@ class TheaterController {
         val pathId: Long
         val dtoId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
             dtoId = dto.id!!.toLong()
         } catch (e: Exception) {
             /*
@@ -230,7 +230,7 @@ class TheaterController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
