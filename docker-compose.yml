@@ -2,9 +2,6 @@ version: '3.3'
 services:
     redis:
       image: "redis:latest"
-      ports:
-        - "6379:6379"
-
     eureka:
       build:
         context: ./eureka
