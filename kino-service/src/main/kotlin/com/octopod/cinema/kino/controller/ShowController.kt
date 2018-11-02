@@ -45,7 +45,7 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.createShow(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
+        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
