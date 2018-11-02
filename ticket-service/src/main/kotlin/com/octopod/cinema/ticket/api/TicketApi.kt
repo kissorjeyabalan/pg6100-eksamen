@@ -156,7 +156,7 @@ class TicketApi {
     }
 
     @ApiOperation("update an existing ticket")
-    @PutMapping(path = ["/id"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PutMapping(path = ["/{id}"], consumes = [(MediaType.APPLICATION_JSON_VALUE)])
     fun update(
             @ApiParam("The id of the ticket to be updated")
             @PathVariable("id")
