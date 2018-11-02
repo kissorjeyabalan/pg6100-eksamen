@@ -9,6 +9,11 @@ spring:
           url: lb//user-service
           predicates:
             - Path=/users/**
+        - id: kino-service
+            url: lb//kino-service
+            predicates:
+              - Path=/theaters/**
+              - Path=/shows/**
 eureka:
   instance:
     preferIpAddress: true

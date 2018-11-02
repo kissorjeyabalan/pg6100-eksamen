@@ -4,11 +4,21 @@ services:
       image: "redis:latest"
       ports:
         - "6379:6379"
-    #serviceName:
-        #build:
-            #context: ./moduleFolderName
-            #dockerfile: Dockerfile
-        #ports:
-        # - "externalPort":"containerPort"
-        #depends_on:
-        # - "serviceName of dependency"
+
+    eureka:
+      build:
+        context: ./eureka
+      ports:
+        - "8080:8761"
+
+    gateway:
+      build:
+        context: ./gateway
+      depends_on:
+        - eureka
+
+    kino_service:
+      build:
+        context: ./kino-service
+      depends_on:
+        - eureka

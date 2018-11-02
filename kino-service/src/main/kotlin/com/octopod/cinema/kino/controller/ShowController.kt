@@ -45,11 +45,11 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.createShow(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
+        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/shows/$created")
+                        .fromPath("/shows/${created.id}")
                         .build()
                         .toUri()
         ).build()
@@ -366,7 +366,7 @@ class ShowController {
             val movieNameNode = jsonNode.get("movieName")
             newMovieName = when {
                 movieNameNode.isNull -> return ResponseEntity.status(400).build()
-                movieNameNode.isNumber -> movieNameNode.asText()
+                movieNameNode.isTextual -> movieNameNode.asText()
                 else -> //Invalid JSON. Non-string name
                     return ResponseEntity.status(400).build()
             }
