@@ -268,7 +268,7 @@ class ShowApiTest: ApiTestBase() {
 
         given().get(path).then().statusCode(200)
                 .body("data.startTime", equalTo(dto.startTime))
-                .body("data.", equalTo(newMovieName))
+                .body("data.movieName", equalTo(newMovieName))
                 .body("data.cinemaId", equalTo(dto.cinemaId))
     }
 }
