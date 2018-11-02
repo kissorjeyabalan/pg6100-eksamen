@@ -31,7 +31,6 @@ class TicketTest {
 
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
-        RestAssured.basePath = "/tickets"
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
         repo.deleteAll()
     }
@@ -104,41 +103,39 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId,null, null)
 
-        val id = given().contentType(ContentType.JSON)
+        val path = given().contentType(ContentType.JSON)
                 .body(dto)
-                .post()
+                .post("/tickets")
                 .then()
                 .statusCode(201)
-                .extract().asString()
+                .extract().header("Location")
 
-        given().get()
+        given().get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(1))
 
-        given().get()
+        given().get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.list[0].userId", equalTo("1"))
 
 
-        val updatedUserId = "2"
-        val updatedScreeningId = "2"
 
-        val updatedDto = TicketDto(updatedUserId, updatedScreeningId,null, id)
+        val updatedDto = TicketDto("2", "2",null, path.split("/")[2])
 
 
         given().contentType(ContentType.JSON)
                 .body(updatedDto)
-                .put("/$id")
+                .put(path)
                 .then()
                 .statusCode(204)
 
         given().contentType(ContentType.JSON)
-                .get(id)
+                .get(path)
                 .then()
                 .statusCode(200)
-                .body("data.list[0].userId", equalTo("2"))
+                .body("data.userId", equalTo("2"))
 
 
     }
