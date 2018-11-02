@@ -80,7 +80,6 @@ class TicketTest {
                 .post()
                 .then()
                 .statusCode(201)
-                .extract().header("Location")
 
         given().get()
                 .then()
@@ -95,6 +94,52 @@ class TicketTest {
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(0))
+
+    }
+
+    @Test
+    fun testUpdateTicket() {
+        val userId = "1"
+        val screeningId = "1"
+
+        val dto = TicketDto(userId, screeningId,null, null)
+
+        val id = given().contentType(ContentType.JSON)
+                .body(dto)
+                .post()
+                .then()
+                .statusCode(201)
+                .extract().asString()
+
+        given().get()
+                .then()
+                .statusCode(200)
+                .body("data.list.size()", equalTo(1))
+
+        given().get()
+                .then()
+                .statusCode(200)
+                .body("data.list[0].userId", equalTo("1"))
+
+
+        val updatedUserId = "2"
+        val updatedScreeningId = "2"
+
+        val updatedDto = TicketDto(updatedUserId, updatedScreeningId,null, id)
+
+
+        given().contentType(ContentType.JSON)
+                .body(updatedDto)
+                .put("/$id")
+                .then()
+                .statusCode(204)
+
+        given().contentType(ContentType.JSON)
+                .get(id)
+                .then()
+                .statusCode(200)
+                .body("data.list[0].userId", equalTo("2"))
+
 
     }
 
