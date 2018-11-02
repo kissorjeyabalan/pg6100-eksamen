@@ -6,6 +6,8 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>eureka</module>
+        <module>gateway</module>
         <module>common</module>
         <module>user-service</module>
         <module>kino-service</module>
@@ -19,7 +21,7 @@
         <version.kotlin>1.2.71</version.kotlin>
         <version.java>1.8</version.java>
         <version.springboot>2.0.5.RELEASE</version.springboot>
-        <version.springcloud>Finchley.SR1</version.springcloud>
+        <version.springcloud>Finchley.RELEASE</version.springcloud>
         <version.springfox>2.9.2</version.springfox>
     </properties>
     
@@ -68,7 +70,18 @@
             <!-- SpringBoot and Cloud -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-zuul</artifactId>
+                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                <version>2.0.2.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                <version>2.0.2.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway</artifactId>
+                <version>${version.springboot}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
