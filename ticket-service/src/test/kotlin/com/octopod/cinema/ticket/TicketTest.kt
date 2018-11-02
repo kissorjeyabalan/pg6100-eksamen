@@ -72,10 +72,10 @@ class TicketTest {
         given().get()
                 .then()
                 .statusCode(200)
-                .body("data.list.size()", equalTo(1))
+                .body("data.list.size()", equalTo(0))
 
 
-        val id = given().contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .body(dto)
                 .post()
                 .then()
@@ -85,16 +85,16 @@ class TicketTest {
         given().get()
                 .then()
                 .statusCode(200)
-                .body("data.data.size()", equalTo(1))
+                .body("data.list.size()", equalTo(1))
 
-        given().delete(id)
+        given().delete(ticketId)
                 .then()
                 .statusCode(204)
 
         given().get()
                 .then()
                 .statusCode(200)
-                .body("data.data.size()", equalTo(0))
+                .body("data.list.size()", equalTo(0))
 
     }
 
