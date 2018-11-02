@@ -2,13 +2,20 @@ version: '3.3'
 services:
     redis:
       image: "redis:latest"
+    eureka:
+      build:
+        context: ./eureka
+
+    gateway:
+      build:
+        context: ./gateway
       ports:
-        - "6379:6379"
-    #serviceName:
-        #build:
-            #context: ./moduleFolderName
-            #dockerfile: Dockerfile
-        #ports:
-        # - "externalPort":"containerPort"
-        #depends_on:
-        # - "serviceName of dependency"
+        - "8080:8080"
+      depends_on:
+        - eureka
+
+    kino_service:
+      build:
+        context: ./kino-service
+      depends_on:
+        - eureka

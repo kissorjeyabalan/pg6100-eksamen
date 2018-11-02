@@ -33,10 +33,11 @@ class ShowController {
     @Autowired
     lateinit var repo: ShowRepository
 
-    @ApiOperation("create a new show")
+    @ApiOperation("Create a new show")
     @PostMapping
     fun createShow(
 
+            @ApiParam("Show dto")
             @RequestBody dto: ShowDto
 
     ): ResponseEntity<Void> {
@@ -45,11 +46,11 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.createShow(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
+        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
-                        .fromPath("/shows/${created!!}")
+                        .fromPath("/shows/${created.id}")
                         .build()
                         .toUri()
         ).build()
@@ -59,10 +60,17 @@ class ShowController {
     @GetMapping(produces = [Format.HAL_V1])
     fun getShows(
 
+            @ApiParam("Page number")
             @RequestParam("page", defaultValue = "1")
             page: String,
+
+            @ApiParam("Limit")
             @RequestParam("limit", defaultValue = "10")
-            limit: String
+            limit: String,
+
+            @ApiParam("Theater id")
+            @RequestParam("theater", required = false)
+            theater: String?
 
     ): ResponseEntity<WrappedResponse<HalPage<ShowDto>>> {
 
@@ -78,7 +86,20 @@ class ShowController {
             )
         }
 
-        val entryList = repo.findAll().toList()
+        val entryList: List<Show>
+
+        if ( theater.isNullOrBlank()) {
+            entryList = repo.findAll().toList()
+        } else {
+            val theaterId: Long
+            try {
+                theaterId = theater!!.toLong()
+            } catch (e: Exception) {
+                return ResponseEntity.status(400).build()
+            }
+            entryList = repo.findAllByCinemaId(theaterId)
+        }
+
         val dto = ShowConverter.transform(entryList, pageInt, limitInt)
 
         val uriBuilder = UriComponentsBuilder.fromPath("/shows")
@@ -113,6 +134,7 @@ class ShowController {
     @GetMapping(path = ["/{id}"])
     fun getShow(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String
 
@@ -120,7 +142,7 @@ class ShowController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -140,67 +162,11 @@ class ShowController {
         )
     }
 
-    @ApiOperation("Get all shows for a specific theater")
-    @GetMapping(path = ["/{show}"])
-    fun getShowsByTheater(
-
-            @RequestParam("page", defaultValue = "1")
-            page: String,
-            @RequestParam("limit", defaultValue = "10")
-            limit: String,
-
-            @PathVariable("theater")
-            theaterId: String
-
-    ): ResponseEntity<WrappedResponse<HalPage<ShowDto>>> {
-
-        val pageInt = page.toInt()
-        val limitInt = limit.toInt()
-
-        if (pageInt < 1 || limitInt < 1) {
-            return ResponseEntity.status(400).body(
-                    WrappedResponse<HalPage<ShowDto>>(
-                            code = 400,
-                            message = "Malformed limit or page number supplied"
-                    ).validated()
-            )
-        }
-
-        val entryList = repo.findAll().toList().filter { it.cinemaId == theaterId }
-        val dto = ShowConverter.transform(entryList, pageInt, limitInt)
-
-        val uriBuilder = UriComponentsBuilder.fromPath("/shows")
-        dto._self = HalLink(uriBuilder.cloneBuilder()
-                .queryParam("page", page)
-                .queryParam("limit", limit)
-                .build().toString())
-
-        if (!entryList.isEmpty() && pageInt > 1) {
-            dto.previous = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("page", (pageInt - 1).toString())
-                    .queryParam("limit", limit)
-                    .build().toString())
-        }
-
-        if (((pageInt) * limitInt) < entryList.size) {
-            dto.next = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("page", (pageInt + 1).toString())
-                    .queryParam("limit", limit)
-                    .build().toString())
-        }
-
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
-        )
-    }
-
     @ApiOperation("Delete show with specific id")
     @DeleteMapping(path = ["/{id}"])
     fun deleteShowById(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String
 
@@ -208,7 +174,7 @@ class ShowController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -226,10 +192,11 @@ class ShowController {
     @PutMapping(path = ["/{id}"])
     fun updateShow(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String,
 
-            @ApiParam("The show that will replace the old one. Cannot change id")
+            @ApiParam("New show dto")
             @RequestBody
             dto: ShowDto
 
@@ -238,7 +205,7 @@ class ShowController {
         val pathId: Long
         val dtoId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
             dtoId = dto.id!!.toLong()
         } catch (e: Exception) {
             /*
@@ -278,10 +245,11 @@ class ShowController {
     @PatchMapping(path = ["/{id}"])
     fun patchShow(
 
+            @ApiParam("Show id")
             @PathVariable("id")
             id: String,
 
-            @ApiParam("The show that will replace the old one. Cannot change id")
+            @ApiParam("New show JSON")
             @RequestBody
             json: String
 
@@ -289,7 +257,7 @@ class ShowController {
 
         val pathId: Long
         try {
-            pathId = id!!.toLong()
+            pathId = id.toLong()
         } catch (e: Exception) {
             /*
                 invalid id. But here we return 404 instead of 400,
@@ -349,7 +317,7 @@ class ShowController {
             val movieNameNode = jsonNode.get("movieName")
             newMovieName = when {
                 movieNameNode.isNull -> return ResponseEntity.status(400).build()
-                movieNameNode.isNumber -> movieNameNode.asText()
+                movieNameNode.isTextual -> movieNameNode.asText()
                 else -> //Invalid JSON. Non-string name
                     return ResponseEntity.status(400).build()
             }

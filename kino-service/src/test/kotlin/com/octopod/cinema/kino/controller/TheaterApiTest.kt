@@ -63,7 +63,8 @@ class TheaterApiTest: ApiTestBase() {
 
         val name = null
         val seatsMax = null
-        val dto = TheaterDto(name, seatsMax, null)
+        val id = null
+        val dto = TheaterDto(name, seatsMax, id)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 

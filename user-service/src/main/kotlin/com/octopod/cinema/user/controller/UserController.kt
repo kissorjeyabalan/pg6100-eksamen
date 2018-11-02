@@ -16,13 +16,14 @@ import java.net.URI
 
 @RequestMapping(
         path = ["/users"],
-        produces = [(MediaType.APPLICATION_JSON_VALUE)]
+        produces = [(MediaType.APPLICATION_JSON_VALUE)],
+        consumes = [MediaType.APPLICATION_JSON_VALUE]
 )
 @RestController
 class UserController {
     @Autowired lateinit var repo: UserRepository
 
-    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping
     fun createUserInfo(@RequestBody userInfo: UserDto): ResponseEntity<Void> {
         if (userInfo.phone.isNullOrEmpty() || userInfo.name.isNullOrEmpty() ||userInfo.email.isNullOrEmpty()) {
             return ResponseEntity.status(400).build()
@@ -103,5 +104,30 @@ class UserController {
                         data = dto
                 ).validated()
         )
+    }
+
+    @PutMapping(path = ["/{id}"])
+    fun replaceUser(
+            @PathVariable("id")
+            userId: String,
+            @RequestBody
+            replacement: UserDto
+    ) : ResponseEntity<WrappedResponse<Void>> {
+        if (userId.isEmpty() || replacement.name.isNullOrEmpty() || replacement.name != userId) {
+            return ResponseEntity.status(400).build()
+        }
+
+        if (!repo.existsById(userId)) {
+            return ResponseEntity.status(404).build();
+        }
+
+        if (replacement.email.isNullOrEmpty() || replacement.phone.isNullOrEmpty()) {
+            return ResponseEntity.status(400).build()
+        }
+
+        val user = UserConverter.transform(replacement)
+        repo.save(user)
+
+        return ResponseEntity.status(204).build()
     }
 }

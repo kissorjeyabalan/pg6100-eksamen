@@ -8,7 +8,7 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
-@SpringBootTest(classes = [(TheaterApplication::class), (ShowApplication::class)],
+@SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class ApiTestBase {
 

@@ -4,12 +4,13 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 @Entity
 class Show (
 
         //TODO: Ta en vurdering på om dette burde være en annen type variabel
-        @get:NotBlank
+        @get:NotNull
         var startTime: Int? = null,
 
         @get:NotBlank
