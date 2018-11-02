@@ -9,6 +9,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 
+//Copied from acruri82 testing and development, websecurityconfig
+
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig: WebSecurityConfigurerAdapter() {
@@ -17,24 +19,15 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
 
         http
-                .httpBasic()
-                .and()
-                .authorizeRequests()
-                .antMatchers("/usersInfoCount").permitAll()
-                .antMatchers("/usersInfo").hasRole("ADMIN")
-                //
-                .antMatchers("/usersInfo/{id}/**")
-                /*
-                    the "#" resolves the variable in the path, "{id}" in this case.
-                    the "@" resolves a current bean.
-                  */
-                .access("hasRole('USER') and @userSecurity.checkId(authentication, #id)")
-                //
-                .anyRequest().denyAll()
-                .and()
-                .csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+            .httpBasic()
+            .and()
+            .authorizeRequests()
+            .antMatchers("/theaters").permitAll()
+            .antMatchers("/shows").permitAll()
+            .and()
+            .csrf().disable()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
     }
 
     @Bean

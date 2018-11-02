@@ -33,7 +33,7 @@ class ShowController {
     @Autowired
     lateinit var repo: ShowRepository
 
-    @ApiOperation("create a new show")
+    @ApiOperation("Create a new show")
     @PostMapping
     fun createShow(
 
