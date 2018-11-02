@@ -48,7 +48,7 @@ class ShowApiTest {
 
     @Test
     fun testCreateAndGet() {
-        /*
+
         //TODO: finn ut om det er nødvendig med sikkerhet for å skjekke om cinemaId er til en faktisk kino
         val startTime = 10
         val movieName = "movie"
@@ -76,6 +76,6 @@ class ShowApiTest {
                 .body("data.startTime", equalTo(dto.startTime))
                 .body("data.movieName", equalTo(dto.movieName))
                 .body("data.cinemaId", equalTo(dto.cinemaId))
-                */
+
     }
 }

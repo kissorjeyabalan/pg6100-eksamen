@@ -2,6 +2,7 @@ package com.octopod.cinema.kino
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.PathSelectors
@@ -17,6 +18,7 @@ class TheaterApplication {
     @Bean
     fun swaggerApi(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
                 .select()
                 .paths(PathSelectors.any())
                 .build()
@@ -32,5 +34,5 @@ class TheaterApplication {
 }
 
 fun main(args: Array<String>) {
-    SpringApplication.run(TheaterApplication::class.java, *args)
+    runApplication<TheaterApplication>(*args)
 }
