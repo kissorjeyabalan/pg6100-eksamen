@@ -101,6 +101,31 @@ class TicketApi {
         ).validated())
     }
 
+    @ApiOperation("Get a single ticket by id")
+    @GetMapping(path = ["/{id}"])
+    fun getTicket(
+            @ApiParam("Ticket id")
+            @PathVariable("id")
+            id: String
+
+    ): ResponseEntity<WrappedResponse<TicketDto>> {
+
+        val pathId: Long
+        try {
+            pathId = id.toLong()
+        } catch (e: Exception) {
+            return ResponseEntity.status(404).build()
+        }
+
+        val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
+        val dto = DtoTransformer.transform(entity)
+
+        return ResponseEntity.ok(WrappedResponse(
+                code = 200,
+                data = dto
+        ).validated())
+    }
+
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {

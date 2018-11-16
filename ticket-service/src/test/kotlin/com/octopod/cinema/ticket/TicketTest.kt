@@ -15,6 +15,7 @@ import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
+import java.time.ZonedDateTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,21 +43,18 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId,null, null)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
 
         val id = given().contentType(ContentType.JSON)
                 .body(dto)
-                .post()
+                .post("/tickets")
                 .then()
                 .statusCode(201)
 
-        given().get()
+        given().get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(1))
-
-
-
     }
 
 
@@ -66,7 +64,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId,null, ticketId)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), ticketId)
 
         given().get()
                 .then()
@@ -101,7 +99,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId,null, null)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -120,10 +118,7 @@ class TicketTest {
                 .statusCode(200)
                 .body("data.list[0].userId", equalTo("1"))
 
-
-
-        val updatedDto = TicketDto("2", "2",null, path.split("/")[2])
-
+        val updatedDto = TicketDto("2", "2", ZonedDateTime.now(), path.split("/")[2])
 
         given().contentType(ContentType.JSON)
                 .body(updatedDto)
