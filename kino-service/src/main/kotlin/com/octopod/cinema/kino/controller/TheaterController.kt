@@ -21,11 +21,12 @@ import com.octopod.cinema.common.hateos.HalLink
 import com.octopod.cinema.common.hateos.HalPage
 import javax.validation.ConstraintViolationException
 
-@Api(value = "theaters", description = "Handling theaters")
+@Api(value = "theaters", description = "Handling of theaters")
 @RequestMapping(
         path = ["/theaters"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
+
 @RestController
 class TheaterController {
 
@@ -151,7 +152,7 @@ class TheaterController {
             @PathVariable("id")
             id: String
 
-    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+    ): ResponseEntity<WrappedResponse<TheaterDto>> {
 
         val pathId: Long
         try {
@@ -169,7 +170,7 @@ class TheaterController {
         return ResponseEntity.status(204).build()
     }
 
-    @ApiOperation("Update the theater")
+    @ApiOperation("Update a theater")
     @PutMapping(path = ["/{id}"])
     fun updateTheater(
 
@@ -177,11 +178,11 @@ class TheaterController {
             @PathVariable("id")
             id: String,
 
-            @ApiParam("New theater dto")
+            @ApiParam("Updated theater dto")
             @RequestBody
             dto: TheaterDto
 
-    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+    ): ResponseEntity<WrappedResponse<TheaterDto>> {
 
         val pathId: Long
         val dtoId: Long
@@ -222,7 +223,7 @@ class TheaterController {
         return ResponseEntity.status(204).build()
     }
 
-    @ApiOperation("Update a field in theater")
+    @ApiOperation("Update a field in a theater")
     @PatchMapping(path = ["/{id}"])
     fun patchTheater(
 

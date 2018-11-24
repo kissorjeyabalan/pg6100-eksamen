@@ -7,6 +7,7 @@ import kotlin.streams.toList
 
 class ShowConverter {
     companion object {
+
         fun transform(show: Show): ShowDto {
             return ShowDto(
                     startTime = show.startTime,

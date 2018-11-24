@@ -10,7 +10,7 @@ data class ShowDto (
         @ApiModelProperty("Name of the movie")
         var movieName: String? = null,
 
-        @ApiModelProperty("name of the hosting cinema")
+        @ApiModelProperty("Name of the hosting cinema")
         var cinemaId: String? = null,
 
         @ApiModelProperty("Id for the show")

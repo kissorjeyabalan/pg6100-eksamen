@@ -8,10 +8,15 @@ import javax.persistence.EntityManager
 import javax.persistence.Id
 import javax.transaction.Transactional
 
+/**
+ * Some functions may not be in use, but might be used in further development
+ */
+
 @Repository
 interface TheaterRepository: CrudRepository<Theater, Long>, TheaterRepositoryCustom {
     fun deleteAllById(ids: List<Long>)
 }
+
 @Transactional
 interface TheaterRepositoryCustom {
     fun createTheater(name: String, seatsMax: Int): Long
@@ -20,6 +25,7 @@ interface TheaterRepositoryCustom {
 @Repository
 @Transactional
 class TheaterRepositoryImpl: TheaterRepositoryCustom {
+
     @Autowired
     private lateinit var em: EntityManager
 

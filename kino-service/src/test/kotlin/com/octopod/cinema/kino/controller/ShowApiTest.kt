@@ -2,20 +2,14 @@ package com.octopod.cinema.kino.controller
 
 import com.octopod.cinema.kino.ApiTestBase
 import com.octopod.cinema.kino.dto.ShowDto
-import com.octopod.cinema.kino.dto.TheaterDto
 import com.octopod.cinema.kino.repository.ShowRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.web.server.LocalServerPort
-import org.springframework.test.context.junit4.SpringRunner
 
 class ShowApiTest: ApiTestBase() {
 
@@ -29,7 +23,6 @@ class ShowApiTest: ApiTestBase() {
 
     @Test
     fun testCleanDB() {
-
         RestAssured.given().get("/shows").then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
@@ -46,15 +39,12 @@ class ShowApiTest: ApiTestBase() {
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
 
@@ -66,7 +56,6 @@ class ShowApiTest: ApiTestBase() {
                 .body("data.startTime", equalTo(dto.startTime))
                 .body("data.movieName", equalTo(dto.movieName))
                 .body("data.cinemaId", equalTo(dto.cinemaId))
-
     }
 
     @Test
@@ -100,15 +89,12 @@ class ShowApiTest: ApiTestBase() {
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
 
@@ -140,15 +126,12 @@ class ShowApiTest: ApiTestBase() {
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
 
@@ -176,8 +159,6 @@ class ShowApiTest: ApiTestBase() {
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
 

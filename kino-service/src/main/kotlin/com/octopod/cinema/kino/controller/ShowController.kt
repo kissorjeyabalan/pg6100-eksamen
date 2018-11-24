@@ -21,7 +21,7 @@ import com.octopod.cinema.common.hateos.HalPage
 import org.springframework.http.MediaType
 import javax.validation.ConstraintViolationException
 
-@Api(value = "shows", description = "handling of shows")
+@Api(value = "shows", description = "Handling of shows")
 @RequestMapping(
         path = ["/shows"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
@@ -170,7 +170,7 @@ class ShowController {
             @PathVariable("id")
             id: String
 
-    ) : ResponseEntity<WrappedResponse<ShowDto>> {
+    ): ResponseEntity<WrappedResponse<ShowDto>> {
 
         val pathId: Long
         try {
@@ -188,7 +188,7 @@ class ShowController {
         return ResponseEntity.status(204).build()
     }
 
-    @ApiOperation("Update the show")
+    @ApiOperation("Update a show with specific id")
     @PutMapping(path = ["/{id}"])
     fun updateShow(
 
@@ -200,7 +200,7 @@ class ShowController {
             @RequestBody
             dto: ShowDto
 
-    ) : ResponseEntity<WrappedResponse<ShowDto>> {
+    ): ResponseEntity<WrappedResponse<ShowDto>> {
 
         val pathId: Long
         val dtoId: Long
@@ -241,7 +241,7 @@ class ShowController {
         return ResponseEntity.status(204).build()
     }
 
-    @ApiOperation("Update a field in show")
+    @ApiOperation("Update a field in a show with specific id")
     @PatchMapping(path = ["/{id}"])
     fun patchShow(
 
@@ -253,7 +253,7 @@ class ShowController {
             @RequestBody
             json: String
 
-    ) : ResponseEntity<WrappedResponse<ShowDto>> {
+    ): ResponseEntity<WrappedResponse<ShowDto>> {
 
         val pathId: Long
         try {
