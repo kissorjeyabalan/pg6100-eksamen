@@ -38,15 +38,12 @@ class TheaterApiTest: ApiTestBase() {
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
@@ -68,7 +65,8 @@ class TheaterApiTest: ApiTestBase() {
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        //val path =
+        given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
@@ -87,15 +85,13 @@ class TheaterApiTest: ApiTestBase() {
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-
-        val path = given().contentType(ContentType.JSON)
+        //val path =
+        given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
@@ -126,15 +122,12 @@ class TheaterApiTest: ApiTestBase() {
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
@@ -161,9 +154,7 @@ class TheaterApiTest: ApiTestBase() {
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-
-
-
+        
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         val id = "a"

@@ -7,6 +7,7 @@ import kotlin.streams.toList
 
 class TheaterConverter {
     companion object {
+
         fun transform(theater: Theater): TheaterDto {
             return TheaterDto(
                     name = theater.name,

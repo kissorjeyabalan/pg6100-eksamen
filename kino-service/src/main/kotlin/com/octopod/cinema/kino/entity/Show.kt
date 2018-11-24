@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull
 @Entity
 class Show (
 
-        //TODO: Ta en vurdering på om dette burde være en annen type variabel
         @get:NotNull
         var startTime: Int? = null,
 

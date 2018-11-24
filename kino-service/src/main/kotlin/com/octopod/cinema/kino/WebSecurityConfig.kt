@@ -15,9 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails
 @EnableWebSecurity
 class WebSecurityConfig: WebSecurityConfigurerAdapter() {
 
-
     override fun configure(http: HttpSecurity) {
-
         http
             .httpBasic()
             .and()
@@ -42,9 +40,7 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
  * one of the other users
  */
 class UserSecurity{
-
     fun checkId(authentication: Authentication, id: String) : Boolean{
-
         val current = (authentication.principal as UserDetails).username
 
         return current == id
