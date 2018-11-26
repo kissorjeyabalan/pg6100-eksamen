@@ -3,6 +3,8 @@ services:
     redis:
       image: "redis:latest"
     eureka:
+      ports:
+        - "8081:8761"
       build:
         context: ./eureka
 
