@@ -1,5 +1,5 @@
 package com.octopod.cinema.ticket
-/*
+
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -10,8 +10,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 
-//@Configuration
-//@EnableWebSecurity
+@Configuration
+@EnableWebSecurity
 class WebSecurityConfig(
 
 ) : WebSecurityConfigurerAdapter() {
@@ -49,4 +49,4 @@ class UserSecurity{
 
         return current == id
     }
-}*/
+}
