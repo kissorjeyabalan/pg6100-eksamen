@@ -19,3 +19,4 @@ services:
         context: ./kino-service
       depends_on:
         - eureka
+        - redis
