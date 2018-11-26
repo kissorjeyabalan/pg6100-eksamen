@@ -21,7 +21,13 @@ services:
         - eureka
 
     ticket_service:
-          build:
-            context: ./ticket-service
-          depends_on:
-            - eureka
+      build:
+        context: ./ticket-service
+      depends_on:
+        - eureka
+
+    user_service:
+      build:
+        context: ./user-service
+      depends_on:
+        - eureka

@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: kino-service
   redis:
     #host: redis
     host: redis
@@ -6,8 +8,6 @@ spring:
   session:
     # specify that session tokes should be stored in Redis
     store-type: redis
-  application:
-    name: kino-service
 eureka:
   instance:
     preferIpAddress: true
