@@ -1,4 +1,4 @@
-package org.tsdes.advanced.security.distributedsession.userservice
+package com.octopod.cinema.kino
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
