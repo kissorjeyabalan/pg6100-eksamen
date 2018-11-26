@@ -20,6 +20,12 @@ spring:
         - Path=/kino/**
         filters:
         - StripPrefix=1
+      - id: ticket-service
+        uri: lb://ticket-service
+        predicates:
+        - Path=/tickets/**
+        filters:
+        - StripPrefix=1
 
 eureka:
   instance:

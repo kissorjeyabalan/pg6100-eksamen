@@ -19,3 +19,9 @@ services:
         context: ./kino-service
       depends_on:
         - eureka
+
+    ticket_service:
+          build:
+            context: ./ticket-service
+          depends_on:
+            - eureka
