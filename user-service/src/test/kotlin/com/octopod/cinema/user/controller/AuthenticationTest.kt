@@ -1,4 +1,4 @@
-package com.octopod.cinema.user
+package com.octopod.cinema.user.controller
 
 import com.octopod.cinema.user.service.AuthenticationRepository
 import io.restassured.RestAssured
@@ -45,11 +45,11 @@ class AuthenticationTest {
 
             }
         }
-    }
 
-    @AfterClass
-    fun tearDown() {
-        redis.dockerClient.stopContainerCmd(redis.containerId)
+        @AfterClass
+        fun tearDown() {
+            redis.dockerClient.stopContainerCmd(redis.containerId)
+        }
     }
 
     @Before
