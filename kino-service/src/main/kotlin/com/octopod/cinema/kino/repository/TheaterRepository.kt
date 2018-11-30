@@ -13,26 +13,6 @@ import javax.transaction.Transactional
  */
 
 @Repository
-interface TheaterRepository: CrudRepository<Theater, Long>, TheaterRepositoryCustom {
+interface TheaterRepository: CrudRepository<Theater, Long> {
     fun deleteAllById(ids: List<Long>)
-}
-
-@Transactional
-interface TheaterRepositoryCustom {
-    fun createTheater(name: String, seatsMax: Int): Long
-}
-
-@Repository
-@Transactional
-class TheaterRepositoryImpl: TheaterRepositoryCustom {
-
-    @Autowired
-    private lateinit var em: EntityManager
-
-    override fun createTheater(name: String, seatsMax: Int): Long {
-        val theater = Theater(name, seatsMax)
-
-        em.persist(theater)
-        return theater.id!!
-    }
 }

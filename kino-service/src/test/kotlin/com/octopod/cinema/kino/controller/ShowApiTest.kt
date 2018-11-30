@@ -66,24 +66,18 @@ class ShowApiTest: ApiTestBase() {
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
-
         given()
                 .param("theater", cinemaId)
                 .param("movie", movieId)
-                .get(path)
-                .then()
-                .statusCode(200)
-                .body("data.startTime", equalTo(dto.startTime))
-                .body("data.movieId", equalTo(dto.movieId))
-                .body("data.cinemaId", equalTo(dto.cinemaId))
+                .get("/shows").then().statusCode(200)
+                .body("data.data.size()", equalTo(1))
     }
 
     @Test
@@ -96,23 +90,18 @@ class ShowApiTest: ApiTestBase() {
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
-
         given()
                 .param("theater", cinemaId)
-                .get(path)
-                .then()
+                .get("/shows").then()
                 .statusCode(200)
-                .body("data.startTime", equalTo(dto.startTime))
-                .body("data.movieId", equalTo(dto.movieId))
-                .body("data.cinemaId", equalTo(dto.cinemaId))
+                .body("data.data.size()", equalTo(1))
     }
 
     @Test

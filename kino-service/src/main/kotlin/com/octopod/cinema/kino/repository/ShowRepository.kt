@@ -13,28 +13,8 @@ import javax.transaction.Transactional
  */
 
 @Repository
-interface ShowRepository: CrudRepository<Show, Long>, ShowRepositoryCustom {
+interface ShowRepository: CrudRepository<Show, Long> {
     fun deleteAllById(ids: List<Long>)
     fun findAllByCinemaId(id: Long): List<Show>
     fun findAllByCinemaIdAndMovieId(cinemaId: Long, movieId: Long): List<Show>
-}
-
-@Transactional
-interface ShowRepositoryCustom {
-    fun createShow(startTime: Int, movieName: Long, cinemaId: Long): Long
-}
-
-@Repository
-@Transactional
-class ShowRepositoryImpl: ShowRepositoryCustom {
-
-    @Autowired
-    private lateinit var em: EntityManager
-
-    override fun createShow(startTime: Int, movieName: Long, cinemaId: Long): Long {
-        val show = Show(startTime, movieName, cinemaId)
-
-        em.persist(show)
-        return show.id!!
-    }
 }
