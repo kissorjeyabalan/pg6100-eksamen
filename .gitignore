@@ -31,6 +31,9 @@ hs_err_pid*
 **/target
 bundle.js
 
+# osx specific
+.DS_Store
+
 # maven
 pom.xml.tag
 pom.xml.releaseBackup

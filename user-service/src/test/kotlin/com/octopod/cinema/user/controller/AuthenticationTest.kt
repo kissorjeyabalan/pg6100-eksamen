@@ -3,6 +3,7 @@ package com.octopod.cinema.user
 import com.octopod.cinema.user.service.AuthenticationRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
+import org.junit.AfterClass
 import org.junit.Before
 import org.junit.ClassRule
 import org.junit.Test
@@ -44,6 +45,11 @@ class AuthenticationTest {
 
             }
         }
+    }
+
+    @AfterClass
+    fun tearDown() {
+        redis.dockerClient.stopContainerCmd(redis.containerId)
     }
 
     @Before
