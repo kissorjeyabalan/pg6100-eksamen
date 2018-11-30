@@ -246,14 +246,7 @@ class ShowController {
 
         val show = ShowConverter.transform(dto)
 
-        try {
-            repo.save(show)
-        } catch (e: Exception) {
-            if(Throwables.getRootCause(e) is ConstraintViolationException) {
-                return ResponseEntity.status(400).build()
-            }
-            throw e
-        }
+        repo.save(show)
 
         return ResponseEntity.status(204).build()
     }

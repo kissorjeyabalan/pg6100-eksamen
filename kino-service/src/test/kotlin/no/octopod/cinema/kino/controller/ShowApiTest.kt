@@ -246,6 +246,23 @@ class ShowApiTest: ApiTestBase() {
     }
 
     @Test
+    fun testGetCatchError() {
+
+        given()
+                .param("movie", "a")
+                .param("theater", "a")
+                .get("/shows")
+                .then()
+                .statusCode(400)
+
+        given()
+                .param("theater", "a")
+                .get("/shows")
+                .then()
+                .statusCode(400)
+    }
+
+    @Test
     fun testDeleteById() {
 
         val startTime = 10
@@ -339,6 +356,66 @@ class ShowApiTest: ApiTestBase() {
                 .body("data.startTime", equalTo(dto.startTime))
                 .body("data.movieId", equalTo(dto.movieId))
                 .body("data.cinemaId", equalTo(dto.cinemaId))
+    }
+
+    @Test
+    fun testUpdateErrors() {
+
+        val startTime = 10
+        val movieName = "1"
+        val cinemaId = "1"
+        val dto1 = ShowDto(startTime, movieName, cinemaId, null)
+
+        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
+
+        val path = given()
+                .contentType(ContentType.JSON)
+                .body(dto1)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val dto = given()
+                .get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        dto.movieId = "2"
+
+        given().contentType(ContentType.JSON)
+                .body(dto)
+                .put("/shows/a")
+                .then()
+                .statusCode(404)
+
+        given().contentType(ContentType.JSON)
+                .body(dto)
+                .put("/shows/1000")
+                .then()
+                .statusCode(409)
+
+        dto1.id = 1000
+        given().contentType(ContentType.JSON)
+                .body(dto1)
+                .put("/shows/1000")
+                .then()
+                .statusCode(404)
+
+        dto.startTime = null
+        dto.cinemaId = null
+        dto.movieId = null
+
+        given().contentType(ContentType.JSON)
+                .body(dto)
+                .put(path)
+                .then()
+                .statusCode(400)
     }
 
     @Test
