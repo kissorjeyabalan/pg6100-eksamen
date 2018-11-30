@@ -1,5 +1,6 @@
 package com.octopod.cinema.user
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
@@ -20,10 +21,10 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig(
-        private val dataSource: DataSource,
-        private val passwordEncoder: PasswordEncoder
-) : WebSecurityConfigurerAdapter() {
+class WebSecurityConfig() : WebSecurityConfigurerAdapter() {
+
+    @Autowired lateinit var dataSource: DataSource
+    @Autowired lateinit var passwordEncoder: PasswordEncoder
 
     @Bean
     override fun userDetailsService(): UserDetailsService {
@@ -46,7 +47,7 @@ class WebSecurityConfig(
                 .antMatchers("/auth/login").permitAll()
                 .antMatchers("/auth/register").permitAll()
                 .antMatchers("/auth/logout").permitAll()
-                .antMatchers("/users").permitAll()
+                .antMatchers("/users/**").permitAll()
                 .anyRequest().denyAll()
                 .and()
                 .csrf().disable()
