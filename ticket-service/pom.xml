@@ -5,7 +5,7 @@
 
     <parent>
         <artifactId>cinema</artifactId>
-        <groupId>com.octopod.cinema</groupId>
+        <groupId>no.octopod.cinema</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -30,7 +30,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.octopod.cinema</groupId>
+            <groupId>no.octopod.cinema</groupId>
             <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
