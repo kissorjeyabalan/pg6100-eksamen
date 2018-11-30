@@ -40,7 +40,7 @@ class UserConverter {
             val pageDto = HalPage<UserDto>()
             pageDto.data = dtoList
             pageDto.count = entities.size.toLong()
-            pageDto.pages = ((pageDto.count / limit) +1).toInt()
+            pageDto.pages = ((pageDto.count / limit)).toInt()
 
             return pageDto
         }
