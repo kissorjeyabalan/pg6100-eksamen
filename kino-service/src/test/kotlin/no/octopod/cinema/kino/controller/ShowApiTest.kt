@@ -6,7 +6,7 @@ import no.octopod.cinema.kino.repository.ShowRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -160,6 +160,89 @@ class ShowApiTest: ApiTestBase() {
                 .get("/shows/$id")
                 .then()
                 .statusCode(404)
+    }
+
+    @Test
+    fun testGetWithHalpage() {
+
+        val startTime1 = 10
+        val startTime2 = 20
+        val startTime3 = 30
+
+        val movieId1 = "1"
+        val movieId2 = "4"
+        val movieId3 = "7"
+
+        val cinemaId1 = "2"
+        val cinemaId2 = "4"
+        val cinemaId3 = "6"
+
+        val dto1 = ShowDto(startTime1, movieId1, cinemaId1, null)
+        val dto2 = ShowDto(startTime2, movieId2, cinemaId2, null)
+        val dto3 = ShowDto(startTime3, movieId3, cinemaId3, null)
+
+        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
+
+        given().contentType(ContentType.JSON)
+                .body(dto1)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().contentType(ContentType.JSON)
+                .body(dto2)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().contentType(ContentType.JSON)
+                .body(dto3)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(3))
+
+        given()
+                .param("limit", "1")
+                .get("/shows")
+                .then()
+                .statusCode(200)
+                .body("data.pages", equalTo(3))
+                .body("data.count", equalTo(3))
+                .body("data.data.size()", equalTo(1))
+                .body("$", not(hasKey("data._links.previous")))
+                .body("data._links.next.href", notNullValue())
+                .body("data._links.self.href", notNullValue())
+
+        given()
+                .param("limit", "1")
+                .param("page", "2")
+                .get("/shows")
+                .then()
+                .statusCode(200)
+                .body("data.pages", equalTo(3))
+                .body("data.count", equalTo(3))
+                .body("data.data.size()", equalTo(1))
+                .body("data._links.previous.href", notNullValue())
+                .body("data._links.next.href", notNullValue())
+                .body("data._links.self.href", notNullValue())
+
+        given()
+                .param("limit", "1")
+                .param("page", "3")
+                .get("/shows")
+                .then()
+                .statusCode(200)
+                .body("data.pages", equalTo(3))
+                .body("data.count", equalTo(3))
+                .body("data.data.size()", equalTo(1))
+                .body("data._links.previous", notNullValue())
+                .body("$", not(hasKey("data._links.next")))
+                .body("data._links.self.href", notNullValue())
     }
 
     @Test
