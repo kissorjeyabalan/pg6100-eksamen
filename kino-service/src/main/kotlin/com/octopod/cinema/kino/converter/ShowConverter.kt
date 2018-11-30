@@ -11,8 +11,8 @@ class ShowConverter {
         fun transform(show: Show): ShowDto {
             return ShowDto(
                     startTime = show.startTime,
-                    movieName = show.movieName,
-                    cinemaId = show.cinemaId,
+                    movieId = show.movieId!!.toString(),
+                    cinemaId = show.cinemaId!!.toString(),
                     id = show.id
             )
         }
@@ -20,8 +20,8 @@ class ShowConverter {
         fun transform(showdto: ShowDto): Show {
             return Show(
                     startTime = showdto.startTime,
-                    movieName = showdto.movieName,
-                    cinemaId = showdto.cinemaId,
+                    movieId = showdto.movieId!!.toLong(),
+                    cinemaId = showdto.cinemaId!!.toLong(),
                     id = showdto.id!!.toLong()
             )
         }

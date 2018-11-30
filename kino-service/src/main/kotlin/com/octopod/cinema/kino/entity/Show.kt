@@ -12,11 +12,11 @@ class Show (
         @get:NotNull
         var startTime: Int? = null,
 
-        @get:NotBlank
-        var movieName: String? = null,
+        @get:NotNull
+        var movieId: Long? = null,
 
-        @get:NotBlank
-        var cinemaId: String? = null,
+        @get:NotNull
+        var cinemaId: Long? = null,
 
         @get:Id @get:GeneratedValue
         var id: Long? = null

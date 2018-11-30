@@ -42,11 +42,11 @@ class ShowController {
 
     ): ResponseEntity<Void> {
 
-        if (dto.movieName == null || dto.cinemaId == null || dto.startTime == null) {
+        if (dto.movieId == null || dto.cinemaId == null || dto.startTime == null) {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(Show(dto.startTime!!, dto.movieName!!, dto.cinemaId!!))
+        val created = repo.save(Show(dto.startTime!!, dto.movieId!!.toLong(), dto.cinemaId!!.toLong()))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -70,7 +70,11 @@ class ShowController {
 
             @ApiParam("Theater id")
             @RequestParam("theater", required = false)
-            theater: String?
+            theater: String?,
+
+            @ApiParam("Movie Id")
+            @RequestParam("movie", required = false)
+            movie: String?
 
     ): ResponseEntity<WrappedResponse<HalPage<ShowDto>>> {
 
@@ -86,18 +90,31 @@ class ShowController {
             )
         }
 
-        val entryList: List<Show>
+        val entryList: List<Show> =
+        if ( !theater.isNullOrBlank() && !movie.isNullOrBlank() ) {
 
-        if ( theater.isNullOrBlank()) {
-            entryList = repo.findAll().toList()
-        } else {
+            val theaterId: Long
+            val movieId: Long
+            try {
+                theaterId = theater!!.toLong()
+                movieId = movie!!.toLong()
+            } catch (e: Exception) {
+                return ResponseEntity.status(400).build()
+            }
+            repo.findAllByCinemaIdAndMovieId(theaterId, movieId)
+
+        } else if ( !theater.isNullOrBlank() && movie.isNullOrBlank() ) {
+
             val theaterId: Long
             try {
                 theaterId = theater!!.toLong()
             } catch (e: Exception) {
                 return ResponseEntity.status(400).build()
             }
-            entryList = repo.findAllByCinemaId(theaterId)
+            repo.findAllByCinemaId(theaterId)
+
+        } else {
+            repo.findAll().toList()
         }
 
         val dto = ShowConverter.transform(entryList, pageInt, limitInt)
@@ -223,7 +240,7 @@ class ShowController {
             return ResponseEntity.status(404).build()
         }
 
-        if (dto.startTime == null || dto.cinemaId == null || dto.movieName == null) {
+        if (dto.startTime == null || dto.cinemaId == null || dto.movieId == null) {
             return ResponseEntity.status(400).build()
         }
 
@@ -290,8 +307,8 @@ class ShowController {
         }
 
         var newStartTime = originalDto.startTime
-        var newCinemaName = originalDto.cinemaId
-        var newMovieName = originalDto.movieName
+        var newCinemaId = originalDto.cinemaId
+        var newMovieId = originalDto.movieId
 
         if (jsonNode.has("startTime")) {
             val startTimeNode = jsonNode.get("startTime")
@@ -304,28 +321,28 @@ class ShowController {
         }
 
         if (jsonNode.has("cinemaId")) {
-            val cinemaNameNode = jsonNode.get("cinemaId")
-            newCinemaName = when {
-                cinemaNameNode.isNull -> return ResponseEntity.status(400).build()
-                cinemaNameNode.isTextual -> cinemaNameNode.asText()
+            val cinemaIdNode = jsonNode.get("cinemaId")
+            newCinemaId = when {
+                cinemaIdNode.isNull -> return ResponseEntity.status(400).build()
+                cinemaIdNode.isTextual -> cinemaIdNode.asLong()
                 else -> //Invalid JSON. Non-string name
                     return ResponseEntity.status(400).build()
             }
         }
 
-        if (jsonNode.has("movieName")) {
-            val movieNameNode = jsonNode.get("movieName")
-            newMovieName = when {
-                movieNameNode.isNull -> return ResponseEntity.status(400).build()
-                movieNameNode.isTextual -> movieNameNode.asText()
+        if (jsonNode.has("movieId")) {
+            val movieIdNode = jsonNode.get("movieId")
+            newMovieId = when {
+                movieIdNode.isNull -> return ResponseEntity.status(400).build()
+                movieIdNode.isTextual -> movieIdNode.asLong()
                 else -> //Invalid JSON. Non-string name
                     return ResponseEntity.status(400).build()
             }
         }
 
         originalDto.startTime = newStartTime
-        originalDto.cinemaId = newCinemaName
-        originalDto.movieName = newMovieName
+        originalDto.cinemaId = newCinemaId
+        originalDto.movieId = newMovieId
 
         repo.save(originalDto)
         return ResponseEntity.status(204).build()
