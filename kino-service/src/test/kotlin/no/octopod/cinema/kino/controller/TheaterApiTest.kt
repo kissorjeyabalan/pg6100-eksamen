@@ -148,7 +148,7 @@ class TheaterApiTest: ApiTestBase() {
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()

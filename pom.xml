@@ -13,6 +13,7 @@
         <module>kino-service</module>
         <module>ticket-service</module>
         <module>frontend</module>
+        <module>movie-service</module>
     </modules>
 
     <properties>

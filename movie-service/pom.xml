@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>kino-service</artifactId>
+    <artifactId>movie-service</artifactId>
 
     <dependencies>
 
@@ -63,7 +63,7 @@
             <artifactId>springfox-spring-web</artifactId>
         </dependency>
 
-        <!-- Security -->
+        <!-- Security
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
-        </dependency>
+        </dependency> -->
 
         <!-- Test -->
         <dependency>
@@ -104,10 +104,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <finalName>kino-service</finalName>
+                    <finalName>movie-service</finalName>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -2,13 +2,13 @@ package no.octopod.cinema.kino.converter
 
 import no.octopod.cinema.common.hateos.HalPage
 import no.octopod.cinema.kino.dto.TheaterDto
-import no.octopod.cinema.kino.entity.Theater
+import no.octopod.cinema.kino.entity.TheaterEntity
 import kotlin.streams.toList
 
 class TheaterConverter {
     companion object {
 
-        fun transform(theater: Theater): TheaterDto {
+        fun transform(theater: TheaterEntity): TheaterDto {
             return TheaterDto(
                     name = theater.name,
                     seatsMax = theater.seatsMax,
@@ -16,15 +16,15 @@ class TheaterConverter {
             )
         }
 
-        fun transform(theaterdto: TheaterDto): Theater {
-            return Theater(
+        fun transform(theaterdto: TheaterDto): TheaterEntity {
+            return TheaterEntity(
                     name = theaterdto.name,
                     seatsMax = theaterdto.seatsMax,
                     id = theaterdto.id!!.toLong()
             )
         }
 
-        fun transform(entities: List<Theater>, page: Int, limit: Int): HalPage<TheaterDto> {
+        fun transform(entities: List<TheaterEntity>, page: Int, limit: Int): HalPage<TheaterDto> {
             val offset = ((page - 1) * limit).toLong()
             val dtoList : MutableList<TheaterDto> = entities.stream()
                     .skip(offset)

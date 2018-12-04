@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import no.octopod.cinema.common.dto.WrappedResponse
-import no.octopod.cinema.kino.entity.Show
+import no.octopod.cinema.kino.entity.ShowEntity
 import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
@@ -37,7 +37,7 @@ class ShowController {
     @PostMapping
     fun createShow(
 
-            @ApiParam("Show dto")
+            @ApiParam("ShowEntity dto")
             @RequestBody dto: ShowDto
 
     ): ResponseEntity<Void> {
@@ -46,7 +46,7 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(Show(dto.startTime!!, dto.movieId!!.toLong(), dto.cinemaId!!.toLong()))
+        val created = repo.save(ShowEntity(dto.startTime!!, dto.movieId!!.toLong(), dto.cinemaId!!.toLong()))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -68,7 +68,7 @@ class ShowController {
             @RequestParam("limit", defaultValue = "10")
             limit: String,
 
-            @ApiParam("Theater id")
+            @ApiParam("TheaterEntity id")
             @RequestParam("theater", required = false)
             theater: String?,
 
@@ -90,7 +90,7 @@ class ShowController {
             )
         }
 
-        val entryList: List<Show> =
+        val entryList: List<ShowEntity> =
         if ( !theater.isNullOrBlank() && !movie.isNullOrBlank() ) {
 
             val theaterId: Long
@@ -151,7 +151,7 @@ class ShowController {
     @GetMapping(path = ["/{id}"])
     fun getShow(
 
-            @ApiParam("Show id")
+            @ApiParam("ShowEntity id")
             @PathVariable("id")
             id: String
 
@@ -183,7 +183,7 @@ class ShowController {
     @DeleteMapping(path = ["/{id}"])
     fun deleteShowById(
 
-            @ApiParam("Show id")
+            @ApiParam("ShowEntity id")
             @PathVariable("id")
             id: String
 
@@ -209,7 +209,7 @@ class ShowController {
     @PutMapping(path = ["/{id}"])
     fun updateShow(
 
-            @ApiParam("Show id")
+            @ApiParam("ShowEntity id")
             @PathVariable("id")
             id: String,
 
@@ -255,7 +255,7 @@ class ShowController {
     @PatchMapping(path = ["/{id}"])
     fun patchShow(
 
-            @ApiParam("Show id")
+            @ApiParam("ShowEntity id")
             @PathVariable("id")
             id: String,
 

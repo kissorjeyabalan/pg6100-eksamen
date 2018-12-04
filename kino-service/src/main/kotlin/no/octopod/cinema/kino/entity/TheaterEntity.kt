@@ -7,16 +7,13 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Entity
-class Show (
+class TheaterEntity (
+
+        @get:NotBlank
+        var name: String? = null,
 
         @get:NotNull
-        var startTime: Int? = null,
-
-        @get:NotNull
-        var movieId: Long? = null,
-
-        @get:NotNull
-        var cinemaId: Long? = null,
+        var seatsMax: Int? = null,
 
         @get:Id @get:GeneratedValue
         var id: Long? = null

@@ -1,4 +1,4 @@
-package no.octopod.cinema.kino
+package no.octopod.cinema.movie
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @SpringBootApplication
 @EnableEurekaClient
 @EnableSwagger2
-class KinoApplication {
+class MovieApplication {
 
     @Bean
     fun swaggerApi(): Docket {
@@ -27,7 +27,7 @@ class KinoApplication {
 
     private fun apiInfo(): ApiInfo {
         return ApiInfoBuilder()
-                .title("API for Kino")
+                .title("API for movies")
                 .description("Some description")
                 .version("1.0.0")
                 .build()
@@ -35,5 +35,5 @@ class KinoApplication {
 }
 
 fun main(args: Array<String>) {
-    runApplication<KinoApplication>(*args)
+    runApplication<MovieApplication>(*args)
 }
