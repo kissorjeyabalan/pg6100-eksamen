@@ -66,28 +66,28 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), ticketId)
 
-        given().get()
+        given().get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(0))
 
-
-        given().contentType(ContentType.JSON)
+        val path = given().contentType(ContentType.JSON)
                 .body(dto)
-                .post()
+                .post("/tickets")
                 .then()
                 .statusCode(201)
+                .extract().header("Location")
 
-        given().get()
+        given().get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(1))
 
-        given().delete(ticketId)
+        given().delete(path)
                 .then()
                 .statusCode(204)
 
-        given().get()
+        given().get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.list.size()", equalTo(0))
