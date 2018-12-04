@@ -11,21 +11,27 @@ spring:
         # "lb" stands for Load-Balance, which is done with Ribbon
         uri: lb://user-service
         predicates:
-        - Path=/users/**
+        - Path=/api/v1/users/**
         filters:
-        - StripPrefix=1
+        - StripPrefix=2
+      - id: auth-service
+        uri: lb://user-service
+        predicates:
+        - Path=/api/v1/auth/**
+        filters:
+        - StripPrefix=2
       - id: kino-service
         uri: lb://kino-service
         predicates:
-        - Path=/kino/**
+        - Path=/api/v1/kino/**
         filters:
-        - StripPrefix=1
+        - StripPrefix=3
       - id: ticket-service
         uri: lb://ticket-service
         predicates:
-        - Path=/tickets/**
+        - Path=/api/v1/tickets/**
         filters:
-        - StripPrefix=1
+        - StripPrefix=2
 
 eureka:
   instance:
