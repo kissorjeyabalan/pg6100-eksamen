@@ -1,4 +1,4 @@
-package no.octopod.cinema.user.entity
+package no.octopod.cinema.auth.entity
 
 import javax.persistence.ElementCollection
 import javax.persistence.Entity

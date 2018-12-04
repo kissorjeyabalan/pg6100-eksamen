@@ -1,10 +1,11 @@
-package no.octopod.cinema.user.controller
+package no.octopod.cinema.auth.controller
 
-import no.octopod.cinema.user.dto.LoginDto
-import no.octopod.cinema.user.service.AuthenticationService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
+import no.octopod.cinema.auth.dto.LoginDto
+import no.octopod.cinema.auth.service.AuthenticationService
+import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager

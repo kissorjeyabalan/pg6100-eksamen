@@ -1,6 +1,6 @@
-package no.octopod.cinema.user.service
+package no.octopod.cinema.auth.service
 
-import no.octopod.cinema.user.entity.AuthenticationEntity
+import no.octopod.cinema.auth.entity.AuthenticationEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.CrudRepository
 import org.springframework.security.crypto.password.PasswordEncoder

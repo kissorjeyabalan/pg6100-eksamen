@@ -1,4 +1,4 @@
-package no.octopod.cinema.user.dto
+package no.octopod.cinema.auth.dto
 
 data class LoginDto(
         var username: String? = null,
