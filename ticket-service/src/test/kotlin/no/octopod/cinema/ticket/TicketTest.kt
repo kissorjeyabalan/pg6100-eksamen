@@ -54,7 +54,7 @@ class TicketTest {
         given().get("/tickets")
                 .then()
                 .statusCode(200)
-                .body("data.list.size()", equalTo(1))
+                .body("data.data.size()", equalTo(1))
     }
 
 
@@ -69,7 +69,7 @@ class TicketTest {
         given().get("/tickets")
                 .then()
                 .statusCode(200)
-                .body("data.list.size()", equalTo(0))
+                .body("data.data.size()", equalTo(0))
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -81,7 +81,7 @@ class TicketTest {
         given().get("/tickets")
                 .then()
                 .statusCode(200)
-                .body("data.list.size()", equalTo(1))
+                .body("data.data.size()", equalTo(1))
 
         given().delete(path)
                 .then()
@@ -90,7 +90,7 @@ class TicketTest {
         given().get("/tickets")
                 .then()
                 .statusCode(200)
-                .body("data.list.size()", equalTo(0))
+                .body("data.data.size()", equalTo(0))
 
     }
 
@@ -99,7 +99,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
 
         val path = given().contentType(ContentType.JSON)
                 .body(dto)
@@ -111,12 +111,12 @@ class TicketTest {
         given().get("/tickets")
                 .then()
                 .statusCode(200)
-                .body("data.list.size()", equalTo(1))
+                .body("data.data.size()", equalTo(1))
 
         given().get("/tickets")
                 .then()
                 .statusCode(200)
-                .body("data.list[0].userId", equalTo("1"))
+                .body("data.data[0].userId", equalTo("1"))
 
         val updatedDto = TicketDto("2", "2", ZonedDateTime.now(), path.split("/")[2])
 
@@ -138,5 +138,18 @@ class TicketTest {
     @Test
     fun testPatchTicket() {
         // TODO finish test
+    }
+
+    @Test
+    fun test() {
+        val dto = TicketDto("foo", "1")
+
+        val resPath = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/tickets")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
     }
 }

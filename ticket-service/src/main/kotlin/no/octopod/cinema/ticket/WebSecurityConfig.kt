@@ -2,6 +2,7 @@ package no.octopod.cinema.ticket
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -12,18 +13,11 @@ import org.springframework.security.core.userdetails.UserDetails
 
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig(
-
-) : WebSecurityConfigurerAdapter() {
+class WebSecurityConfig: WebSecurityConfigurerAdapter() {
 
     @Bean
     fun userSecurity() : UserSecurity {
         return UserSecurity()
-    }
-
-    @Bean
-    override fun authenticationManager(): AuthenticationManager {
-        return super.authenticationManager()
     }
 
     override fun configure(http: HttpSecurity) {
@@ -32,11 +26,15 @@ class WebSecurityConfig(
                 .httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/tickets").hasRole("ADMIN")
+                .antMatchers("/tickets").permitAll()
+                //
                 .and()
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                .and()
+                .authorizeRequests().antMatchers("/**").permitAll()
     }
 
 }

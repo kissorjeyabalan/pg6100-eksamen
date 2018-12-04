@@ -4,6 +4,7 @@ import no.octopod.cinema.common.dto.TicketDto
 import no.octopod.cinema.ticket.entity.Ticket
 import no.octopod.cinema.ticket.hal.PageDto
 import kotlin.streams.toList
+import no.octopod.cinema.common.hateos.HalPage
 
 object DtoTransformer {
 
@@ -15,22 +16,25 @@ object DtoTransformer {
     }
 
     fun transform(ticketList: List<Ticket>,
-                  offset: Int,
+                  page: Int,
                   limit: Int)
-    : PageDto<TicketDto> {
+    : HalPage<TicketDto> {
+
+        val offset = ((page - 1) * limit).toLong()
 
         val dtoList: MutableList<TicketDto> = ticketList.stream()
-                .skip(offset.toLong())
+                .skip(offset)
                 .limit(limit.toLong())
                 .map { transform(it) }
                 .toList().toMutableList()
 
-        return PageDto(
-                list = dtoList,
-                rangeMin = offset,
-                rangeMax = offset + dtoList.size - 1,
-                totalSize = ticketList.size
-        )
+        val pageDto = HalPage<TicketDto>()
+
+        pageDto.data = dtoList
+        pageDto.count = ticketList.size.toLong()
+        pageDto.pages = ((pageDto.count / limit) + 1).toInt()
+
+        return pageDto
 
     }
 }
