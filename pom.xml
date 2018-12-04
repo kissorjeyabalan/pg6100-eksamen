@@ -13,6 +13,7 @@
         <module>kino-service</module>
         <module>ticket-service</module>
         <module>frontend</module>
+        <module>auth-service</module>
     </modules>
 
     <properties>
@@ -21,7 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <version.kotlin>1.2.71</version.kotlin>
         <version.java>1.8</version.java>
-        <version.springboot>2.0.5.RELEASE</version.springboot>
+        <version.springboot>2.0.6.RELEASE</version.springboot>
         <version.springcloud>Finchley.RELEASE</version.springcloud>
         <version.springfox>2.9.2</version.springfox>
     </properties>
@@ -56,7 +57,7 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>${version.springboot}</version>
@@ -67,7 +68,7 @@
                 <groupId>org.springframework.session</groupId>
                 <artifactId>spring-session-data-redis</artifactId>
                 <version>${version.springboot}</version>
-            </dependency>
+            </dependency>-->
             <!-- SpringBoot and Cloud -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -79,7 +80,7 @@
                 <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
                 <version>2.0.2.RELEASE</version>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-gateway</artifactId>
                 <version>2.0.2.RELEASE</version>
@@ -98,9 +99,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${version.springboot}</version>
-            </dependency>
+            </dependency>-->
 
-            <!-- SpringFox - Swagger -->
+            <!--- SpringFox - Swagger -->
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>

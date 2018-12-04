@@ -17,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("disable-auth")
 class UserTest {
 
     @LocalServerPort private var port = 0
@@ -28,13 +27,26 @@ class UserTest {
         RestAssured.baseURI = "http://localhost"
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
+
         userRepo.deleteAll()
 
-        given().get("/users")
+        /*given().get("/users")
                 .then()
                 .statusCode(200)
-                .body("data.data.size()", equalTo(0))
+                .body("data.data.size()", equalTo(0))*/
     }
+
+    /*@Test
+    fun test() {
+        val originalUserDto = UserDto(phone = "1243234323", email = "test@test.xyz", name = "Test User")
+        val userInfoPath = given().auth().preemptive().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(originalUserDto)
+                .post("/users")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+    }*/
 
     @Test
     fun testCreateAndGetSpecificUserInfo() {
