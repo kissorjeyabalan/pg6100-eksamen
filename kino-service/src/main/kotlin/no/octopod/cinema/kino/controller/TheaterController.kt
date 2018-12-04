@@ -1,7 +1,11 @@
 package no.octopod.cinema.kino.controller
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.type.ResolvedType
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Throwables
 import no.octopod.cinema.kino.converter.TheaterConverter
 import no.octopod.cinema.kino.dto.TheaterDto
@@ -42,11 +46,14 @@ class TheaterController {
 
     ): ResponseEntity<Void> {
 
-        if (dto.name == null || dto.seatsMax == null) {
+        if (dto.name == null || dto.seats == null) {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(TheaterEntity(dto.name!!, dto.seatsMax!!))
+        val theater = TheaterEntity(name = dto.name!!, seatsMax = dto.seats!!.size)
+        theater.seats!!.addAll(dto.seats!!)
+
+        val created = repo.save(theater)
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -205,7 +212,7 @@ class TheaterController {
             return ResponseEntity.status(404).build()
         }
 
-        if (dto.name == null || dto.seatsMax == null) {
+        if (dto.name == null || dto.seats == null) {
             return ResponseEntity.status(400).build()
         }
 
@@ -273,6 +280,7 @@ class TheaterController {
 
         var newName = originalDto.name
         var newSeatsMax = originalDto.seatsMax
+        var newSeats = originalDto.seats
 
         if (jsonNode.has("name")) {
             val nameNode = jsonNode.get("name")
@@ -289,13 +297,28 @@ class TheaterController {
             newSeatsMax = when {
                 maxNode.isNull -> return ResponseEntity.status(400).build()
                 maxNode.isNumber -> maxNode.asInt()
-                else -> //Invalid JSON. Non-string name
+                else -> //Invalid JSON. Non-int seatsMax
                     return ResponseEntity.status(400).build()
+            }
+        }
+
+        if (jsonNode.has("seats")) {
+            val seatsNode = jsonNode.withArray("seats")
+            if (seatsNode.isNull) return ResponseEntity.status(400).build()
+            if (seatsNode.isArray) {
+                var mutableArr = mutableListOf<String>()
+                seatsNode.elements().forEach { it ->
+                    mutableArr.add(it.asText())
+                }
+                newSeats = mutableArr
+            } else {
+                return ResponseEntity.status(400).build()
             }
         }
 
         originalDto.name = newName
         originalDto.seatsMax = newSeatsMax
+        originalDto.seats = newSeats
 
         repo.save(originalDto)
         return ResponseEntity.status(204).build()

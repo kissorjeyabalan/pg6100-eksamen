@@ -15,6 +15,9 @@ class TheaterEntity (
         @get:NotNull
         var seatsMax: Int? = null,
 
+        @get:NotNull
+        var seats: MutableList<String>? = mutableListOf(),
+
         @get:Id @get:GeneratedValue
         var id: Long? = null
 

@@ -10,15 +10,18 @@ import javax.validation.constraints.NotNull
 class ShowEntity (
 
         @get:NotNull
-        var startTime: Int? = null,
+    var startTime: Int? = null,
 
         @get:NotNull
-        var movieId: Long? = null,
+    var movieId: Long? = null,
 
         @get:NotNull
-        var cinemaId: Long? = null,
+    var cinemaId: Long? = null,
+
+    @get:NotNull
+    var seats: MutableList<String>? = mutableListOf(),
 
         @get:Id @get:GeneratedValue
-        var id: Long? = null
+    var id: Long? = null
 
 )
