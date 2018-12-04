@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Entity
-class Theater (
+class TheaterEntity (
 
         @get:NotBlank
         var name: String? = null,

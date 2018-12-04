@@ -1,6 +1,6 @@
 package no.octopod.cinema.kino.repository
 
-import no.octopod.cinema.kino.entity.Show
+import no.octopod.cinema.kino.entity.ShowEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
@@ -13,8 +13,8 @@ import javax.transaction.Transactional
  */
 
 @Repository
-interface ShowRepository: CrudRepository<Show, Long> {
+interface ShowRepository: CrudRepository<ShowEntity, Long> {
     fun deleteAllById(ids: List<Long>)
-    fun findAllByCinemaId(id: Long): List<Show>
-    fun findAllByCinemaIdAndMovieId(cinemaId: Long, movieId: Long): List<Show>
+    fun findAllByCinemaId(id: Long): List<ShowEntity>
+    fun findAllByCinemaIdAndMovieId(cinemaId: Long, movieId: Long): List<ShowEntity>
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import org.springframework.http.MediaType
 import no.octopod.cinema.common.dto.WrappedResponse
-import no.octopod.cinema.kino.entity.Theater
+import no.octopod.cinema.kino.entity.TheaterEntity
 import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
@@ -37,7 +37,7 @@ class TheaterController {
     @PostMapping
     fun createTheater(
 
-            @ApiParam("Show dto")
+            @ApiParam("ShowEntity dto")
             @RequestBody dto: TheaterDto
 
     ): ResponseEntity<Void> {
@@ -46,7 +46,7 @@ class TheaterController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(Theater(dto.name!!, dto.seatsMax!!))
+        val created = repo.save(TheaterEntity(dto.name!!, dto.seatsMax!!))
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -118,7 +118,7 @@ class TheaterController {
     @GetMapping(path = ["/{id}"])
     fun getTheater(
 
-            @ApiParam("Theater id")
+            @ApiParam("TheaterEntity id")
             @PathVariable("id")
             id: String
 
@@ -148,7 +148,7 @@ class TheaterController {
     @DeleteMapping(path = ["/{id}"])
     fun deleteTheaterById(
 
-            @ApiParam("Theater id")
+            @ApiParam("TheaterEntity id")
             @PathVariable("id")
             id: String
 
@@ -174,7 +174,7 @@ class TheaterController {
     @PutMapping(path = ["/{id}"])
     fun updateTheater(
 
-            @ApiParam("Theater id")
+            @ApiParam("TheaterEntity id")
             @PathVariable("id")
             id: String,
 
@@ -227,7 +227,7 @@ class TheaterController {
     @PatchMapping(path = ["/{id}"])
     fun patchTheater(
 
-            @ApiParam("Theater id")
+            @ApiParam("TheaterEntity id")
             @PathVariable("id")
             id: String,
 

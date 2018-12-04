@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @SpringBootApplication
 @EnableEurekaClient
 @EnableSwagger2
-class TheaterApplication {
+class KinoApplication {
 
     @Bean
     fun swaggerApi(): Docket {
@@ -35,5 +35,5 @@ class TheaterApplication {
 }
 
 fun main(args: Array<String>) {
-    runApplication<TheaterApplication>(*args)
+    runApplication<KinoApplication>(*args)
 }

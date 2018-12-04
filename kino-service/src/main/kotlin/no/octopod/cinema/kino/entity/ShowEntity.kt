@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Entity
-class Show (
+class ShowEntity (
 
         @get:NotNull
         var startTime: Int? = null,

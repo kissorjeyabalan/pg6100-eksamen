@@ -2,13 +2,13 @@ package no.octopod.cinema.kino.converter
 
 import no.octopod.cinema.common.hateos.HalPage
 import no.octopod.cinema.kino.dto.ShowDto
-import no.octopod.cinema.kino.entity.Show
+import no.octopod.cinema.kino.entity.ShowEntity
 import kotlin.streams.toList
 
 class ShowConverter {
     companion object {
 
-        fun transform(show: Show): ShowDto {
+        fun transform(show: ShowEntity): ShowDto {
             return ShowDto(
                     startTime = show.startTime,
                     movieId = show.movieId!!.toString(),
@@ -17,8 +17,8 @@ class ShowConverter {
             )
         }
 
-        fun transform(showdto: ShowDto): Show {
-            return Show(
+        fun transform(showdto: ShowDto): ShowEntity {
+            return ShowEntity(
                     startTime = showdto.startTime,
                     movieId = showdto.movieId!!.toLong(),
                     cinemaId = showdto.cinemaId!!.toLong(),
@@ -26,7 +26,7 @@ class ShowConverter {
             )
         }
 
-        fun transform(entities: List<Show>, page: Int, limit: Int): HalPage<ShowDto> {
+        fun transform(entities: List<ShowEntity>, page: Int, limit: Int): HalPage<ShowDto> {
             val offset = ((page - 1) * limit).toLong()
             val dtoList : MutableList<ShowDto> = entities.stream()
                     .skip(offset)
