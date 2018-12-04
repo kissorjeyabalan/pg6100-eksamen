@@ -35,7 +35,7 @@ class TheaterConverter {
             val pageDto = HalPage<TheaterDto>()
             pageDto.data = dtoList
             pageDto.count = entities.size.toLong()
-            pageDto.pages = ((pageDto.count / limit)).toInt()
+            pageDto.pages = ((pageDto.count / limit + 1)).toInt()
 
             return pageDto
         }
