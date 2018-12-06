@@ -50,7 +50,7 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        //chekc for long
+        //TODO: chekc for long
         val theater = theaterRepo.findById(dto.cinemaId!!.toLong()).orElse(null)
                 ?: return ResponseEntity.status(400).build()
 
