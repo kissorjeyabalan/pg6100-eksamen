@@ -1,11 +1,7 @@
 package no.octopod.cinema.kino.controller
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.type.ResolvedType
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Throwables
 import no.octopod.cinema.kino.converter.TheaterConverter
 import no.octopod.cinema.kino.dto.TheaterDto

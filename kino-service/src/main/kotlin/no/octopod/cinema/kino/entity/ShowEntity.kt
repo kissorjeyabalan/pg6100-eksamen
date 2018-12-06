@@ -1,5 +1,6 @@
 package no.octopod.cinema.kino.entity
 
+import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -18,8 +19,8 @@ class ShowEntity (
         @get:NotNull
     var cinemaId: Long? = null,
 
-    @get:NotNull
-    var seats: MutableList<String>? = mutableListOf(),
+    @get:NotNull @ElementCollection(targetClass = String::class)
+    var seats: MutableList<String>? = ArrayList<String>(),
 
         @get:Id @get:GeneratedValue
     var id: Long? = null
