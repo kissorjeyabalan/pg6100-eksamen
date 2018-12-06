@@ -151,5 +151,26 @@ class TicketTest {
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
+
+        given().auth().basic("bar", "123")
+                .get(resPath)
+                .then()
+                .statusCode(401)
+
+
+        given().auth().basic("foo", "123")
+                .get(resPath)
+                .then()
+                .statusCode(200)
+
+        given().auth().basic("admin", "admin")
+                .get(resPath)
+                .then()
+                .statusCode(200)
+
+        given()
+                .get(resPath)
+                .then()
+                .statusCode(401)
     }
 }

@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
+import no.octopod.cinema.common.utility.SecurityUtil.isAuthenticatedOrAdmin
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -20,6 +21,10 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import java.security.Principal
+import javax.servlet.http.HttpServletRequest
+import org.springframework.security.core.context.SecurityContextHolder
+
+
 
 @Api(value = "tickets", description = "handling of tickets")
 @RequestMapping(
@@ -115,7 +120,8 @@ class TicketApi {
     fun getTicket(
             @ApiParam("Ticket id")
             @PathVariable("id")
-            id: String
+            id: String,
+            authentication: Authentication
 
     ): ResponseEntity<WrappedResponse<TicketDto>> {
         val pathId: Long
@@ -125,7 +131,13 @@ class TicketApi {
             return ResponseEntity.status(404).build()
         }
 
+
+
         val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
+        if (!isAuthenticatedOrAdmin(authentication, entity.userId)) {
+            return ResponseEntity.status(401).build()
+        }
+
         val dto = DtoTransformer.transform(entity)
 
         return ResponseEntity.ok(WrappedResponse(
@@ -136,8 +148,7 @@ class TicketApi {
 
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
-
+    fun createTicket(@RequestBody dto: TicketDto, authentication: Authentication) : ResponseEntity<Void> {
         if(dto.userId == null || dto.screeningId == null) {
             return ResponseEntity.status(400).build()
         }
@@ -306,16 +317,6 @@ class TicketApi {
                         code = 204
                 ).validated()
         )
-    }
-
-    private fun isAuthenticatedOrAdmin(authentication: Authentication, id: String): Boolean {
-        var principal = authentication.principal as Principal
-        val userDetails = principal as UserDetails
-        if (userDetails.username == id ||
-                authentication.authorities.contains(SimpleGrantedAuthority("ADMIN"))) {
-            return true
-        }
-        return false
     }
 }
 
