@@ -45,13 +45,15 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
 
-        val id = given().contentType(ContentType.JSON)
+        val id = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
                 .then()
                 .statusCode(201)
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(1))
@@ -66,28 +68,33 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), ticketId)
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(1))
 
-        given().delete(path)
+        given().auth().basic("admin", "admin")
+                .delete(path)
                 .then()
                 .statusCode(204)
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))

@@ -16,15 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import java.security.Principal
-import javax.servlet.http.HttpServletRequest
-import org.springframework.security.core.context.SecurityContextHolder
-
-
 
 @Api(value = "tickets", description = "handling of tickets")
 @RequestMapping(
@@ -61,7 +54,6 @@ class TicketApi {
 
     ): ResponseEntity<WrappedResponse<HalPage<TicketDto>>> {
 
-
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
             return ResponseEntity.status(401).build()
         }
@@ -77,8 +69,6 @@ class TicketApi {
                     ).validated()
             )
         }
-
-
 
         val ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
             repo.findAll().toList()
@@ -166,7 +156,8 @@ class TicketApi {
 
     @ApiOperation("delete a ticket")
     @DeleteMapping(path = ["/{id}"])
-    fun deleteTicket(@PathVariable("id") ticketId: String? ) : ResponseEntity<WrappedResponse<TicketDto>> {
+    fun deleteTicket(@PathVariable("id") ticketId: String?)
+            : ResponseEntity<WrappedResponse<TicketDto>> {
 
         val id: Long
         try {
@@ -235,9 +226,6 @@ class TicketApi {
                 ).validated()
         )
     }
-
-
-
 
     // Copied from CounterRest class in package org.tsdes.advanced.rest.patch
     @ApiOperation("Modify the fields of a ticket")
@@ -309,12 +297,9 @@ class TicketApi {
             }
         }
 
-
-
         //now that the input is validated, do the update
         ticketDto.userId = newUserId
         ticketDto.screeningId = newScreeningId
-
 
         return ResponseEntity.status(204).body(
                 WrappedResponse<TicketDto>(
@@ -323,5 +308,3 @@ class TicketApi {
         )
     }
 }
-
-
