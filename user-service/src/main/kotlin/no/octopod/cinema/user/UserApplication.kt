@@ -19,10 +19,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @EnableEurekaClient
 @EnableRedisRepositories
 class UserApplication {
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
 
     fun swaggerApi(): Docket {
         return Docket(DocumentationType.SWAGGER_2)

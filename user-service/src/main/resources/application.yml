@@ -19,3 +19,12 @@ eureka:
 logging:
   level:
     org.springframework.security: debug
+
+---
+spring:
+  profiles: local
+  session:
+    store-type: none
+eureka:
+  client:
+    enabled: false

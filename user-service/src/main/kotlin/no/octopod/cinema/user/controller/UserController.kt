@@ -7,12 +7,14 @@ import no.octopod.cinema.common.dto.WrappedResponse
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
+import no.octopod.cinema.common.utility.SecurityUtil.isAuthenticatedOrAdmin
 import no.octopod.cinema.user.entity.UserEntity
 import org.codehaus.jackson.JsonNode
 import org.codehaus.jackson.map.ObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -26,10 +28,18 @@ class UserController {
     @Autowired lateinit var repo: UserRepository
 
     @PostMapping
-    fun createUserInfo(@RequestBody userInfo: UserDto): ResponseEntity<Void> {
+    fun createUserInfo(
+            @RequestBody userInfo: UserDto,
+            authentication: Authentication
+            ): ResponseEntity<Void> {
         if (userInfo.phone.isNullOrEmpty() || userInfo.name.isNullOrEmpty() ||userInfo.email.isNullOrEmpty()) {
             return ResponseEntity.status(400).build()
         }
+
+        if (!isAuthenticatedOrAdmin(authentication, userInfo.phone!!)) {
+            return ResponseEntity.status(401).build()
+        }
+
         val entity = UserConverter.transform(userInfo)
 
         if (repo.existsById(userInfo.phone!!)) {
@@ -40,13 +50,17 @@ class UserController {
         return ResponseEntity.created(URI.create("/users/${saved.phone}")).build()
     }
 
-    @GetMapping(path = ["/{id}"])
+    @GetMapping(path = ["/{userId}"])
     fun getById(
-            @PathVariable("id")
-            id: String
+            @PathVariable("userId")
+            userId: String,
+            authentication: Authentication
     ): ResponseEntity<WrappedResponse<UserDto>> {
-        val userInfo = repo.findById(id).orElse(null) ?:
-        return ResponseEntity.status(404).body(
+        if (!isAuthenticatedOrAdmin(authentication, userId)) {
+            return ResponseEntity.status(401).build()
+        }
+
+        val userInfo = repo.findById(userId).orElse(null) ?: return ResponseEntity.status(404).body(
                 WrappedResponse<UserDto>(
                         code = 404,
                         message = "Resource not found"
@@ -108,19 +122,28 @@ class UserController {
         )
     }
 
-    @PutMapping(path = ["/{id}"])
+    @PutMapping(path = ["/{userId}"])
     fun replaceUser(
-            @PathVariable("id")
+            @PathVariable("userId")
             userId: String,
             @RequestBody
-            replacement: UserDto
+            replacement: UserDto,
+            authentication: Authentication
     ) : ResponseEntity<Void> {
-        if (userId.isEmpty() || replacement.name.isNullOrEmpty() || replacement.phone.isNullOrEmpty() || replacement.email.isNullOrEmpty()) {
+        if (!isAuthenticatedOrAdmin(authentication, userId)) {
+            return ResponseEntity.status(401).build()
+        }
+
+        if (replacement.name.isNullOrEmpty() || replacement.phone.isNullOrEmpty() || replacement.email.isNullOrEmpty()) {
             return ResponseEntity.status(400).build()
         }
 
         if (userId != replacement.phone) {
             return ResponseEntity.status(409).build()
+        }
+
+        if (!isAuthenticatedOrAdmin(authentication, userId)) {
+            return ResponseEntity.status(401).build()
         }
 
         var entity = repo.findById(userId).orElse(null)
@@ -148,15 +171,24 @@ class UserController {
     https://github.com/arcuri82/testing_security_development_enterprise_systems/blob/7b9ee145f66718d5976d273b99542a374571b8cf/advanced/rest/patch/src/main/kotlin/org/tsdes/advanced/rest/patch/CounterRest.kt
     */
 
-    @PatchMapping(path = ["/{id}"], consumes = ["application/merge-patch+json"])
+    @PatchMapping(path = ["/{userId}"], consumes = ["application/merge-patch+json"])
     fun mergePatch(
-            @PathVariable("id")
-            id: String,
+            @PathVariable("userId")
+            userId: String,
             @RequestBody
-            jsonPatch: String
+            jsonPatch: String,
+            authentication: Authentication
     ) : ResponseEntity<Void> {
-        val entity = repo.findById(id).orElse(null)
+        if (!isAuthenticatedOrAdmin(authentication, userId)) {
+            return ResponseEntity.status(401).build()
+        }
+
+        val entity = repo.findById(userId).orElse(null)
                 ?: return ResponseEntity.status(404).build()
+
+        if (!isAuthenticatedOrAdmin(authentication, entity.)) {
+            return ResponseEntity.status(401).build()
+        }
 
         val jackson = ObjectMapper()
 
