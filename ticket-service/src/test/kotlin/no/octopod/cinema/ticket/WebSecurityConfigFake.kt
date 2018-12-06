@@ -28,11 +28,13 @@ class WebSecurityConfigLocalFake: WebSecurityConfig() {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
     }
+
+
     override fun configure(auth: AuthenticationManagerBuilder) {
 
-        /*auth.inMemoryAuthentication()
+        auth.inMemoryAuthentication()
                 .withUser("foo").password("{noop}123").roles("USER").and()
                 .withUser("bar").password("{noop}123").roles("USER").and()
-                .withUser("admin").password("{noop}admin").roles("ADMIN", "USER")*/
+                .withUser("admin").password("{noop}admin").roles("ADMIN", "USER")
     }
 }

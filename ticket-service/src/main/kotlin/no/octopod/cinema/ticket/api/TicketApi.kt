@@ -5,18 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.octopod.cinema.ticket.dto.DtoTransformer
 import no.octopod.cinema.common.dto.TicketDto
 import no.octopod.cinema.common.dto.WrappedResponse
-import no.octopod.cinema.ticket.entity.Ticket
-import no.octopod.cinema.ticket.hal.HalLink
-import no.octopod.cinema.ticket.hal.PageDto
 import no.octopod.cinema.ticket.repository.TicketRepository
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import no.octopod.cinema.common.hateos.HalLink
+import no.octopod.cinema.common.hateos.HalPage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
+import java.security.Principal
 
 @Api(value = "tickets", description = "handling of tickets")
 @RequestMapping(
@@ -41,18 +44,27 @@ class TicketApi {
             @RequestParam("userId", required = false)
             userId: String?,
 
-            @ApiParam("offset")
-            @RequestParam("offset", defaultValue = "0")
-            offset: Int,
+            @ApiParam("Page number")
+            @RequestParam("page", defaultValue = "1")
+            page: String,
 
             @ApiParam("Limit of tickets in a single retrieved page")
             @RequestParam("limit", defaultValue = "10")
             limit: Int
 
-    ): ResponseEntity<WrappedResponse<PageDto<TicketDto>>> {
+    ): ResponseEntity<WrappedResponse<HalPage<TicketDto>>> {
 
-        if (offset < 0 || limit < 1) {
-            return ResponseEntity.status(400).build()
+
+        val pageInt = page.toInt()
+        val limitInt = limit.toInt()
+
+        if (pageInt < 1 || limitInt < 1) {
+            return ResponseEntity.status(400).body(
+                    WrappedResponse<HalPage<TicketDto>>(
+                            code = 400,
+                            message = "Malformed limit og page number supplied"
+                    ).validated()
+            )
         }
 
         val ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
@@ -64,34 +76,31 @@ class TicketApi {
             repo.findAllByUserId(userId!!)
         }
 
-
-        if (offset != 0 && offset >= ticketList.size) {
-            return ResponseEntity.status(400).build()
-        }
-
         val dto = DtoTransformer.transform(
-                ticketList, offset, limit)
+                ticketList, pageInt, limit)
 
         var builder = UriComponentsBuilder
                 .fromPath("/tickets")
-                .queryParam("limit", limit)
 
 
         dto._self = HalLink(builder.cloneBuilder()
-                .queryParam("offset", offset)
+                .queryParam("page", page)
+                .queryParam("limit", limit)
                 .build().toString()
         )
 
-        if (!ticketList.isEmpty() && offset > 0) {
+        if (!ticketList.isEmpty() && pageInt > 0) {
             dto.previous = HalLink(builder.cloneBuilder()
-                    .queryParam("offset", Math.max(offset - limit, 0))
+                    .queryParam("page", (pageInt - 1).toString())
+                    .queryParam("limit", limit)
                     .build().toString()
             )
         }
 
-        if (offset + limit < ticketList.size) {
+        if (((pageInt) * limitInt) < ticketList.size) {
             dto.next = HalLink(builder.cloneBuilder()
-                    .queryParam("offset", offset + limit)
+                    .queryParam("page", (pageInt + 1).toString())
+                    .queryParam("limit", limit)
                     .build().toString())
         }
 
@@ -109,7 +118,6 @@ class TicketApi {
             id: String
 
     ): ResponseEntity<WrappedResponse<TicketDto>> {
-
         val pathId: Long
         try {
             pathId = id.toLong()
@@ -136,7 +144,6 @@ class TicketApi {
 
         val id = repo.createTicket(dto.userId!!, dto.screeningId!!)
 
-        //TODO wrap response
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
         ).build()
@@ -299,6 +306,16 @@ class TicketApi {
                         code = 204
                 ).validated()
         )
+    }
+
+    private fun isAuthenticatedOrAdmin(authentication: Authentication, id: String): Boolean {
+        var principal = authentication.principal as Principal
+        val userDetails = principal as UserDetails
+        if (userDetails.username == id ||
+                authentication.authorities.contains(SimpleGrantedAuthority("ADMIN"))) {
+            return true
+        }
+        return false
     }
 }
 

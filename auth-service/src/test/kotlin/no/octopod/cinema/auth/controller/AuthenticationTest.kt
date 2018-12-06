@@ -1,8 +1,8 @@
-package no.octopod.cinema.user.controller
+package no.octopod.cinema.auth.controller
 
-import no.octopod.cinema.user.service.AuthenticationRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
+import no.octopod.cinema.auth.service.AuthenticationRepository
 import org.junit.AfterClass
 import org.junit.Before
 import org.junit.ClassRule

@@ -1,6 +1,5 @@
 package no.octopod.cinema.user.entity
 
-import no.octopod.cinema.common.dto.TicketDto
 import java.time.ZonedDateTime
 import javax.persistence.Entity
 import javax.persistence.Id
