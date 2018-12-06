@@ -6,6 +6,9 @@ import no.octopod.cinema.kino.repository.ShowRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import no.octopod.cinema.kino.dto.TheaterDto
+import no.octopod.cinema.kino.repository.TheaterRepository
+import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Test
@@ -16,9 +19,16 @@ class ShowApiTest: ApiTestBase() {
     @Autowired
     private lateinit var crudShow: ShowRepository
 
+    @Autowired
+    private lateinit var crudTheater: TheaterRepository
+
     @Before
     fun before() {
         crudShow.deleteAll()
+        crudTheater.deleteAll()
+
+        given().get("/shows").then().statusCode(200).body("data.data.size()", CoreMatchers.equalTo(0))
+        given().get("/theaters").then().statusCode(200).body("data.data.size()", CoreMatchers.equalTo(0))
     }
 
     @Test
@@ -31,9 +41,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testCreateAndGet() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieId = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto = ShowDto(startTime, movieId, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -59,15 +71,17 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testCreateAndGetWithTheaterIdAndMovieId() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieId = "1"
-        val cinemaId = "1"
-        val dto = ShowDto(startTime, movieId, cinemaId, null)
+        val cinemaId = theater.id.toString()
+        val showDto = ShowDto(startTime = startTime, movieId = movieId, cinemaId = cinemaId)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         given().contentType(ContentType.JSON)
-                .body(dto)
+                .body(showDto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
@@ -83,10 +97,12 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testCreateAndGetWithTheaterId() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieId = "1"
-        val cinemaId = "1"
-        val dto = ShowDto(startTime, movieId, cinemaId, null)
+        val cinemaId = theater.id.toString()
+        val dto = ShowDto(startTime, movieId, cinemaId)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -128,9 +144,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testGetAndFailWithMalformedLimit() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieName = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -173,9 +191,13 @@ class ShowApiTest: ApiTestBase() {
         val movieId2 = "4"
         val movieId3 = "7"
 
-        val cinemaId1 = "2"
-        val cinemaId2 = "4"
-        val cinemaId3 = "6"
+        val theater1 = createTheater("theater $movieId1", mutableListOf("a $movieId1"))
+        val theater2 = createTheater("theater $movieId2", mutableListOf("a $movieId2"))
+        val theater3 = createTheater("theater $movieId3", mutableListOf("a $movieId3"))
+
+        val cinemaId1 = theater1.id.toString()
+        val cinemaId2 = theater2.id.toString()
+        val cinemaId3 = theater3.id.toString()
 
         val dto1 = ShowDto(startTime1, movieId1, cinemaId1, null)
         val dto2 = ShowDto(startTime2, movieId2, cinemaId2, null)
@@ -265,9 +287,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testDeleteById() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieName = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -292,9 +316,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testDeleteAndFailWithMalformedId() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieName = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -321,9 +347,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testUpdateShow() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieName = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto1 = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -361,9 +389,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testUpdateErrors() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieName = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto1 = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -421,9 +451,11 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testPatchTheater() {
 
+        val theater = createTheater("theater", mutableListOf("a1"))
+
         val startTime = 10
         val movieName = "1"
-        val cinemaId = "1"
+        val cinemaId = theater.id.toString()
         val dto1 = ShowDto(startTime, movieName, cinemaId, null)
 
         given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
@@ -457,5 +489,38 @@ class ShowApiTest: ApiTestBase() {
                 .body("data.startTime", equalTo(dto.startTime))
                 .body("data.movieId", equalTo(newMovieName))
                 .body("data.cinemaId", equalTo(dto.cinemaId))
+    }
+
+    private fun createTheater(name: String, seats: MutableList<String>): TheaterDto {
+
+        val theaterDto = TheaterDto(name = name, seats = seats)
+
+
+
+
+        val path = given().contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().get("/theaters").then().statusCode(200).body("data.data.name", hasItem(name))
+
+        given()
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("data.name", equalTo(theaterDto.name))
+                .body("data.seats.size()", CoreMatchers.equalTo(theaterDto.seats!!.size))
+
+        return given().get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
     }
 }

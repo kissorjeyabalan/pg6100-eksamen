@@ -12,7 +12,8 @@ class TheaterConverter {
             return TheaterDto(
                     name = theater.name,
                     seatsMax = theater.seatsMax,
-                    id = theater.id
+                    id = theater.id,
+                    seats = theater.seats
             )
         }
 
@@ -20,7 +21,8 @@ class TheaterConverter {
             return TheaterEntity(
                     name = theaterdto.name,
                     seatsMax = theaterdto.seatsMax,
-                    id = theaterdto.id!!.toLong()
+                    id = theaterdto.id!!.toLong(),
+                    seats = theaterdto.seats
             )
         }
 
