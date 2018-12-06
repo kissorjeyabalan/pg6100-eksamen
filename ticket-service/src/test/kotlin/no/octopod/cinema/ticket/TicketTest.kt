@@ -101,32 +101,37 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(1))
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data[0].userId", equalTo("1"))
 
         val updatedDto = TicketDto("2", "2", ZonedDateTime.now(), path.split("/")[2])
 
-        given().contentType(ContentType.JSON)
+        given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(updatedDto)
                 .put(path)
                 .then()
                 .statusCode(204)
 
-        given().contentType(ContentType.JSON)
+        given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .get(path)
                 .then()
                 .statusCode(200)

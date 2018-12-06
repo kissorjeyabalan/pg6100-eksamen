@@ -55,10 +55,16 @@ class TicketApi {
 
             @ApiParam("Limit of tickets in a single retrieved page")
             @RequestParam("limit", defaultValue = "10")
-            limit: Int
+            limit: Int,
+
+            authentication: Authentication
 
     ): ResponseEntity<WrappedResponse<HalPage<TicketDto>>> {
 
+
+        if (!isAuthenticatedOrAdmin(authentication, userId)) {
+            return ResponseEntity.status(401).build()
+        }
 
         val pageInt = page.toInt()
         val limitInt = limit.toInt()
@@ -72,9 +78,10 @@ class TicketApi {
             )
         }
 
+
+
         val ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
             repo.findAll().toList()
-
         } else if ( !screeningId.isNullOrBlank() && !userId.isNullOrBlank()) {
             repo.findAllByScreeningIdAndUserId(userId!!, screeningId!!)
         } else {
@@ -86,7 +93,6 @@ class TicketApi {
 
         var builder = UriComponentsBuilder
                 .fromPath("/tickets")
-
 
         dto._self = HalLink(builder.cloneBuilder()
                 .queryParam("page", page)
@@ -130,8 +136,6 @@ class TicketApi {
         } catch (e: Exception) {
             return ResponseEntity.status(404).build()
         }
-
-
 
         val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
         if (!isAuthenticatedOrAdmin(authentication, entity.userId)) {
