@@ -13,6 +13,8 @@ data class ShowDto (
         @ApiModelProperty("Name of the hosting cinema")
         var cinemaId: String? = null,
 
+        var availableSeats: List<String>? = null,
+
         @ApiModelProperty("Id for the show")
         var id: Long? = null
 )

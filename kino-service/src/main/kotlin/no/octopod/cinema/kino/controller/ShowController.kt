@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
+import no.octopod.cinema.kino.repository.TheaterRepository
 import org.springframework.http.MediaType
 import javax.validation.ConstraintViolationException
 
@@ -33,6 +34,9 @@ class ShowController {
     @Autowired
     lateinit var repo: ShowRepository
 
+    @Autowired
+    lateinit var theaterRepo: TheaterRepository
+
     @ApiOperation("Create a new show")
     @PostMapping
     fun createShow(
@@ -46,7 +50,13 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        val created = repo.save(ShowEntity(dto.startTime!!, dto.movieId!!.toLong(), dto.cinemaId!!.toLong()))
+        //TODO: chekc for long
+        val theater = theaterRepo.findById(dto.cinemaId!!.toLong()).orElse(null)
+                ?: return ResponseEntity.status(400).build()
+
+        val showEntity = ShowEntity(startTime = dto.startTime!!, movieId = dto.movieId!!.toLong(), cinemaId = theater.id, seats = theater.seats!!.toMutableList())
+
+        val created = repo.save(showEntity)
 
         return ResponseEntity.created(
                 UriComponentsBuilder
@@ -201,6 +211,45 @@ class ShowController {
         }
 
         repo.deleteById(pathId)
+
+        return ResponseEntity.status(204).build()
+    }
+
+    @ApiOperation("Delete specific seats from show")
+    @DeleteMapping(path= ["/{id}/seats/{seatId}"])
+    fun deleteSeatFromShow(
+
+            @ApiParam("ShowEntity id")
+            @PathVariable("id")
+            id: String,
+
+            @ApiParam("seat number")
+            @PathVariable("seatId")
+            seatId: String
+
+    ): ResponseEntity<WrappedResponse<ShowDto>> {
+
+        val pathId: Long
+        try {
+            pathId = id.toLong()
+        } catch (e: Exception) {
+            /*
+                invalid id. But here we return 404 instead of 400,
+                as in the API we defined the id as string instead of long
+             */
+            return ResponseEntity.status(404).build()
+        }
+
+        val showEntity = repo.findById(pathId).orElse(null)
+        val seatExists = showEntity?.seats?.contains(seatId)
+
+        if (showEntity != null || seatExists == null || !seatExists) {
+            return ResponseEntity.status(404).build()
+        }
+
+        showEntity!!.seats!!.remove(seatId)
+
+        repo.save(showEntity)
 
         return ResponseEntity.status(204).build()
     }
