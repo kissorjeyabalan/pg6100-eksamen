@@ -11,15 +11,13 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
+import no.octopod.cinema.common.utility.SecurityUtil.isAuthenticatedOrAdmin
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import java.security.Principal
 
 @Api(value = "tickets", description = "handling of tickets")
 @RequestMapping(
@@ -50,10 +48,15 @@ class TicketApi {
 
             @ApiParam("Limit of tickets in a single retrieved page")
             @RequestParam("limit", defaultValue = "10")
-            limit: Int
+            limit: Int,
+
+            authentication: Authentication
 
     ): ResponseEntity<WrappedResponse<HalPage<TicketDto>>> {
 
+        if (!isAuthenticatedOrAdmin(authentication, userId)) {
+            return ResponseEntity.status(401).build()
+        }
 
         val pageInt = page.toInt()
         val limitInt = limit.toInt()
@@ -69,7 +72,6 @@ class TicketApi {
 
         val ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
             repo.findAll().toList()
-
         } else if ( !screeningId.isNullOrBlank() && !userId.isNullOrBlank()) {
             repo.findAllByScreeningIdAndUserId(userId!!, screeningId!!)
         } else {
@@ -81,7 +83,6 @@ class TicketApi {
 
         var builder = UriComponentsBuilder
                 .fromPath("/tickets")
-
 
         dto._self = HalLink(builder.cloneBuilder()
                 .queryParam("page", page)
@@ -115,7 +116,8 @@ class TicketApi {
     fun getTicket(
             @ApiParam("Ticket id")
             @PathVariable("id")
-            id: String
+            id: String,
+            authentication: Authentication
 
     ): ResponseEntity<WrappedResponse<TicketDto>> {
         val pathId: Long
@@ -126,6 +128,10 @@ class TicketApi {
         }
 
         val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
+        if (!isAuthenticatedOrAdmin(authentication, entity.userId)) {
+            return ResponseEntity.status(401).build()
+        }
+
         val dto = DtoTransformer.transform(entity)
 
         return ResponseEntity.ok(WrappedResponse(
@@ -136,8 +142,7 @@ class TicketApi {
 
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
-
+    fun createTicket(@RequestBody dto: TicketDto, authentication: Authentication) : ResponseEntity<Void> {
         if(dto.userId == null || dto.screeningId == null) {
             return ResponseEntity.status(400).build()
         }
@@ -151,7 +156,8 @@ class TicketApi {
 
     @ApiOperation("delete a ticket")
     @DeleteMapping(path = ["/{id}"])
-    fun deleteTicket(@PathVariable("id") ticketId: String? ) : ResponseEntity<WrappedResponse<TicketDto>> {
+    fun deleteTicket(@PathVariable("id") ticketId: String?)
+            : ResponseEntity<WrappedResponse<TicketDto>> {
 
         val id: Long
         try {
@@ -220,9 +226,6 @@ class TicketApi {
                 ).validated()
         )
     }
-
-
-
 
     // Copied from CounterRest class in package org.tsdes.advanced.rest.patch
     @ApiOperation("Modify the fields of a ticket")
@@ -294,12 +297,9 @@ class TicketApi {
             }
         }
 
-
-
         //now that the input is validated, do the update
         ticketDto.userId = newUserId
         ticketDto.screeningId = newScreeningId
-
 
         return ResponseEntity.status(204).body(
                 WrappedResponse<TicketDto>(
@@ -307,16 +307,4 @@ class TicketApi {
                 ).validated()
         )
     }
-
-    private fun isAuthenticatedOrAdmin(authentication: Authentication, id: String): Boolean {
-        var principal = authentication.principal as Principal
-        val userDetails = principal as UserDetails
-        if (userDetails.username == id ||
-                authentication.authorities.contains(SimpleGrantedAuthority("ADMIN"))) {
-            return true
-        }
-        return false
-    }
 }
-
-

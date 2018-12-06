@@ -45,13 +45,15 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
 
-        val id = given().contentType(ContentType.JSON)
+        val id = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
                 .then()
                 .statusCode(201)
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(1))
@@ -66,28 +68,33 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), ticketId)
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(1))
 
-        given().delete(path)
+        given().auth().basic("admin", "admin")
+                .delete(path)
                 .then()
                 .statusCode(204)
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
@@ -101,32 +108,37 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(1))
 
-        given().get("/tickets")
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data[0].userId", equalTo("1"))
 
         val updatedDto = TicketDto("2", "2", ZonedDateTime.now(), path.split("/")[2])
 
-        given().contentType(ContentType.JSON)
+        given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(updatedDto)
                 .put(path)
                 .then()
                 .statusCode(204)
 
-        given().contentType(ContentType.JSON)
+        given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .get(path)
                 .then()
                 .statusCode(200)
@@ -151,5 +163,26 @@ class TicketTest {
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
+
+        given().auth().basic("bar", "123")
+                .get(resPath)
+                .then()
+                .statusCode(401)
+
+
+        given().auth().basic("foo", "123")
+                .get(resPath)
+                .then()
+                .statusCode(200)
+
+        given().auth().basic("admin", "admin")
+                .get(resPath)
+                .then()
+                .statusCode(200)
+
+        given()
+                .get(resPath)
+                .then()
+                .statusCode(401)
     }
 }
