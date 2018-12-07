@@ -50,6 +50,10 @@ class AuthenticationController(
     @PostMapping(path = ["/register"], consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE])
     @ApiResponse(code = 201, message = "Successfully created new user")
     fun register(@RequestBody creds: LoginDto): ResponseEntity<Void> {
+        if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
+            return ResponseEntity.status(400).build()
+        }
+        
         val registered = authService.createUser(creds.username!!, creds.password!!, setOf("USER"))
         if (!registered) {
             return ResponseEntity.status(400).build()

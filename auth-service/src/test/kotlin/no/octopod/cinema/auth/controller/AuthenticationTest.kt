@@ -161,6 +161,37 @@ class AuthenticationTest {
         checkAuthenticatedCookie(authCookie, 401)
     }
 
+    @Test
+    fun testDuplicateUser() {
+        val userId = "12345678"
+        val pwd = "123"
+
+        registerUser(userId, pwd)
+        given().contentType(ContentType.JSON)
+                .body(LoginDto(userId, pwd))
+                .post("/register")
+                .then()
+                .statusCode(400)
+    }
+
+    @Test
+    fun testIllegalLoginValue() {
+        given().contentType(ContentType.JSON)
+                .body(LoginDto(null, ""))
+                .post("/login")
+                .then()
+                .statusCode(400)
+    }
+
+    @Test
+    fun testIllegalRegisterValue() {
+        given().contentType(ContentType.JSON)
+                .body(LoginDto(null, ""))
+                .post("/register")
+                .then()
+                .statusCode(400)
+    }
+
 
     // TODO: Add source
     private fun registerUser(userId: String, password: String): String {
