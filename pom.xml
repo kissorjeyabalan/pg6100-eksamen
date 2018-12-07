@@ -12,7 +12,6 @@
         <module>user-service</module>
         <module>kino-service</module>
         <module>frontend</module>
-        <module>movie-service</module>
         <module>auth-service</module>
         <module>ticket-service</module>
     </modules>
