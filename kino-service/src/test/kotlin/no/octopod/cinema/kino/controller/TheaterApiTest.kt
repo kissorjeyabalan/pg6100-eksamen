@@ -33,8 +33,8 @@ class TheaterApiTest: ApiTestBase() {
     fun testCreateAndGet() {
 
         val name = "theater"
-        val seatsMax = 10
-        val dto = TheaterDto(name, seatsMax, null)
+        val seats = mutableListOf("a1")
+        val dto = TheaterDto(name = name, seats = seats)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -52,7 +52,7 @@ class TheaterApiTest: ApiTestBase() {
             .then()
             .statusCode(200)
             .body("data.name", equalTo(dto.name))
-            .body("data.seatsMax", equalTo(seatsMax))
+            .body("data.seats.size()", equalTo(seats.size))
     }
 
     @Test
@@ -80,8 +80,8 @@ class TheaterApiTest: ApiTestBase() {
     fun testGetAndFailWithMalformedLimit() {
 
         val name = "theater"
-        val seatsMax = 10
-        val dto = TheaterDto(name, seatsMax, null)
+        val seats = mutableListOf<String>("a1")
+        val dto = TheaterDto(name = name, seats = seats)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -117,8 +117,8 @@ class TheaterApiTest: ApiTestBase() {
     fun testDeleteById() {
 
         val name = "theater"
-        val seatsMax = 10
-        val dto = TheaterDto(name, seatsMax, null)
+        val seats = mutableListOf<String>("a1")
+        val dto = TheaterDto(name = name, seats = seats)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -143,8 +143,8 @@ class TheaterApiTest: ApiTestBase() {
     fun testDeleteAndFailWithMalformedId() {
 
         val name = "theater"
-        val seatsMax = 10
-        val dto = TheaterDto(name, seatsMax, null)
+        val seats = mutableListOf<String>("a1")
+        val dto = TheaterDto(name = name, seats = seats)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -171,8 +171,8 @@ class TheaterApiTest: ApiTestBase() {
     fun testUpdateTheater() {
 
         val name1 = "theater"
-        val seatsMax1 = 10
-        val dto1 = TheaterDto(name1, seatsMax1, null)
+        val seats = mutableListOf<String>("a1")
+        val dto1 = TheaterDto(name = name1, seats = seats)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -209,8 +209,8 @@ class TheaterApiTest: ApiTestBase() {
     fun testPatchTheater() {
 
         val name1 = "theater"
-        val seatsMax1 = 10
-        val dto1 = TheaterDto(name1, seatsMax1, null)
+        val seats = mutableListOf<String>("a1")
+        val dto1 = TheaterDto(name = name1, seats = seats)
 
         given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
@@ -233,7 +233,7 @@ class TheaterApiTest: ApiTestBase() {
         val name = "new name"
         val body = "{\"name\":\"$name\"}"
 
-        given().contentType(ContentType.JSON)
+        given().contentType("application/merge-patch+json")
                 .body(body)
                 .patch(path)
                 .then()
@@ -242,6 +242,9 @@ class TheaterApiTest: ApiTestBase() {
         given().get(path).then().statusCode(200)
                 .body("data.name", equalTo(name))
                 .body("data.seatsMax", equalTo(dto.seatsMax))
+
+
+        // DELETE /shows/{id}/seats/A1
 
     }
 }
