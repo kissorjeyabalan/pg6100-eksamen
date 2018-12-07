@@ -2,7 +2,6 @@ package no.octopod.cinema.kino.controller
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.common.base.Throwables
 import no.octopod.cinema.kino.converter.ShowConverter
 import no.octopod.cinema.kino.dto.ShowDto
 import no.octopod.cinema.kino.repository.ShowRepository
@@ -20,7 +19,6 @@ import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
 import no.octopod.cinema.kino.repository.TheaterRepository
 import org.springframework.http.MediaType
-import javax.validation.ConstraintViolationException
 
 @Api(value = "shows", description = "Handling of shows")
 @RequestMapping(
@@ -51,10 +49,10 @@ class ShowController {
         }
 
         //TODO: chekc for long
-        val theater = theaterRepo.findById(dto.cinemaId!!.toLong()).orElse(null)
+        val theater = theaterRepo.findById(dto.cinemaId!!).orElse(null)
                 ?: return ResponseEntity.status(400).build()
 
-        val showEntity = ShowEntity(startTime = dto.startTime!!, movieId = dto.movieId!!.toLong(), cinemaId = theater.id, seats = theater.seats!!.toMutableList())
+        val showEntity = ShowEntity(startTime = dto.startTime!!, movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
 
         val created = repo.save(showEntity)
 
@@ -243,11 +241,11 @@ class ShowController {
         val showEntity = repo.findById(pathId).orElse(null)
         val seatExists = showEntity?.seats?.contains(seatId)
 
-        if (showEntity != null || seatExists == null || !seatExists) {
+        if (showEntity == null || seatExists == null || !seatExists) {
             return ResponseEntity.status(404).build()
         }
 
-        showEntity!!.seats!!.remove(seatId)
+        showEntity.seats!!.remove(seatId)
 
         repo.save(showEntity)
 
@@ -351,23 +349,25 @@ class ShowController {
         var newStartTime = originalDto.startTime
         var newCinemaId = originalDto.cinemaId
         var newMovieId = originalDto.movieId
+        var newSeats = originalDto.seats
 
         if (jsonNode.has("startTime")) {
             val startTimeNode = jsonNode.get("startTime")
             newStartTime = when {
                 startTimeNode.isNull -> return ResponseEntity.status(400).build()
-                startTimeNode.isTextual -> startTimeNode.asInt()
-                else -> //Invalid JSON. Non-string name
+                startTimeNode.isInt -> startTimeNode.asInt()
+                else -> //Invalid JSON. Non-Integer startTime
                     return ResponseEntity.status(400).build()
             }
         }
 
+        //TODO: check if cinema exists
         if (jsonNode.has("cinemaId")) {
             val cinemaIdNode = jsonNode.get("cinemaId")
             newCinemaId = when {
                 cinemaIdNode.isNull -> return ResponseEntity.status(400).build()
-                cinemaIdNode.isTextual -> cinemaIdNode.asLong()
-                else -> //Invalid JSON. Non-string name
+                cinemaIdNode.isInt -> cinemaIdNode.asInt().toLong()
+                else -> //Invalid JSON. Non-Long cinemaId
                     return ResponseEntity.status(400).build()
             }
         }
@@ -376,15 +376,33 @@ class ShowController {
             val movieIdNode = jsonNode.get("movieId")
             newMovieId = when {
                 movieIdNode.isNull -> return ResponseEntity.status(400).build()
-                movieIdNode.isTextual -> movieIdNode.asLong()
-                else -> //Invalid JSON. Non-string name
+                movieIdNode.isInt -> movieIdNode.asInt().toLong()
+                else -> //Invalid JSON. Non-Long movieId
                     return ResponseEntity.status(400).build()
+            }
+        }
+
+        if (jsonNode.has("availableSeats")) {
+            val seatsNode = jsonNode.get("availableSeats")
+
+            if (seatsNode.isNull) {
+                return ResponseEntity.status(400).build()
+            } else if (seatsNode.isArray) {
+                newSeats = mutableListOf()
+                for (seatNode in seatsNode) {
+                    if (seatNode.isTextual) {
+                        newSeats.add(seatNode.asText())
+                    }
+                }
+            } else {
+                return ResponseEntity.status(400).build()
             }
         }
 
         originalDto.startTime = newStartTime
         originalDto.cinemaId = newCinemaId
         originalDto.movieId = newMovieId
+        originalDto.seats = newSeats
 
         repo.save(originalDto)
         return ResponseEntity.status(204).build()

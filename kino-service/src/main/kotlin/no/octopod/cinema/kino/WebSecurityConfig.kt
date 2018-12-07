@@ -2,6 +2,7 @@ package no.octopod.cinema.kino
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -20,8 +21,11 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             .httpBasic()
             .and()
             .authorizeRequests()
-            .antMatchers("/theaters").permitAll()
-            .antMatchers("/shows").permitAll()
+            .antMatchers("/theaters/**").hasRole("ADMIN")
+            .antMatchers("/shows/**").hasRole("ADMIN")
+            .antMatchers(HttpMethod.GET, "/theaters/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/shows/**").permitAll()
+            .anyRequest().denyAll()
             .and()
             .csrf().disable()
             .sessionManagement()

@@ -24,7 +24,9 @@ class TheaterApiTest: ApiTestBase() {
     @Test
     fun testCleanDB() {
 
-        RestAssured.given().get("/theaters").then()
+        RestAssured.given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
     }
@@ -36,23 +38,30 @@ class TheaterApiTest: ApiTestBase() {
         val seats = mutableListOf("a1")
         val dto = TheaterDto(name = name, seats = seats)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
-            .get(path)
-            .then()
-            .statusCode(200)
-            .body("data.name", equalTo(dto.name))
-            .body("data.seats.size()", equalTo(seats.size))
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("data.name", equalTo(dto.name))
+                .body("data.seats.size()", equalTo(seats.size))
     }
 
     @Test
@@ -63,17 +72,23 @@ class TheaterApiTest: ApiTestBase() {
         val id = null
         val dto = TheaterDto(name, seatsMax, id)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         //val path =
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(400)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -83,19 +98,26 @@ class TheaterApiTest: ApiTestBase() {
         val seats = mutableListOf<String>("a1")
         val dto = TheaterDto(name = name, seats = seats)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
         //val path =
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .param("limit", "0")
                 .get("/theaters")
                 .then()
@@ -108,6 +130,7 @@ class TheaterApiTest: ApiTestBase() {
         val id = "a"
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/theaters/$id")
                 .then()
                 .statusCode(404)
@@ -120,23 +143,32 @@ class TheaterApiTest: ApiTestBase() {
         val seats = mutableListOf<String>("a1")
         val dto = TheaterDto(name = name, seats = seats)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .delete(path)
                 .then()
                 .statusCode(204)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -146,25 +178,34 @@ class TheaterApiTest: ApiTestBase() {
         val seats = mutableListOf<String>("a1")
         val dto = TheaterDto(name = name, seats = seats)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
         
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
 
         val id = "a"
 
         given()
+                .auth().basic("admin", "admin")
                 .delete("/theaters/$id")
                 .then()
                 .statusCode(404)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(1))
     }
 
     @Test
@@ -174,16 +215,22 @@ class TheaterApiTest: ApiTestBase() {
         val seats = mutableListOf<String>("a1")
         val dto1 = TheaterDto(name = name1, seats = seats)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto1)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        val dto = given().get(path)
+        val dto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -194,13 +241,19 @@ class TheaterApiTest: ApiTestBase() {
 
         dto.name = "another name"
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .put(path)
                 .then()
                 .statusCode(204)
 
-        given().get(path).then().statusCode(200)
+        given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
                 .body("data.name", equalTo(dto.name))
                 .body("data.seatsMax", equalTo(dto.seatsMax))
     }
@@ -212,16 +265,22 @@ class TheaterApiTest: ApiTestBase() {
         val seats = mutableListOf<String>("a1")
         val dto1 = TheaterDto(name = name1, seats = seats)
 
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto1)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        val dto = given().get(path)
+        val dto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -232,19 +291,21 @@ class TheaterApiTest: ApiTestBase() {
 
         val name = "new name"
         val body = "{\"name\":\"$name\"}"
-
-        given().contentType("application/merge-patch+json")
+        
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(body)
                 .patch(path)
                 .then()
                 .statusCode(204)
 
-        given().get(path).then().statusCode(200)
+        given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
                 .body("data.name", equalTo(name))
                 .body("data.seatsMax", equalTo(dto.seatsMax))
-
-
-        // DELETE /shows/{id}/seats/A1
-
     }
 }
