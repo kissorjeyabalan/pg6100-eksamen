@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient
 import org.springframework.context.annotation.Bean
+import org.springframework.security.core.Authentication
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.PathSelectors
 import springfox.documentation.service.ApiInfo
@@ -21,6 +22,7 @@ class TicketServiceApplication {
     fun swaggerApi(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
+                .ignoredParameterTypes(Authentication::class.java)
                 .select()
                 .paths(PathSelectors.any())
                 .build()
@@ -28,7 +30,7 @@ class TicketServiceApplication {
 
     private fun apiInfo(): ApiInfo {
         return ApiInfoBuilder()
-                .title("API for REST News")
+                .title("API for REST Tickets")
                 .description("Some description")
                 .version("2.0.0") // Note the change in version
                 .build()

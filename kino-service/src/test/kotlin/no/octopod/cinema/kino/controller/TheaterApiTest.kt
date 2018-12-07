@@ -291,7 +291,7 @@ class TheaterApiTest: ApiTestBase() {
 
         val name = "new name"
         val body = "{\"name\":\"$name\"}"
-
+        
         given()
                 .auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
