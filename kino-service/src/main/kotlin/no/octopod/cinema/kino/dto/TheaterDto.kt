@@ -13,5 +13,6 @@ data class TheaterDto (
         @ApiModelProperty("Id for the theater")
         var id: Long? = null,
 
+        @ApiModelProperty("Seats in the theater")
         var seats: MutableList<String>? = null
 )

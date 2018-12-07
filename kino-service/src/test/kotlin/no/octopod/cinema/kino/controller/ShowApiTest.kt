@@ -1,5 +1,6 @@
 package no.octopod.cinema.kino.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.octopod.cinema.kino.ApiTestBase
 import no.octopod.cinema.kino.dto.ShowDto
 import no.octopod.cinema.kino.repository.ShowRepository
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired
 
 class ShowApiTest: ApiTestBase() {
 
+    //TODO: test for riktig tilganger
+
     @Autowired
     private lateinit var crudShow: ShowRepository
 
@@ -27,13 +30,16 @@ class ShowApiTest: ApiTestBase() {
         crudShow.deleteAll()
         crudTheater.deleteAll()
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", CoreMatchers.equalTo(0))
-        given().get("/theaters").then().statusCode(200).body("data.data.size()", CoreMatchers.equalTo(0))
+        given().auth().basic("admin", "admin").get("/shows").then().statusCode(200).body("data.data.size()", CoreMatchers.equalTo(0))
+        given().auth().basic("admin", "admin").get("/theaters").then().statusCode(200).body("data.data.size()", CoreMatchers.equalTo(0))
     }
 
     @Test
     fun testCleanDB() {
-        RestAssured.given().get("/shows").then()
+        RestAssured.given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
     }
@@ -44,11 +50,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieId = "1"
-        val cinemaId = theater.id.toString()
+        val movieId = 1L
+        val cinemaId = theater.id
         val dto = ShowDto(startTime, movieId, cinemaId)
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
@@ -56,6 +64,7 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then()
                 .statusCode(200)
@@ -63,12 +72,13 @@ class ShowApiTest: ApiTestBase() {
                 .body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .get(path)
                 .then()
                 .statusCode(200)
                 .body("data.startTime", equalTo(dto.startTime))
-                .body("data.movieId", equalTo(dto.movieId))
-                .body("data.cinemaId", equalTo(dto.cinemaId))
+                .body("data.movieId", equalTo(dto.movieId?.toInt()))
+                .body("data.cinemaId", equalTo(dto.cinemaId?.toInt()))
     }
 
     @Test
@@ -77,11 +87,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieId = "1"
-        val cinemaId = theater.id.toString()
+        val movieId = 1L
+        val cinemaId = theater.id
         val showDto = ShowDto(startTime = startTime, movieId = movieId, cinemaId = cinemaId)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(showDto)
                 .post("/shows")
                 .then()
@@ -89,6 +101,7 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then()
                 .statusCode(200)
@@ -96,6 +109,7 @@ class ShowApiTest: ApiTestBase() {
                 .body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .param("theater", cinemaId)
                 .param("movie", movieId)
                 .get("/shows").then().statusCode(200)
@@ -108,11 +122,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieId = "1"
-        val cinemaId = theater.id.toString()
+        val movieId = 1L
+        val cinemaId = theater.id
         val dto = ShowDto(startTime, movieId, cinemaId)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
@@ -120,12 +136,14 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
                 .body("data.data.startTime", hasItem(startTime))
                 .body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .param("theater", cinemaId)
                 .get("/shows").then()
                 .statusCode(200)
@@ -137,14 +155,35 @@ class ShowApiTest: ApiTestBase() {
 
         val dto = ShowDto()
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(400)
                 .extract().header("Location")
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
+
+        dto.startTime = 10
+        dto.cinemaId = 1L
+        dto.movieId = 1L
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/shows")
+                .then()
+                .statusCode(400)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -153,11 +192,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieName = "1"
-        val cinemaId = theater.id.toString()
+        val movieName = 1L
+        val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
@@ -165,16 +206,53 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
                 .body("data.data.startTime", hasItem(startTime))
                 .body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .param("limit", "0")
                 .get("/shows")
                 .then()
                 .statusCode(400)
+    }
+
+    @Test
+    fun testGetWithNonExistentTheater() {
+
+        val theater = createTheater("theater", mutableListOf("a1"))
+
+        val startTime = 10
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto = ShowDto(startTime, movieName, cinemaId)
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime))
+                .body("data.data.size()", equalTo(1))
+
+        val badId = 1000L
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows/$badId")
+                .then()
+                .statusCode(404)
     }
 
     @Test
@@ -183,6 +261,7 @@ class ShowApiTest: ApiTestBase() {
         val id = "a"
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows/$id")
                 .then()
                 .statusCode(404)
@@ -195,46 +274,55 @@ class ShowApiTest: ApiTestBase() {
         val startTime2 = 20
         val startTime3 = 30
 
-        val movieId1 = "1"
-        val movieId2 = "4"
-        val movieId3 = "7"
+        val movieId1 = 1L
+        val movieId2 = 4L
+        val movieId3 = 7L
 
         val theater1 = createTheater("theater $movieId1", mutableListOf("a $movieId1"))
         val theater2 = createTheater("theater $movieId2", mutableListOf("a $movieId2"))
         val theater3 = createTheater("theater $movieId3", mutableListOf("a $movieId3"))
 
-        val cinemaId1 = theater1.id.toString()
-        val cinemaId2 = theater2.id.toString()
-        val cinemaId3 = theater3.id.toString()
+        val cinemaId1 = theater1.id
+        val cinemaId2 = theater2.id
+        val cinemaId3 = theater3.id
 
         val dto1 = ShowDto(startTime1, movieId1, cinemaId1)
         val dto2 = ShowDto(startTime2, movieId2, cinemaId2)
         val dto3 = ShowDto(startTime3, movieId3, cinemaId3)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto1)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto2)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto3)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(3))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows").then().statusCode(200).body("data.data.size()", equalTo(3))
 
         given()
+                .auth().basic("admin", "admin")
                 .param("limit", "1")
                 .get("/shows")
                 .then()
@@ -247,6 +335,7 @@ class ShowApiTest: ApiTestBase() {
                 .body("data._links.self.href", notNullValue())
 
         given()
+                .auth().basic("admin", "admin")
                 .param("limit", "1")
                 .param("page", "2")
                 .get("/shows")
@@ -260,6 +349,7 @@ class ShowApiTest: ApiTestBase() {
                 .body("data._links.self.href", notNullValue())
 
         given()
+                .auth().basic("admin", "admin")
                 .param("limit", "1")
                 .param("page", "3")
                 .get("/shows")
@@ -277,6 +367,7 @@ class ShowApiTest: ApiTestBase() {
     fun testGetCatchError() {
 
         given()
+                .auth().basic("admin", "admin")
                 .param("movie", "a")
                 .param("theater", "a")
                 .get("/shows")
@@ -284,6 +375,7 @@ class ShowApiTest: ApiTestBase() {
                 .statusCode(400)
 
         given()
+                .auth().basic("admin", "admin")
                 .param("theater", "a")
                 .get("/shows")
                 .then()
@@ -296,11 +388,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieName = "1"
-        val cinemaId = theater.id.toString()
+        val movieName = 1L
+        val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
@@ -308,17 +402,21 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
                 .body("data.data.startTime", hasItem(startTime))
                 .body("data.data.size()", equalTo(1))
 
         given()
+                .auth().basic("admin", "admin")
                 .delete(path)
                 .then()
                 .statusCode(204)
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
     }
 
     @Test
@@ -327,11 +425,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieName = "1"
-        val cinemaId = theater.id.toString()
+        val movieName = 1L
+        val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/shows")
                 .then()
@@ -339,6 +439,7 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
                 .body("data.data.startTime", hasItem(startTime))
@@ -347,84 +448,44 @@ class ShowApiTest: ApiTestBase() {
         val id = "a"
 
         given()
+                .auth().basic("admin", "admin")
                 .delete("/shows/$id")
                 .then()
                 .statusCode(404)
 
-        given().get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
-    }
-
-    @Test
-    fun testUpdateShow() {
-
-        val theater = createTheater("theater", mutableListOf("a1"))
-
-        val startTime = 10
-        val movieName = "1"
-        val cinemaId = theater.id.toString()
-        val dto1 = ShowDto(startTime, movieName, cinemaId)
-
-        val path = given().contentType(ContentType.JSON)
-                .body(dto1)
-                .post("/shows")
-                .then()
-                .statusCode(201)
-                .extract().header("Location")
-
         given()
-                .get("/shows")
-                .then().statusCode(200)
-                .body("data.data.startTime", hasItem(startTime))
-                .body("data.data.size()", equalTo(1))
-
-        val dto = given().get(path)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response()
-                .body()
-                .jsonPath()
-                .getObject("data", ShowDto::class.java)
-
-        dto.movieId = "2"
-
-        given().contentType(ContentType.JSON)
-                .body(dto)
-                .put(path)
-                .then()
-                .statusCode(204)
-
-        given().get(path).then().statusCode(200)
-                .body("data.startTime", equalTo(dto.startTime))
-                .body("data.movieId", equalTo(dto.movieId))
-                .body("data.cinemaId", equalTo(dto.cinemaId))
+                .auth().basic("admin", "admin")
+                .get("/shows").then().statusCode(200).body("data.data.size()", equalTo(1))
     }
 
     @Test
-    fun testUpdateErrors() {
+    fun testDeleteSeatFromShow() {
 
-        val theater = createTheater("theater", mutableListOf("a1"))
+        val theater = createTheater("theater", mutableListOf("a1", "a2", "b1", "b2"))
 
         val startTime = 10
-        val movieName = "1"
-        val cinemaId = theater.id.toString()
-        val dto1 = ShowDto(startTime, movieName, cinemaId)
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto = ShowDto(startTime, movieName, cinemaId)
 
         val path = given()
+                .auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
-                .body(dto1)
+                .body(dto)
                 .post("/shows")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
                 .body("data.data.startTime", hasItem(startTime))
                 .body("data.data.size()", equalTo(1))
 
-        val dto = given()
+        val pathDto = given()
+                .auth().basic("admin", "admin")
                 .get(path)
                 .then()
                 .statusCode(200)
@@ -434,22 +495,207 @@ class ShowApiTest: ApiTestBase() {
                 .jsonPath()
                 .getObject("data", ShowDto::class.java)
 
-        dto.movieId = "2"
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/shows/${pathDto.id}/seats/a1")
+                .then()
+                .statusCode(204)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(3))
+    }
+
+    @Test
+    fun testAndFailDeleteSeatFromShow() {
+
+        val seats = "a1"
+
+        val theater = createTheater("theater", mutableListOf(seats))
+
+        val startTime = 10
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto = ShowDto(startTime, movieName, cinemaId)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime))
+                .body("data.data.size()", equalTo(1))
+
+        val pathDto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/shows/a/seats/a1")
+                .then()
+                .statusCode(404)
+
+        //Testing for seat with bad id
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/shows/a/seats/a1")
+                .then()
+                .statusCode(404)
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/shows/${pathDto.id}/seats/$seats")
+                .then()
+                .statusCode(204)
+
+        //Testing if you can delete already deleted seat
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/shows/${pathDto.id}/seats/a1")
+                .then()
+                .statusCode(404)
+
+        //Testing if you can delete from a show that does not exists
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/shows/1000/seats/a1")
+                .then()
+                .statusCode(404)
+    }
+
+    @Test
+    fun testUpdateShow() {
+
+        val theater = createTheater("theater", mutableListOf("a1"))
+
+        val startTime = 10
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto1 = ShowDto(startTime, movieName, cinemaId)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto1)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime))
+                .body("data.data.size()", equalTo(1))
+
+        val dto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        dto.movieId = 2L
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .put(path)
+                .then()
+                .statusCode(204)
+
+        given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("data.startTime", equalTo(dto.startTime))
+                .body("data.movieId", equalTo(dto.movieId?.toInt()))
+                .body("data.cinemaId", equalTo(dto.cinemaId?.toInt()))
+    }
+
+    @Test
+    fun testUpdateErrors() {
+
+        val theater = createTheater("theater", mutableListOf("a1"))
+
+        val startTime = 10
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto1 = ShowDto(startTime, movieName, cinemaId)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto1)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime))
+                .body("data.data.size()", equalTo(1))
+
+        val dto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        dto.movieId = 2L
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .put("/shows/a")
                 .then()
                 .statusCode(404)
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .put("/shows/1000")
                 .then()
                 .statusCode(409)
 
-        dto1.id = 1000
-        given().contentType(ContentType.JSON)
+        dto1.id = 1000L
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto1)
                 .put("/shows/1000")
                 .then()
@@ -459,7 +705,9 @@ class ShowApiTest: ApiTestBase() {
         dto.cinemaId = null
         dto.movieId = null
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto)
                 .put(path)
                 .then()
@@ -472,11 +720,13 @@ class ShowApiTest: ApiTestBase() {
         val theater = createTheater("theater", mutableListOf("a1"))
 
         val startTime = 10
-        val movieName = "1"
-        val cinemaId = theater.id.toString()
-        val dto1 = ShowDto(startTime, movieName, cinemaId)
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto1 = ShowDto(startTime = startTime, movieId = movieName, cinemaId = cinemaId, availableSeats = theater.seats)
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(dto1)
                 .post("/shows")
                 .then()
@@ -484,12 +734,15 @@ class ShowApiTest: ApiTestBase() {
                 .extract().header("Location")
 
         given()
+                .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
                 .body("data.data.startTime", hasItem(startTime))
                 .body("data.data.size()", equalTo(1))
 
-        val dto = given().get(path)
+        val dto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -498,42 +751,190 @@ class ShowApiTest: ApiTestBase() {
                 .jsonPath()
                 .getObject("data", ShowDto::class.java)
 
-        val newMovieName = "3"
-        val body = "{\"movieId\":\"$newMovieName\"}"
+        val newMovieName = 3L
+        val body = "{\"movieId\":$newMovieName}"
 
-        given().contentType(ContentType.JSON)
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(body)
                 .patch(path)
                 .then()
                 .statusCode(204)
 
-        given().get(path).then().statusCode(200)
+        given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
                 .body("data.startTime", equalTo(dto.startTime))
-                .body("data.movieId", equalTo(newMovieName))
-                .body("data.cinemaId", equalTo(dto.cinemaId))
+                .body("data.movieId", equalTo(newMovieName?.toInt()))
+                .body("data.cinemaId", equalTo(dto.cinemaId?.toInt()))
+                .body("data.availableSeats", equalTo(dto.availableSeats))
+    }
+
+    @Test
+    fun testpatchAndFail() {
+
+        //Test with malformed id
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"fail\":\"test\"}")
+                .patch("/shows/a")
+                .then()
+                .statusCode(404)
+
+        //Test path with non existent show
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"fail\":\"test\"}")
+                .patch("/shows/1")
+                .then()
+                .statusCode(404)
+
+        val theater = createTheater("theater", mutableListOf("a1"))
+
+        val startTime = 10
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto1 = ShowDto(startTime, movieName, cinemaId)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto1)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime))
+                .body("data.data.size()", equalTo(1))
+
+        //Testing if valid json
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("fail\":\"test\"}")
+                .patch(path)
+                .then()
+                .statusCode(400)
+
+        //testing if we can send id
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"id\":\"123\"}")
+                .patch(path)
+                .then()
+                .statusCode(409)
+
+        val newTheater = createTheater("new theater", mutableListOf("b2", "b1"))
+
+        val newMovieId = 2L
+        val newStarttime = 123
+        val newCinemaId = newTheater.id
+        val newSeats = newTheater.seats
+
+        val mapper = ObjectMapper()
+
+        val body = "{" +
+                "\"startTime\":$newStarttime, " +
+                "\"cinemaId\":$newCinemaId, " +
+                "\"movieId\":$newMovieId, " +
+                "\"availableSeats\":${mapper.writeValueAsString(newSeats)}}"
+
+        //Testing that all json merges work
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(body)
+                .patch(path)
+                .then()
+                .statusCode(204)
+
+        val newBadMovieName = "a"
+        val newBadStartTime = "a"
+        val newBadCinemaId = "a"
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"startTime\":\"$newBadStartTime\"}")
+                .patch(path)
+                .then()
+                .statusCode(400)
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"movieId\":\"$newBadMovieName\"}")
+                .patch(path)
+                .then()
+                .statusCode(400)
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"cinemaId\":\"$newBadCinemaId\"}")
+                .patch(path)
+                .then()
+                .statusCode(400)
+
+        val badSeats1 = null
+        val badSeats2 = 5L
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"availableSeats\":$badSeats1}")
+                .patch(path)
+                .then()
+                .statusCode(400)
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body("{\"availableSeats\":${mapper.writeValueAsString(badSeats2)}}")
+                .patch(path)
+                .then()
+                .statusCode(400)
     }
 
     private fun createTheater(name: String, seats: MutableList<String>): TheaterDto {
 
         val theaterDto = TheaterDto(name = name, seats = seats)
 
-        val path = given().contentType(ContentType.JSON)
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(theaterDto)
                 .post("/theaters")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().get("/theaters").then().statusCode(200).body("data.data.name", hasItem(name))
+        given()
+                .auth().basic("admin", "admin")
+                .get("/theaters").then().statusCode(200).body("data.data.name", hasItem(name))
 
         given()
+                .auth().basic("admin", "admin")
                 .get(path)
                 .then()
                 .statusCode(200)
                 .body("data.name", equalTo(theaterDto.name))
                 .body("data.seats.size()", CoreMatchers.equalTo(theaterDto.seats!!.size))
 
-        return given().get(path)
+        return given()
+                .auth().basic("admin", "admin")
+                .get(path)
                 .then()
                 .statusCode(200)
                 .extract()

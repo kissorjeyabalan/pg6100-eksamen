@@ -11,8 +11,9 @@ class ShowConverter {
         fun transform(show: ShowEntity): ShowDto {
             return ShowDto(
                     startTime = show.startTime,
-                    movieId = show.movieId!!.toString(),
-                    cinemaId = show.cinemaId!!.toString(),
+                    movieId = show.movieId!!,
+                    cinemaId = show.cinemaId!!,
+                    availableSeats = show.seats,
                     id = show.id
             )
         }
@@ -20,8 +21,9 @@ class ShowConverter {
         fun transform(showdto: ShowDto): ShowEntity {
             return ShowEntity(
                     startTime = showdto.startTime,
-                    movieId = showdto.movieId!!.toLong(),
-                    cinemaId = showdto.cinemaId!!.toLong(),
+                    movieId = showdto.movieId!!,
+                    cinemaId = showdto.cinemaId!!,
+                    seats = showdto.availableSeats,
                     id = showdto.id!!.toLong()
             )
         }
