@@ -233,7 +233,7 @@ class TheaterApiTest: ApiTestBase() {
         val name = "new name"
         val body = "{\"name\":\"$name\"}"
 
-        given().contentType(ContentType.JSON)
+        given().contentType("application/merge-patch+json")
                 .body(body)
                 .patch(path)
                 .then()

@@ -142,7 +142,9 @@ class TicketApi {
 
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createTicket(@RequestBody dto: TicketDto, authentication: Authentication) : ResponseEntity<Void> {
+    fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
+
+
         if(dto.userId == null || dto.screeningId == null) {
             return ResponseEntity.status(400).build()
         }
@@ -158,6 +160,7 @@ class TicketApi {
     @DeleteMapping(path = ["/{id}"])
     fun deleteTicket(@PathVariable("id") ticketId: String?)
             : ResponseEntity<WrappedResponse<TicketDto>> {
+
 
         val id: Long
         try {
@@ -250,7 +253,6 @@ class TicketApi {
 
         val ticketOptional = repo.findById(id)
         val ticket = ticketOptional.get()
-        val ticketDto = DtoTransformer.transform(ticket)
 
         val jackson = ObjectMapper()
 
@@ -270,14 +272,12 @@ class TicketApi {
 
         //do not alter dto till all data is validated. A PATCH has to be atomic,
         //either all modifications are done, or none.
-        var newUserId = ticketDto.userId
-        var newScreeningId = ticketDto.screeningId
+        var newUserId = ticket.userId
+        var newScreeningId = ticket.screeningId
 
         if (jsonNode.has("userId")) {
             val userIdNode = jsonNode.get("userId")
-            if (userIdNode.isNull) {
-                newUserId = null
-            } else if (userIdNode.isTextual) {
+            if (userIdNode.isTextual) {
                 newUserId = userIdNode.asText()
             } else {
                 //Invalid JSON. Non-string name
@@ -287,9 +287,7 @@ class TicketApi {
 
         if (jsonNode.has("screeningId")) {
             val screeningIdNode = jsonNode.get("screeningId")
-            if (screeningIdNode.isNull) {
-                newScreeningId = null
-            } else if (screeningIdNode.isTextual) {
+            if (screeningIdNode.isTextual) {
                 newScreeningId = screeningIdNode.asText()
             } else {
                 //Invalid JSON. Non-string name
@@ -298,8 +296,12 @@ class TicketApi {
         }
 
         //now that the input is validated, do the update
-        ticketDto.userId = newUserId
-        ticketDto.screeningId = newScreeningId
+        ticket.userId = newUserId
+        ticket.screeningId = newScreeningId
+
+
+
+        repo.save(ticket)
 
         return ResponseEntity.status(204).body(
                 WrappedResponse<TicketDto>(

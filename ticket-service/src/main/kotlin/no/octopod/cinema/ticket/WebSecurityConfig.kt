@@ -26,19 +26,14 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
                 .httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/tickets").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/tickets/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PATCH, "/tickets/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PUT, "/tickets/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/tickets/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/tickets").permitAll()
+                .antMatchers("/tickets/**").hasRole("ADMIN")
+                .antMatchers("/tickets").denyAll()
                 //
                 .and()
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
-                .and()
-                .authorizeRequests().antMatchers("/**").permitAll()
     }
 
 }
