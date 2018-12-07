@@ -756,7 +756,7 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body(body)
                 .patch(path)
                 .then()
@@ -779,7 +779,7 @@ class ShowApiTest: ApiTestBase() {
         //Test with malformed id
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"fail\":\"test\"}")
                 .patch("/shows/a")
                 .then()
@@ -788,7 +788,7 @@ class ShowApiTest: ApiTestBase() {
         //Test path with non existent show
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"fail\":\"test\"}")
                 .patch("/shows/1")
                 .then()
@@ -820,7 +820,7 @@ class ShowApiTest: ApiTestBase() {
         //Testing if valid json
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("fail\":\"test\"}")
                 .patch(path)
                 .then()
@@ -829,7 +829,7 @@ class ShowApiTest: ApiTestBase() {
         //testing if we can send id
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"id\":\"123\"}")
                 .patch(path)
                 .then()
@@ -853,7 +853,7 @@ class ShowApiTest: ApiTestBase() {
         //Testing that all json merges work
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body(body)
                 .patch(path)
                 .then()
@@ -865,7 +865,7 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"startTime\":\"$newBadStartTime\"}")
                 .patch(path)
                 .then()
@@ -873,7 +873,7 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"movieId\":\"$newBadMovieName\"}")
                 .patch(path)
                 .then()
@@ -881,7 +881,7 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"cinemaId\":\"$newBadCinemaId\"}")
                 .patch(path)
                 .then()
@@ -892,7 +892,7 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"availableSeats\":$badSeats1}")
                 .patch(path)
                 .then()
@@ -900,7 +900,7 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .contentType(ContentType.JSON)
+                .contentType("application/merge-patch+json")
                 .body("{\"availableSeats\":${mapper.writeValueAsString(badSeats2)}}")
                 .patch(path)
                 .then()
@@ -942,5 +942,166 @@ class ShowApiTest: ApiTestBase() {
                 .body()
                 .jsonPath()
                 .getObject("data", TheaterDto::class.java)
+    }
+
+    @Test
+    fun testEndpointGetAllAuthorization() {
+
+        given().auth()
+                .basic("foo", "123")
+                .get("/shows")
+                .then()
+                .statusCode(200)
+
+        given().get("/shows")
+                .then()
+                .statusCode(200)
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/shows")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testEndpointGetSingleAuthorization() {
+
+        given().auth()
+                .basic("foo", "123")
+                .get("/shows/1")
+                .then()
+                .statusCode(not(403))
+
+        given().get("/shows/1")
+                .then()
+                .statusCode(not(403))
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/shows/1")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testEndpointPostAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .post("/shows/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .post("/shows/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .post("/shows/1")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testEndpointDeleteAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .delete("/shows/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .delete("/shows/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .delete("/shows/1")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testEndpointPutAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .put("/shows/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .put("/shows/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .put("/shows/1")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testEndpointPatchAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .contentType("application/merge-patch+json")
+                .patch("/shows/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .contentType("application/merge-patch+json")
+                .patch("/shows/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .patch("/shows/1")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testEndpointDeleteSeatAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .contentType("application/merge-patch+json")
+                .delete("/shows/1/seats/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .contentType("application/merge-patch+json")
+                .delete("/shows/1/seats/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .delete("/shows/1/seats/1")
+                .then()
+                .statusCode(not(403))
     }
 }

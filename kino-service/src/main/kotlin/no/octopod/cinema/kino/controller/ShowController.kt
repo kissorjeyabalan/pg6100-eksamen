@@ -298,8 +298,9 @@ class ShowController {
         return ResponseEntity.status(204).build()
     }
 
+    //TODO: make it merge patch content type
     @ApiOperation("Update a field in a show with specific id")
-    @PatchMapping(path = ["/{id}"])
+    @PatchMapping(path = ["/{id}"], consumes = ["application/merge-patch+json"])
     fun patchShow(
 
             @ApiParam("ShowEntity id")

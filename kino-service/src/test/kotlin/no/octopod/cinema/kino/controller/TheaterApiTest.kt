@@ -7,6 +7,7 @@ import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -291,7 +292,7 @@ class TheaterApiTest: ApiTestBase() {
 
         val name = "new name"
         val body = "{\"name\":\"$name\"}"
-        
+
         given()
                 .auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -307,5 +308,140 @@ class TheaterApiTest: ApiTestBase() {
                 .statusCode(200)
                 .body("data.name", equalTo(name))
                 .body("data.seatsMax", equalTo(dto.seatsMax))
+    }
+
+    @Test
+    fun testEndpointGetAllAuthorization() {
+
+        given().auth()
+                .basic("foo", "123")
+                .get("/theaters")
+                .then()
+                .statusCode(200)
+
+        given().get("/theaters")
+                .then()
+                .statusCode(200)
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/theaters")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testEndpointGetSingleAuthorization() {
+
+        given().auth()
+                .basic("foo", "123")
+                .get("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
+
+        given().get("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
+    }
+
+    @Test
+    fun testEndpointPostAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .post("/theaters/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .post("/theaters/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .post("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
+    }
+
+    @Test
+    fun testEndpointDeleteAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .delete("/theaters/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .delete("/theaters/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .delete("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
+    }
+
+    @Test
+    fun testEndpointPutAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .put("/theaters/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .put("/theaters/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .put("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
+    }
+
+    @Test
+    fun testEndpointPatchAuthorization() {
+
+        given()
+                .auth()
+                .basic("foo", "123")
+                .contentType("application/merge-patch+json")
+                .patch("/theaters/1")
+                .then()
+                .statusCode(403)
+
+        given()
+                .contentType("application/merge-patch+json")
+                .patch("/theaters/1")
+                .then()
+                .statusCode(401)
+
+        given()
+                .auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .patch("/theaters/1")
+                .then()
+                .statusCode(Matchers.not(403))
     }
 }
