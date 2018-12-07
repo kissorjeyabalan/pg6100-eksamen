@@ -7,6 +7,7 @@ import no.octopod.cinema.common.dto.TicketDto
 import no.octopod.cinema.common.dto.WrappedResponse
 import no.octopod.cinema.ticket.repository.TicketRepository
 import io.swagger.annotations.Api
+import io.swagger.annotations.ApiModelProperty
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.HalLink

@@ -36,7 +36,6 @@ class TicketTest {
         repo.deleteAll()
     }
 
-
     @Test
     fun testCreateAndGet() {
 
@@ -119,7 +118,6 @@ class TicketTest {
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", equalTo(0))
-
     }
 
     @Test
@@ -257,11 +255,7 @@ class TicketTest {
                 .statusCode(200)
                 .body("data.userId", CoreMatchers.equalTo(dto.userId))
                 .body("data.screeningId", CoreMatchers.equalTo(newScreeningId))
-
     }
-
-
-
 
     @Test
     fun testAuth() {
@@ -280,7 +274,6 @@ class TicketTest {
                 .then()
                 .statusCode(401)
 
-
         given().auth().basic("foo", "123")
                 .get(resPath)
                 .then()
@@ -297,7 +290,6 @@ class TicketTest {
                 .statusCode(401)
     }
 
-
     @Test
     fun testGetAsAdminAndNotAsAdmin() {
 
@@ -310,8 +302,6 @@ class TicketTest {
                 .get("/tickets")
                 .then()
                 .statusCode((401))
-
-
     }
 
     @Test
