@@ -22,8 +22,8 @@ class FakeWebSecurityConfig: WebSecurityConfig() {
     override fun configure(auth: AuthenticationManagerBuilder) {
         print("CONfiguring authaewtaonweg")
         auth.inMemoryAuthentication()
-                .withUser("foo").password("{noop}123").roles("USER").and()
-                .withUser("bar").password("{noop}123").roles("USER").and()
+                .withUser("12345678").password("{noop}123").roles("USER").and()
+                .withUser("87654321").password("{noop}123").roles("USER").and()
                 .withUser("admin").password("{noop}admin").roles("ADMIN", "USER")
     }
 }

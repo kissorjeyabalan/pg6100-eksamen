@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.junit4.SpringRunner
 import org.hamcrest.Matchers.*
-import org.springframework.test.context.ActiveProfiles
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,35 +29,29 @@ class UserTest {
 
         userRepo.deleteAll()
 
-        /*given().get("/users")
+        given().auth().basic("admin", "admin").get("/users")
                 .then()
                 .statusCode(200)
-                .body("data.data.size()", equalTo(0))*/
+                .body("data.data.size()", equalTo(0))
     }
 
-    /*@Test
-    fun test() {
-        val originalUserDto = UserDto(phone = "1243234323", email = "test@test.xyz", name = "Test User")
-        val userInfoPath = given().auth().preemptive().basic("admin", "admin")
+    @Test
+    fun testCreateAndGetSpecificUserInfo() {
+        val phone = "12345678"
+        val originalUserDto = UserDto(phone = phone, email = "test@test.xyz", name = "Test User")
+
+        val userInfoPath = given().auth()
+                .basic(phone, "123")
                 .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
-    }*/
 
-    @Test
-    fun testCreateAndGetSpecificUserInfo() {
-        val originalUserDto = UserDto(phone = "1243234323", email = "test@test.xyz", name = "Test User")
-        val userInfoPath = given().contentType(ContentType.JSON)
-                .body(originalUserDto)
-                .post("/users")
-                .then()
-                .statusCode(201)
-                .extract().header("Location")
-
-        given().get(userInfoPath)
+        given().auth()
+                .basic(phone, "123")
+                .get(userInfoPath)
                 .then()
                 .statusCode(200)
                 .body("data.phone", equalTo(originalUserDto.phone))
@@ -69,17 +62,46 @@ class UserTest {
     }
 
     @Test
+    fun testDelete() {
+        val originalUserDto = UserDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
+
+        val userInfoPath = given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(originalUserDto)
+                .post("/users")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().auth()
+                .basic("admin", "admin")
+                .delete(userInfoPath)
+                .then()
+                .statusCode(204)
+
+        given().auth()
+                .basic("admin", "admin")
+                .delete(userInfoPath)
+                .then()
+                .statusCode(404)
+    }
+    @Test
     fun createFailsWhenInvalidContentSupplied() {
         val originalUserDto = UserDto()
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("12345678", "123")
+                .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
                 .statusCode(400)
 
         originalUserDto.email = "test@test.xyz"
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("12345678", "123")
+                .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
@@ -87,7 +109,9 @@ class UserTest {
 
         originalUserDto.email = null
         originalUserDto.name = "Test User"
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("12345678", "123")
+                .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
@@ -95,7 +119,9 @@ class UserTest {
 
         originalUserDto.name = null
         originalUserDto.phone = "12341234"
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("12345678", "123")
+                .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
@@ -104,14 +130,20 @@ class UserTest {
 
     @Test
     fun testCreateFailsWhenUserAlreadyExists() {
-        val originalUserDto = UserDto(phone = "1243234323", email = "test@test.xyz", name = "Test User")
-        given().contentType(ContentType.JSON)
+        val phone = "12345678"
+        val originalUserDto = UserDto(phone = phone, email = "test@test.xyz", name = "Test User")
+
+        given().auth()
+                .basic(phone, "123")
+                .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
                 .statusCode(201)
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic(phone, "123")
+                .contentType(ContentType.JSON)
                 .body(originalUserDto)
                 .post("/users")
                 .then()
@@ -120,7 +152,9 @@ class UserTest {
 
     @Test
     fun testGetReturnsResourceNotFoundWhenInvalidId() {
-        given().get("/users/1")
+        given().auth()
+                .basic("admin", "admin")
+                .get("/users/1")
                 .then()
                 .statusCode(404)
                 .body("code", equalTo(404))
@@ -129,22 +163,28 @@ class UserTest {
 
     @Test
     fun testGetAll() {
-        val userDto1 = UserDto(phone = "43214321", email = "test1@test1.xyz", name = "Test User 1")
-        val userDto2 = UserDto(phone = "12341234", email = "test2@test2.xyz", name = "Test User 2")
+        val userDto1 = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val userDto2 = UserDto(phone = "87654321", email = "test2@test2.xyz", name = "Test User 2")
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(userDto1)
                 .post("/users")
                 .then()
                 .statusCode(201)
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(userDto2)
                 .post("/users")
                 .then()
                 .statusCode(201)
 
-        given().get("/users")
+        given().auth()
+                .basic("admin", "admin")
+                .get("/users")
                 .then()
                 .statusCode(200)
                 .body("data.count", equalTo(2))
@@ -155,12 +195,16 @@ class UserTest {
 
     @Test
     fun testGetAllWithInvalidRequestParameters() {
-       given().param("limit", 0)
+       given().auth()
+               .basic("admin", "admin")
+               .param("limit", 0)
                .get("/users")
                .then()
                .statusCode(400)
 
-        given().param("page", 0)
+        given().auth()
+                .basic("admin", "admin")
+                .param("page", 0)
                 .get("/users")
                 .then()
                 .statusCode(400)
@@ -168,22 +212,28 @@ class UserTest {
 
     @Test
     fun testGetAllWithPaginationAndLimit() {
-        val userDto1 = UserDto(phone = "43214321", email = "test1@test1.xyz", name = "Test User 1")
-        val userDto2 = UserDto(phone = "12341234", email = "test2@test2.xyz", name = "Test User 2")
+        val userDto1 = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val userDto2 = UserDto(phone = "87654321", email = "test2@test2.xyz", name = "Test User 2")
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(userDto1)
                 .post("/users")
                 .then()
                 .statusCode(201)
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(userDto2)
                 .post("/users")
                 .then()
                 .statusCode(201)
 
-        val nextPage = given().param("limit", 1)
+        val nextPage = given().auth()
+                .basic("admin", "admin")
+                .param("limit", 1)
                 .get("/users")
                 .then()
                 .body("data.count", equalTo(2))
@@ -196,7 +246,9 @@ class UserTest {
                 .extract().response().body().jsonPath()
                 .getObject("data._links.next.href", String::class.java)
 
-        given().get(nextPage)
+        given().auth()
+                .basic("admin", "admin")
+                .get(nextPage)
                 .then()
                 .body("data.count", equalTo(2))
                 .body("data.pages", equalTo(2))
@@ -209,22 +261,28 @@ class UserTest {
 
     @Test
     fun testReplaceUserWithInvalidRequestBody() {
-        val originalUserInfoDto = UserDto(phone = "43214321", email = "test1@test1.xyz", name = "Test User 1")
-        val resourcePath = given().contentType(ContentType.JSON)
+        val originalUserInfoDto = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val resourcePath = given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .post("/users")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .put("/users/invalidId")
                 .then()
                 .statusCode(409)
 
         originalUserInfoDto.email = null
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .put(resourcePath)
                 .then()
@@ -232,7 +290,9 @@ class UserTest {
 
         originalUserInfoDto.email = "test1@test1.xyz"
         originalUserInfoDto.phone = null
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .put(resourcePath)
                 .then()
@@ -240,7 +300,9 @@ class UserTest {
 
         originalUserInfoDto.phone = "43214321"
         originalUserInfoDto.name = null
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .put(resourcePath)
                 .then()
@@ -249,15 +311,19 @@ class UserTest {
 
     @Test
     fun testReplaceUserWithValidRequestBody() {
-        val originalUserInfoDto = UserDto(phone = "43214321", email = "test1@test1.xyz", name = "Test User 1")
-        val resourcePath = given().contentType(ContentType.JSON)
+        val originalUserInfoDto = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val resourcePath = given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .post("/users")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        val userInfoDtoFromServer = given().get(resourcePath)
+        val userInfoDtoFromServer = given().auth()
+                .basic("admin", "admin")
+                .get(resourcePath)
                 .then()
                 .statusCode(200)
                 .extract().body().jsonPath().getObject("data", UserDto::class.java)
@@ -265,13 +331,17 @@ class UserTest {
 
         userInfoDtoFromServer.email = "new@test1.xyz"
         userInfoDtoFromServer.name = "New Name"
-        given().contentType(ContentType.JSON)
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(userInfoDtoFromServer)
                 .put(resourcePath)
                 .then()
                 .statusCode(204)
 
-        given().get(resourcePath)
+        given().auth()
+                .basic("admin", "admin")
+                .get(resourcePath)
                 .then()
                 .statusCode(200)
                 .body("data.phone", equalTo(originalUserInfoDto.phone))
@@ -282,18 +352,29 @@ class UserTest {
 
     @Test
     fun testReplaceUserCreatesNewResourceIfNotExists() {
-        val nonExistingUserDto = UserDto(phone = "43214321", email = "test1@test1.xyz", name = "Test User 1")
-        given().contentType(ContentType.JSON)
+        val nonExistingUserDto = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(nonExistingUserDto)
-                .post("/users")
+                .put("/users/${nonExistingUserDto.phone}")
                 .then()
                 .statusCode(201)
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/users")
+                .then()
+                .statusCode(200)
+                .body("data.data.phone", hasItems(nonExistingUserDto.phone))
     }
 
     @Test
     fun testJsonMergePatchWithValidRequestBody() {
-        val originalUserInfoDto = UserDto("12341234", email = "test1@test1.xyz", name = "Test User")
-        val resourcePath = given().contentType(ContentType.JSON)
+        val originalUserInfoDto = UserDto("12345678", email = "test1@test1.xyz", name = "Test User")
+        val resourcePath = given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
                 .body(originalUserInfoDto)
                 .post("/users")
                 .then()
@@ -304,13 +385,17 @@ class UserTest {
         val newEmail = "email@email.xyz"
         val jsonBody = "{\"name\":\"$newName\", \"email\":\"$newEmail\"}"
 
-        given().contentType("application/merge-patch+json")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body(jsonBody)
                 .patch(resourcePath)
                 .then()
                 .statusCode(204)
 
-        given().get(resourcePath)
+        given().auth()
+                .basic("admin", "admin")
+                .get(resourcePath)
                 .then()
                 .statusCode(200)
                 .body("data.name", equalTo(newName))
@@ -320,8 +405,10 @@ class UserTest {
 
     @Test
     fun testJsonMergePatchWithInvalidRequestBody() {
-        val originalUserInfoDto = UserDto("12341234", email = "test1@test1.xyz", name = "Test User")
-        val resourcePath = given().contentType("application/merge-patch+json")
+        val originalUserInfoDto = UserDto("12345678", email = "test1@test1.xyz", name = "Test User")
+        val resourcePath = given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body(originalUserInfoDto)
                 .post("/users")
                 .then()
@@ -329,34 +416,269 @@ class UserTest {
                 .extract().header("Location")
 
 
-        given().contentType("application/merge-patch+json")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body("{\"name\":\"new name\"}")
                 .patch("$resourcePath-invalid")
                 .then()
                 .statusCode(404)
 
-        given().contentType("application/merge-patch+json")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body("{")
                 .patch(resourcePath)
                 .then()
                 .statusCode(400)
 
-        given().contentType("application/merge-patch+json")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body("{\"phone\":\"1234\"}")
                 .patch(resourcePath)
                 .then()
                 .statusCode(409)
 
-        given().contentType("application/merge-patch+json")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body("{\"name\":null}")
                 .patch(resourcePath)
                 .then()
                 .statusCode(400)
 
-        given().contentType("application/merge-patch+json")
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
                 .body("{\"email\":null}")
                 .patch(resourcePath)
                 .then()
                 .statusCode(400)
+    }
+
+
+    /*** Authentication Tests ***/
+
+    @Test
+    fun testUserCanOnlyRetrieveOwnUserInfoAndAdminAny() {
+        val phone = "12345678"
+        val phone2 = "87654321"
+
+        given().auth()
+                .basic(phone, "123")
+                .get("/users/$phone")
+                .then()
+                .statusCode(not(403))
+
+        given().auth()
+                .basic(phone2, "123")
+                .get("/users/$phone")
+                .then()
+                .statusCode(403)
+
+        given().get("/users/$phone")
+                .then()
+                .statusCode(401)
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/users/1234")
+                .then()
+                .statusCode(not(403))
+    }
+
+
+    @Test
+    fun testOnlyAdminCanGetAll() {
+        given().auth()
+                .basic("12345678", "123")
+                .get("/users")
+                .then()
+                .statusCode(403)
+
+        given().get("/users")
+                .then()
+                .statusCode(401)
+
+        given().auth()
+                .basic("admin", "admin")
+                .get("/users")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testUserMustBeAuthenticatedToPost() {
+        given().auth()
+                .basic("12345678", "123")
+                .post("/users")
+                .then()
+                .statusCode(not(403))
+
+        given().auth()
+                .basic("admin", "admin")
+                .post("/users")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testUserMustBeAuthenticatedToPatch() {
+        given().auth()
+                .basic("12345678", "123")
+                .body("")
+                .patch("/users/12345678")
+                .then()
+                .statusCode(not(403))
+
+        given().auth()
+                .basic("admin", "admin")
+                .body("")
+                .patch("/users/12345678")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testUserMustBeAuthenticatedToPut() {
+        given().auth()
+                .basic("12345678", "123")
+                .body("")
+                .put("/users/12345678")
+                .then()
+                .statusCode(not(403))
+
+        given().auth()
+                .basic("admin", "admin")
+                .body("")
+                .put("/users/12345678")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testOnlyAdminCanDeleteUser() {
+        given().auth()
+                .basic("12345678", "123")
+                .delete("/users/12345678")
+                .then()
+                .statusCode(403)
+
+        given().auth()
+                .basic("admin", "admin")
+                .delete("/users/12345678")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testUserCanOnlyPatchTheirOwnInfoAndAdminAny() {
+        given().auth()
+                .basic("12345678", "123")
+                .contentType("application/merge-patch+json")
+                .body("{\"name\":\"new name\"}")
+                .patch("/users/12345678")
+                .then()
+                .statusCode(not(403))
+
+        given().auth()
+                .basic("87654321", "123")
+                .contentType("application/merge-patch+json")
+                .body("{\"name\":\"new name\"}")
+                .patch("/users/12345678")
+                .then()
+                .statusCode(403)
+
+        given().auth()
+                .basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .body("{\"name\":\"new name\"}")
+                .patch("/users/12345678")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testUserCanOnlyPostTheirOwnInfoAndAdminAny() {
+        val userInfoDto = UserDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
+
+        given().auth()
+                .basic(userInfoDto.phone, "123")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .post("/users")
+                .then()
+                .statusCode(201)
+
+        given().auth()
+                .basic("87654321", "123")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .post("/users")
+                .then()
+                .statusCode(403)
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .post("/users")
+                .then()
+                .statusCode(401)
+
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .post("/users")
+                .then()
+                .statusCode(not(403))
+    }
+
+    @Test
+    fun testUserCanOnlyReplaceTheirOwnInfoAndAdminAny() {
+        val userInfoDto = UserDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
+
+        given().auth()
+                .basic(userInfoDto.phone, "123")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .post("/users")
+                .then()
+                .statusCode(201)
+
+        given().auth()
+                .basic(userInfoDto.phone, "123")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .put("/users/${userInfoDto.phone}")
+                .then()
+                .statusCode(204)
+
+        given().auth()
+                .basic("87654321", "123")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .put("/users/${userInfoDto.phone}")
+                .then()
+                .statusCode(403)
+
+        given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .put("/users/${userInfoDto.phone}")
+                .then()
+                .statusCode(204)
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(userInfoDto)
+                .put("/users/${userInfoDto.phone}")
+                .then()
+                .statusCode(401)
+
+
+
     }
 }

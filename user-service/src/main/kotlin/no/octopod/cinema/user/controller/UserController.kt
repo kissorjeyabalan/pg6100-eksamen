@@ -37,7 +37,7 @@ class UserController {
         }
 
         if (!isAuthenticatedOrAdmin(authentication, userInfo.phone!!)) {
-            return ResponseEntity.status(401).build()
+            return ResponseEntity.status(403).build()
         }
 
         val entity = UserConverter.transform(userInfo)
@@ -57,7 +57,7 @@ class UserController {
             authentication: Authentication
     ): ResponseEntity<WrappedResponse<UserDto>> {
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(401).build()
+            return ResponseEntity.status(403).build()
         }
 
         val userInfo = repo.findById(userId).orElse(null) ?: return ResponseEntity.status(404).body(
@@ -81,8 +81,14 @@ class UserController {
             @RequestParam("page", defaultValue = "1")
             page: Int,
             @RequestParam("limit", defaultValue = "10")
-            limit: Int
+            limit: Int,
+            authentication: Authentication
     ): ResponseEntity<WrappedResponse<HalPage<UserDto>>> {
+
+        if (!isAuthenticatedOrAdmin(authentication)) {
+            return ResponseEntity.status(403).build()
+        }
+
         if (page < 1 || limit < 1) {
             return ResponseEntity.status(400).body(
                     WrappedResponse<HalPage<UserDto>>(
@@ -131,7 +137,7 @@ class UserController {
             authentication: Authentication
     ) : ResponseEntity<Void> {
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(401).build()
+            return ResponseEntity.status(403).build()
         }
 
         if (replacement.name.isNullOrEmpty() || replacement.phone.isNullOrEmpty() || replacement.email.isNullOrEmpty()) {
@@ -140,10 +146,6 @@ class UserController {
 
         if (userId != replacement.phone) {
             return ResponseEntity.status(409).build()
-        }
-
-        if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(401).build()
         }
 
         var entity = repo.findById(userId).orElse(null)
@@ -180,15 +182,11 @@ class UserController {
             authentication: Authentication
     ) : ResponseEntity<Void> {
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(401).build()
+            return ResponseEntity.status(403).build()
         }
 
         val entity = repo.findById(userId).orElse(null)
                 ?: return ResponseEntity.status(404).build()
-
-        if (!isAuthenticatedOrAdmin(authentication, entity.)) {
-            return ResponseEntity.status(401).build()
-        }
 
         val jackson = ObjectMapper()
 
@@ -235,5 +233,16 @@ class UserController {
         }
 
         return ResponseEntity.status(responseCode).build()
+    }
+
+    @DeleteMapping(path = ["/{userId}"])
+    fun deleteUser(@PathVariable userId: String): ResponseEntity<Void> {
+        val userInfoExists = repo.existsById(userId)
+        return if (userInfoExists) {
+            repo.deleteById(userId)
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(404).build()
+        }
     }
 }
