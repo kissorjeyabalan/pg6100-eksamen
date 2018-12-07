@@ -1,12 +1,6 @@
 eureka:
   client:
     enabled: false
----
-spring:
-  profiles: disable-auth
-  session:
-    store-type: none
-
 logging:
   level:
     org.springframework.security: debug

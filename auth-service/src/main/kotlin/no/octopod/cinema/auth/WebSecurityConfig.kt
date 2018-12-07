@@ -46,9 +46,10 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter()  {
                 .and()
                 //
                 .authorizeRequests()
-                .antMatchers("/auth/login").permitAll()
-                .antMatchers("/auth/register").permitAll()
-                .antMatchers("/auth/logout").permitAll()
+                .antMatchers("/user").authenticated()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/register").permitAll()
+                .antMatchers("/logout").permitAll()
                 .anyRequest().denyAll()
                 .and()
                 .csrf().disable()
