@@ -20,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 class WebSecurityConfigLocalFake : WebSecurityConfig() {
 
     override fun configure(http: HttpSecurity) {
+
         super.configure(http)
 
         http

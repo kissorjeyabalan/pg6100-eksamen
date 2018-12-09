@@ -8,25 +8,28 @@ import kotlin.streams.toList
 class TheaterConverter {
     companion object {
 
-        fun transform(theater: TheaterEntity): TheaterDto {
+        fun transform(theaterEntity: TheaterEntity): TheaterDto {
+
             return TheaterDto(
-                    name = theater.name,
-                    seatsMax = theater.seatsMax,
-                    id = theater.id,
-                    seats = theater.seats
+                    name = theaterEntity.name,
+                    seatsMax = theaterEntity.seatsMax,
+                    id = theaterEntity.id,
+                    seats = theaterEntity.seats
             )
         }
 
-        fun transform(theaterdto: TheaterDto): TheaterEntity {
+        fun transform(theaterDto: TheaterDto): TheaterEntity {
+
             return TheaterEntity(
-                    name = theaterdto.name,
-                    seatsMax = theaterdto.seatsMax,
-                    id = theaterdto.id!!.toLong(),
-                    seats = theaterdto.seats
+                    name = theaterDto.name,
+                    seatsMax = theaterDto.seatsMax,
+                    id = theaterDto.id!!.toLong(),
+                    seats = theaterDto.seats
             )
         }
 
         fun transform(entities: List<TheaterEntity>, page: Int, limit: Int): HalPage<TheaterDto> {
+
             val offset = ((page - 1) * limit).toLong()
             val dtoList : MutableList<TheaterDto> = entities.stream()
                     .skip(offset)

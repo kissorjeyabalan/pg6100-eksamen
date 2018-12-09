@@ -18,8 +18,6 @@ import java.time.ZonedDateTime
 
 class ShowApiTest: ApiTestBase() {
 
-    //TODO: test for riktig tilganger
-
     @Autowired
     private lateinit var crudShow: ShowRepository
 

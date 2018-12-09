@@ -238,7 +238,7 @@ class TheaterController {
             @RequestBody
             json: String
 
-    ) : ResponseEntity<WrappedResponse<TheaterDto>> {
+    ): ResponseEntity<WrappedResponse<TheaterDto>> {
 
         val pathId: Long
         try {

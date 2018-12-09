@@ -8,27 +8,30 @@ import kotlin.streams.toList
 class ShowConverter {
     companion object {
 
-        fun transform(show: ShowEntity): ShowDto {
+        fun transform(showEntity: ShowEntity): ShowDto {
+
             return ShowDto(
-                    startTime = show.startTime,
-                    movieId = show.movieId!!,
-                    cinemaId = show.cinemaId!!,
-                    availableSeats = show.seats,
-                    id = show.id
+                    startTime = showEntity.startTime,
+                    movieId = showEntity.movieId!!,
+                    cinemaId = showEntity.cinemaId!!,
+                    availableSeats = showEntity.seats,
+                    id = showEntity.id
             )
         }
 
-        fun transform(showdto: ShowDto): ShowEntity {
+        fun transform(showDto: ShowDto): ShowEntity {
+
             return ShowEntity(
-                    startTime = showdto.startTime,
-                    movieId = showdto.movieId!!,
-                    cinemaId = showdto.cinemaId!!,
-                    seats = showdto.availableSeats,
-                    id = showdto.id!!.toLong()
+                    startTime = showDto.startTime,
+                    movieId = showDto.movieId!!,
+                    cinemaId = showDto.cinemaId!!,
+                    seats = showDto.availableSeats,
+                    id = showDto.id!!.toLong()
             )
         }
 
         fun transform(entities: List<ShowEntity>, page: Int, limit: Int): HalPage<ShowDto> {
+
             val offset = ((page - 1) * limit).toLong()
             val dtoList : MutableList<ShowDto> = entities.stream()
                     .skip(offset)
