@@ -1,12 +1,14 @@
 package no.octopod.cinema.kino.dto
 
 import io.swagger.annotations.ApiModelProperty
+import org.springframework.format.annotation.DateTimeFormat
+import java.time.ZonedDateTime
 
 data class ShowDto (
 
         //TODO: change to dateTime
         @ApiModelProperty("The time when the show starts")
-        var startTime: Int? = null,
+        var startTime: ZonedDateTime? = null,
 
         @ApiModelProperty("Name of the movie")
         var movieId: Long? = null,
