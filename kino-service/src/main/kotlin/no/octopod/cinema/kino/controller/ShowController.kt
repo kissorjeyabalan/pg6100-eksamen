@@ -62,7 +62,7 @@ class ShowController {
         val theater = theaterRepo.findById(cinemaId).orElse(null)
                 ?: return ResponseEntity.status(400).build()
 
-        val showEntity = ShowEntity(startTime = dto.startTime!!, movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
+        val showEntity = ShowEntity(startTime = dto.startTime!!.withFixedOffsetZone(), movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
 
         val created = repo.save(showEntity)
 
@@ -340,6 +340,7 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
+        dto.startTime = dto.startTime!!.withFixedOffsetZone()
         val show = ShowConverter.transform(dto)
 
         repo.save(show)
@@ -408,9 +409,9 @@ class ShowController {
             val startTimeNode = jsonNode.get("startTime")
             newStartTime = when {
                 startTimeNode.isNull -> return ResponseEntity.status(400).build()
-                startTimeNode.isTextual -> 
+                startTimeNode.isTextual ->
                     try {
-                        ZonedDateTime.parse(startTimeNode.asText())
+                        ZonedDateTime.parse(startTimeNode.asText()).withFixedOffsetZone()
                     } catch (e: Exception) {
                         return ResponseEntity.status(400).build()
                     }

@@ -210,7 +210,7 @@ class ShowApiTest: ApiTestBase() {
                 .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
-                .body("data.data.startTime", hasItem(startTime.toOffsetDateTime().toString()))
+                .body("data.data[0].startTime", equalTo(startTime.toOffsetDateTime().toString()))
                 .body("data.data.size()", equalTo(1))
 
         given()
@@ -480,10 +480,9 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .get("/shows")
+                .get(path)
                 .then().statusCode(200)
-                .body("data.data.startTime", hasItem(startTime.toOffsetDateTime().toString()))
-                .body("data.data.size()", equalTo(1))
+                .body("data.startTime", equalTo(startTime.toOffsetDateTime().toString()))
 
         val pathDto = given()
                 .auth().basic("admin", "admin")
@@ -1104,5 +1103,101 @@ class ShowApiTest: ApiTestBase() {
                 .delete("/shows/1/seats/1")
                 .then()
                 .statusCode(not(403))
+    }
+
+    @Test
+    fun testPostSeatInShow() {
+
+        val theater = createTheater("theater", mutableListOf("a1", "a2", "b1", "b2"))
+
+        val startTime = ZonedDateTime.now()
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto = ShowDto(startTime, movieName, cinemaId)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime.toOffsetDateTime().toString()))
+                .body("data.data.size()", equalTo(1))
+
+        val pathDto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        given()
+                .auth().basic("admin", "admin")
+                .post("/shows/${pathDto.id}/seats/c1")
+                .then()
+                .statusCode(204)
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(5))
+    }
+
+    @Test
+    fun testPostAndFailSeatInShow() {
+
+        val theater = createTheater("theater", mutableListOf("a1", "a2", "b1", "b2"))
+
+        val startTime = ZonedDateTime.now()
+        val movieName = 1L
+        val cinemaId = theater.id
+        val dto = ShowDto(startTime, movieName, cinemaId)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows")
+                .then().statusCode(200)
+                .body("data.data.startTime", hasItem(startTime.toOffsetDateTime().toString()))
+                .body("data.data.size()", equalTo(1))
+
+        val pathDto = given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        given()
+                .auth().basic("admin", "admin")
+                .post("/shows/${pathDto.id}/seats/a1")
+                .then()
+                .statusCode(409)
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(4))
     }
 }
