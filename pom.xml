@@ -15,6 +15,7 @@
         <module>auth-service</module>
         <module>ticket-service</module>
         <module>movie-service</module>
+        <module>booking-service</module>
     </modules>
 
     <properties>
