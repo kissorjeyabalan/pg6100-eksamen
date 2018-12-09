@@ -2,7 +2,6 @@ package no.octopod.cinema.ticket.dto
 
 import no.octopod.cinema.common.dto.TicketDto
 import no.octopod.cinema.ticket.entity.Ticket
-import no.octopod.cinema.ticket.hal.PageDto
 import kotlin.streams.toList
 import no.octopod.cinema.common.hateos.HalPage
 
