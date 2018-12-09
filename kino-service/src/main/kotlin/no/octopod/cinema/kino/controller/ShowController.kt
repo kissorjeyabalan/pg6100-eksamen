@@ -48,8 +48,14 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        //TODO: chekc for long
-        val theater = theaterRepo.findById(dto.cinemaId!!).orElse(null)
+        val cinemaId: Long
+        try {
+            cinemaId = dto.cinemaId!!
+        } catch (e: Exception) {
+            return ResponseEntity.status(400).build()
+        }
+
+        val theater = theaterRepo.findById(cinemaId).orElse(null)
                 ?: return ResponseEntity.status(400).build()
 
         val showEntity = ShowEntity(startTime = dto.startTime!!, movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
@@ -251,6 +257,45 @@ class ShowController {
 
         return ResponseEntity.status(204).build()
     }
+
+    @ApiOperation("Add specific seat to show")
+    @PostMapping(path = ["/{id}/seats/{seatId}"])
+    fun postSeatInShow(
+
+            @ApiParam("ShowEntity id")
+            @PathVariable("id")
+            id: String,
+
+            @ApiParam("seat number")
+            @PathVariable("seatId")
+            seatId: String
+
+    ): ResponseEntity<WrappedResponse<ShowDto>> {
+
+        val pathId: Long
+        try {
+            pathId = id.toLong()
+        } catch (e: Exception) {
+            return ResponseEntity.status(404).build()
+        }
+
+        val showEntity = repo.findById(pathId).orElse(null)
+        val seatExists = showEntity?.seats?.contains(seatId)
+
+        if (showEntity == null || seatExists == null) {
+            return ResponseEntity.status(404).build()
+        }
+        if (seatExists) {
+            return ResponseEntity.status(409).build()
+        }
+
+        showEntity.seats!!.add(seatId)
+
+        repo.save(showEntity)
+
+        return ResponseEntity.status(204).build()
+    }
+
 
     @ApiOperation("Update a show with specific id")
     @PutMapping(path = ["/{id}"])
