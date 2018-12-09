@@ -4,8 +4,9 @@
   "description": "Kino Application",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode production",
-    "dev": "webpack --mode development"
+    "start": "node src/index.js",
+    "devOld": "webpack --mode development && npm run start",
+    "dev": "webpack-dev-server --open --mode development --port 8080"
   },
   "license": "MIT",
   "devDependencies": {

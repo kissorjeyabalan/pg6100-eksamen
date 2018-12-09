@@ -4,18 +4,23 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 class HomePage extends React.Component {
-    render() {
-        return (
-            <div>
 
+    render() {
+
+        return(
+            <div>
+                <div>
+                    <div>
+                        <h2>Movie-Service</h2>
+                        <p>See this weeks movies</p>
+                    </div>
+                </div>
             </div>
-        );
+        );    
     }
 }
 
-HomePage.propTypes = {
 
-};
 
 function mapStateToProps(state) {
     return {
@@ -24,3 +29,4 @@ function mapStateToProps(state) {
 }
 
 export default withRouter(connect(mapStateToProps)(HomePage))
+
