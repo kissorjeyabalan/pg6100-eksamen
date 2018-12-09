@@ -1,4 +1,4 @@
-import * as type from './cation-types';
+import * as type from './action-types';
 import axios from 'axios';
 
 const URL = '/users/';

@@ -300,8 +300,6 @@ class TicketApi {
         ticket.userId = newUserId
         ticket.screeningId = newScreeningId
 
-
-
         repo.save(ticket)
 
         return ResponseEntity.status(204).body(
