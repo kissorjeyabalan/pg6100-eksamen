@@ -1,3 +1,13 @@
-FROM httpd:2.4
+FROM node:10-alpine
 
-COPY ./build/ /usr/local/apache2/htdocs/
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+CMD npm run start

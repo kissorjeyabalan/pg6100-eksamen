@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",
-    "dev": "webpack-dev-server --open --mode development --port 8080"
+    "dev": "webpack-dev-server --open --mode development --port 8080",
+    "start": "node src/server/server.js"
   },
   "license": "MIT",
   "devDependencies": {

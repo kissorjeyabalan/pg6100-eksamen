@@ -5,6 +5,12 @@ import {connect} from 'react-redux';
 
 class HomePage extends React.Component {
 
+    constructor(props) {
+        super(props)
+
+    }
+
+
     render() {
 
         return(
