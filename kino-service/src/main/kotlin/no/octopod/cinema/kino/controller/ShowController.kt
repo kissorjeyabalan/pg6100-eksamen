@@ -2,6 +2,8 @@ package no.octopod.cinema.kino.controller
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.octopod.cinema.kino.converter.ShowConverter
 import no.octopod.cinema.kino.dto.ShowDto
 import no.octopod.cinema.kino.repository.ShowRepository
@@ -19,6 +21,8 @@ import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
 import no.octopod.cinema.kino.repository.TheaterRepository
 import org.springframework.http.MediaType
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @Api(value = "shows", description = "Handling of shows")
 @RequestMapping(
@@ -58,7 +62,7 @@ class ShowController {
         val theater = theaterRepo.findById(cinemaId).orElse(null)
                 ?: return ResponseEntity.status(400).build()
 
-        val showEntity = ShowEntity(startTime = dto.startTime!!, movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
+        val showEntity = ShowEntity(startTime = dto.startTime!!.withFixedOffsetZone(), movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
 
         val created = repo.save(showEntity)
 
@@ -336,6 +340,7 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
+        dto.startTime = dto.startTime!!.withFixedOffsetZone()
         val show = ShowConverter.transform(dto)
 
         repo.save(show)
@@ -343,7 +348,6 @@ class ShowController {
         return ResponseEntity.status(204).build()
     }
 
-    //TODO: make it merge patch content type
     @ApiOperation("Update a field in a show with specific id")
     @PatchMapping(path = ["/{id}"], consumes = ["application/merge-patch+json"])
     fun patchShow(
@@ -377,7 +381,10 @@ class ShowController {
         )
 
         //taken from arcuri82 CounterRestPatch
+        // https://stackoverflow.com/questions/39086472/jackson-serializes-a-zoneddatetime-wrongly-in-spring-boot
         val mapper = ObjectMapper()
+        mapper.registerModule(JavaTimeModule())
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         val jsonNode: JsonNode
         try {
@@ -401,7 +408,12 @@ class ShowController {
             val startTimeNode = jsonNode.get("startTime")
             newStartTime = when {
                 startTimeNode.isNull -> return ResponseEntity.status(400).build()
-                startTimeNode.isInt -> startTimeNode.asInt()
+                startTimeNode.isTextual ->
+                    try {
+                        ZonedDateTime.parse(startTimeNode.asText()).withFixedOffsetZone()
+                    } catch (e: Exception) {
+                        return ResponseEntity.status(400).build()
+                    }
                 else -> //Invalid JSON. Non-Integer startTime
                     return ResponseEntity.status(400).build()
             }

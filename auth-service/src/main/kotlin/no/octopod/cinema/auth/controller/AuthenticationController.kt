@@ -53,7 +53,7 @@ class AuthenticationController(
         if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
             return ResponseEntity.status(400).build()
         }
-        
+
         val registered = authService.createUser(creds.username!!, creds.password!!, setOf("USER"))
         if (!registered) {
             return ResponseEntity.status(400).build()

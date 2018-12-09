@@ -43,7 +43,7 @@ class UserController {
         val entity = UserConverter.transform(userInfo)
 
         if (repo.existsById(userInfo.phone!!)) {
-            return ResponseEntity.status(400).build()
+            return ResponseEntity.status(409).build()
         }
 
         val saved = repo.save(entity)

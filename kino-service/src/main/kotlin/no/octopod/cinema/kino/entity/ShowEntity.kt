@@ -1,14 +1,14 @@
 package no.octopod.cinema.kino.entity
 
+import java.time.ZonedDateTime
 import javax.persistence.*
-import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Entity
 class ShowEntity (
 
     @get:NotNull
-    var startTime: Int? = null,
+    var startTime: ZonedDateTime? = null,
 
     @get:NotNull
     var movieId: Long? = null,
@@ -23,5 +23,4 @@ class ShowEntity (
 
     @get:Id @get:GeneratedValue
     var id: Long? = null
-
 )

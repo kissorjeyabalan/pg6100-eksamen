@@ -22,5 +22,4 @@ class TheaterEntity (
 
         @get:Id @get:GeneratedValue
         var id: Long? = null
-
 )

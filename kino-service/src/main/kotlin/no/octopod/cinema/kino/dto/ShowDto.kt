@@ -1,17 +1,17 @@
 package no.octopod.cinema.kino.dto
 
 import io.swagger.annotations.ApiModelProperty
+import java.time.ZonedDateTime
 
 data class ShowDto (
 
-        //TODO: change to dateTime
-        @ApiModelProperty("The time when the show starts")
-        var startTime: Int? = null,
+        @ApiModelProperty("The time of when the show starts, standard ISO format")
+        var startTime: ZonedDateTime? = null,
 
-        @ApiModelProperty("Name of the movie")
+        @ApiModelProperty("Id of the movie")
         var movieId: Long? = null,
 
-        @ApiModelProperty("Name of the hosting cinema")
+        @ApiModelProperty("Id of the hosting theater")
         var cinemaId: Long? = null,
 
         @ApiModelProperty("Available seats in show")
