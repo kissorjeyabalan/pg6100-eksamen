@@ -5,16 +5,10 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.awaitility.Awaitility.await
 import org.junit.*
-import org.junit.runner.RunWith
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.web.server.LocalServerPort
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit4.SpringRunner
 import org.testcontainers.containers.DockerComposeContainer
 import java.io.File
-import java.security.cert.CertPath
+import org.hamcrest.CoreMatchers.*
 import java.util.concurrent.TimeUnit
-import java.time.ZonedDateTime
 
 
 class E2EDockerIT {
@@ -71,5 +65,179 @@ class E2EDockerIT {
         given().get("/api/v1/auth/user")
                 .then()
                 .statusCode(401)
+    }
+
+    @Test
+    fun testAuthentication() {
+
+        val username = "username1"
+        val password = "password1"
+
+        val authCookie = registerAuthentication(username, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .post("/api/v1/auth/logout")
+                .then()
+                .statusCode(204)
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"username\":\"$username\", \"password\":\"$password\"}")
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(204)
+    }
+
+    @Test
+    fun testGetTheaters() {
+
+        given()
+                .get("/api/v1/kino/theaters")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testGetShows() {
+
+        given()
+                .get("/api/v1/kino/shows")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testGetMovies() {
+
+        given()
+                .get("/api/v1/movies")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testGetTickets() {
+
+        val username = "username2"
+        val password = "password2"
+
+        val authCookie = registerAuthentication(username, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .get("/api/v1/tickets?userId=$username")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testPostAndGetUser() {
+
+        val phone = "12345678"
+        val email = "test@test.abc"
+        val username = "username3"
+        val password = "password3"
+
+        val authCookie = registerAuthentication(phone, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType(ContentType.JSON)
+                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .post("/api/v1/users")
+                .then()
+                .statusCode(201)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .get("/api/v1/users/$phone")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testPostAndPutUser() {
+
+        val phone = "12345698"
+        val email = "test@test.abc"
+        val username = "username4"
+        val password = "password4"
+
+        val authCookie = registerAuthentication(phone, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType(ContentType.JSON)
+                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .post("/api/v1/users")
+                .then()
+                .statusCode(201)
+
+        val newEmail = "replacement4@replacement.abc"
+        val newUsername = "username4-1"
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType(ContentType.JSON)
+                .body("{\"phone\":\"$phone\", \"email\":\"$newEmail\", \"name\":\"$newUsername\"}")
+                .put("/api/v1/users/$phone")
+                .then()
+                .statusCode(204)
+    }
+
+    @Test
+    fun testPostAndPatchUser() {
+
+        val phone = "12345679"
+        val email = "test@test.abc"
+        val username = "username5"
+        val password = "password5"
+
+        val authCookie = registerAuthentication(phone, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType(ContentType.JSON)
+                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .post("/api/v1/users")
+                .then()
+                .statusCode(201)
+
+        val newEmail = "replacement5@replacement.abc"
+        val newUsername = "username5-1"
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType("application/merge-patch+json")
+                .body("{\"email\":\"$newEmail\", \"name\":\"$newUsername\"}")
+                .patch("/api/v1/users/$phone")
+                .then()
+                .statusCode(204)
+    }
+
+    fun registerAuthentication(username: String? = null, password: String? = null): String {
+
+        var userId: String
+        var userPwd: String
+
+        if (username.isNullOrBlank() && password.isNullOrBlank()) {
+            userId =  counter.toString()
+            userPwd = counter.toString()
+        } else {
+            userId = username!!
+            userPwd = password!!
+        }
+
+        val session = given()
+                .contentType(ContentType.JSON)
+                .body("{\"username\":\"$userId\", \"password\":\"$userPwd\"}")
+                .post("/api/v1/auth/register")
+                .then()
+                .statusCode(204)
+                .header("Set-Cookie", not(equalTo(null)))
+                .extract().cookie("SESSION")
+
+        return session
     }
 }
