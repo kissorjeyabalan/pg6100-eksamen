@@ -1,0 +1,10 @@
+kinoApiAddress: http://localhost:8087
+systemUser: admin
+systemPwd: admin
+spring:
+  session:
+    store-type: none
+
+eureka:
+  client:
+    enabled: false
