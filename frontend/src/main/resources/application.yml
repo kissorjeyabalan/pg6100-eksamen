@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: frontend
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/
+    enabled: false
