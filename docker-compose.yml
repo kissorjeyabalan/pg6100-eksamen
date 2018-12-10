@@ -33,3 +33,15 @@ services:
         context: ./user-service
       depends_on:
         - eureka
+
+    auth_service:
+      build:
+        context: ./auth-service
+      depends_on:
+        - eureka
+
+    movie_service:
+      build:
+        context: ./movie-service
+      depends_on:
+        - eureka

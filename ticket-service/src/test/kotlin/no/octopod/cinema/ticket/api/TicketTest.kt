@@ -44,7 +44,7 @@ class TicketTest {
 
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
 
-        val id = given().auth().basic("admin", "admin")
+        given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/tickets")
