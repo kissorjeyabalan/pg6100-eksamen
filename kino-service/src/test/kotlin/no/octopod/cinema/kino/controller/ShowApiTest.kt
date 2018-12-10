@@ -48,7 +48,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieId = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieId, cinemaId)
@@ -85,7 +85,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieId = 1L
         val cinemaId = theater.id
         val showDto = ShowDto(startTime = startTime, movieId = movieId, cinemaId = cinemaId)
@@ -120,7 +120,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieId = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieId, cinemaId)
@@ -167,7 +167,7 @@ class ShowApiTest: ApiTestBase() {
                 .auth().basic("admin", "admin")
                 .get("/shows").then().statusCode(200).body("data.data.size()", equalTo(0))
 
-        dto.startTime = ZonedDateTime.now()
+        dto.startTime = ZonedDateTime.now().withNano(0)
         dto.cinemaId = 1L
         dto.movieId = 1L
 
@@ -190,7 +190,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -224,7 +224,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -242,7 +242,7 @@ class ShowApiTest: ApiTestBase() {
                 .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
-                .body("data.data.startTime", hasItem(startTime.toOffsetDateTime().toString()))
+                .body("data.data[0].startTime", equalTo(startTime.toOffsetDateTime().toString()))
                 .body("data.data.size()", equalTo(1))
 
         val badId = 1000L
@@ -269,9 +269,9 @@ class ShowApiTest: ApiTestBase() {
     @Test
     fun testGetWithHalpage() {
 
-        val startTime1 = ZonedDateTime.now()
-        val startTime2 = ZonedDateTime.now()
-        val startTime3 = ZonedDateTime.now()
+        val startTime1 = ZonedDateTime.now().withNano(0)
+        val startTime2 = ZonedDateTime.now().withNano(0)
+        val startTime3 = ZonedDateTime.now().withNano(0)
 
         val movieId1 = 1L
         val movieId2 = 4L
@@ -386,7 +386,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -404,7 +404,7 @@ class ShowApiTest: ApiTestBase() {
                 .auth().basic("admin", "admin")
                 .get("/shows")
                 .then().statusCode(200)
-                .body("data.data.startTime", hasItem(startTime.toOffsetDateTime().toString()))
+                .body("data.data[0].startTime", equalTo(startTime.toOffsetDateTime().toString()))
                 .body("data.data.size()", equalTo(1))
 
         given()
@@ -423,7 +423,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -462,7 +462,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1", "a2", "b1", "b2"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -511,7 +511,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf(seats))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -582,7 +582,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieId = 1L
         val cinemaId = theater.id
         val dto1 = ShowDto(startTime, movieId, cinemaId)
@@ -639,7 +639,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto1 = ShowDto(startTime, movieName, cinemaId)
@@ -717,7 +717,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto1 = ShowDto(startTime = startTime, movieId = movieName, cinemaId = cinemaId, availableSeats = theater.seats)
@@ -794,7 +794,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto1 = ShowDto(startTime, movieName, cinemaId)
@@ -836,7 +836,7 @@ class ShowApiTest: ApiTestBase() {
         val newTheater = createTheater("new theater", mutableListOf("b2", "b1"))
 
         val newMovieId = 2L
-        val newStarttime = ZonedDateTime.now()
+        val newStarttime = ZonedDateTime.now().withNano(0)
         val newCinemaId = newTheater.id
         val newSeats = newTheater.seats
 
@@ -1108,7 +1108,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1", "a2", "b1", "b2"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
@@ -1156,7 +1156,7 @@ class ShowApiTest: ApiTestBase() {
 
         val theater = createTheater("theater", mutableListOf("a1", "a2", "b1", "b2"))
 
-        val startTime = ZonedDateTime.now()
+        val startTime = ZonedDateTime.now().withNano(0)
         val movieName = 1L
         val cinemaId = theater.id
         val dto = ShowDto(startTime, movieName, cinemaId)
