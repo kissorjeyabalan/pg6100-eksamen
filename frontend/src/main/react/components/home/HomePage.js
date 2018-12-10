@@ -19,6 +19,9 @@ class HomePage extends React.Component {
                     <div>
                         <h2>Movie-Service</h2>
                         <p>See this weeks movies</p>
+                        <p>See this weeks movies</p>
+                        <p>See this weeks movies</p>
+
                     </div>
                 </div>
             </div>
