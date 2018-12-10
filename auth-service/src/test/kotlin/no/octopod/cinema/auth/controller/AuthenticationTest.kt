@@ -3,7 +3,7 @@ package no.octopod.cinema.auth.controller
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import no.octopod.cinema.auth.dto.LoginDto
+import no.octopod.cinema.auth.dto.AuthDto
 import no.octopod.cinema.auth.service.AuthenticationRepository
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
@@ -68,7 +68,7 @@ class AuthenticationTest {
     @Test
     fun testRegister() {
         given().contentType(ContentType.JSON)
-                .body(LoginDto("userId", "password"))
+                .body(AuthDto("userId", "password"))
                 .then()
                 .statusCode(204)
                 .header("Set-Cookie", not(equalTo(null)))
@@ -107,7 +107,7 @@ class AuthenticationTest {
         checkAuthenticatedCookie(basic, 200)
 
         val login = given().contentType(ContentType.JSON)
-                .body(LoginDto(userId, pwd))
+                .body(AuthDto(userId, pwd))
                 .post("/login")
                 .then()
                 .statusCode(204)
@@ -125,7 +125,7 @@ class AuthenticationTest {
         val pwd = "123"
 
         val invalid = given().contentType(ContentType.JSON)
-                .body(LoginDto(userId, pwd))
+                .body(AuthDto(userId, pwd))
                 .post("/login")
                 .then()
                 .statusCode(400)
@@ -136,7 +136,7 @@ class AuthenticationTest {
         registerUser(userId, pwd)
 
         val authenticated = given().contentType(ContentType.JSON)
-                .body(LoginDto(userId, pwd))
+                .body(AuthDto(userId, pwd))
                 .post("/login")
                 .then()
                 .statusCode(204)
@@ -168,7 +168,7 @@ class AuthenticationTest {
 
         registerUser(userId, pwd)
         given().contentType(ContentType.JSON)
-                .body(LoginDto(userId, pwd))
+                .body(AuthDto(userId, pwd))
                 .post("/register")
                 .then()
                 .statusCode(400)
@@ -177,7 +177,7 @@ class AuthenticationTest {
     @Test
     fun testIllegalLoginValue() {
         given().contentType(ContentType.JSON)
-                .body(LoginDto(null, ""))
+                .body(AuthDto(null, ""))
                 .post("/login")
                 .then()
                 .statusCode(400)
@@ -186,7 +186,7 @@ class AuthenticationTest {
     @Test
     fun testIllegalRegisterValue() {
         given().contentType(ContentType.JSON)
-                .body(LoginDto(null, ""))
+                .body(AuthDto(null, ""))
                 .post("/register")
                 .then()
                 .statusCode(400)
@@ -196,7 +196,7 @@ class AuthenticationTest {
     // TODO: Add source
     private fun registerUser(userId: String, password: String): String {
         val sessionCookie = given().contentType(ContentType.JSON)
-                .body(LoginDto(userId, password))
+                .body(AuthDto(userId, password))
                 .post("/register")
                 .then()
                 .statusCode(204)
