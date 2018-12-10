@@ -43,7 +43,7 @@ class HeaderBar extends React.Component {
 
        return (
            <div className="headerBar">
-               <Link className="btn home" to={"/"}>Home</Link>
+               <Link className="btn-home" to={"/"}>Home</Link>
                {content}
            </div>
        );

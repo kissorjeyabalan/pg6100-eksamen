@@ -32,6 +32,10 @@ spring:
         - Path=/api/v1/tickets/**
         filters:
         - StripPrefix=2
+      - id: movie-service
+        uri: lb://movie-service
+        predicates:
+        - Path=/api/v1/movies/**
 
 eureka:
   instance:

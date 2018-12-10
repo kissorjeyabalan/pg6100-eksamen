@@ -5,6 +5,7 @@ const URL = '/users/';
 
 export function login(username, password, history) {
     return async (dispatch) => {
+
         axios.post(`${URL}/auth/login`, {userId: username, password: password}).then(res => {
                 dispatch({type: type.AUTHENTICATED, data: {userId: res.data.userId}});
                 localStorage.setItem('user', res.data.userId);
