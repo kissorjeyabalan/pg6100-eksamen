@@ -15,7 +15,7 @@ spring:
         filters:
         - StripPrefix=2
       - id: auth-service
-        uri: lb://user-service
+        uri: lb://auth-service
         predicates:
         - Path=/api/v1/auth/**
         filters:
@@ -36,6 +36,8 @@ spring:
         uri: lb://movie-service
         predicates:
         - Path=/api/v1/movies/**
+        filters:
+        - StripPrefix=2
 
 eureka:
   instance:
