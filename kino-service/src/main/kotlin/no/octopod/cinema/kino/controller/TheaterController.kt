@@ -26,7 +26,6 @@ import javax.validation.ConstraintViolationException
         path = ["/theaters"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
-
 @RestController
 class TheaterController {
 
