@@ -18,7 +18,6 @@ import java.time.ZonedDateTime
 
 
 class E2EDockerIT {
-
     companion object {
 
         @BeforeClass @JvmStatic
@@ -40,7 +39,6 @@ class E2EDockerIT {
         @BeforeClass
         @JvmStatic
         fun initialize() {
-
             RestAssured.baseURI = "http://localhost"
             RestAssured.port = 80
             RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
@@ -52,12 +50,12 @@ class E2EDockerIT {
                     .until {
 
                         given()
-                                .get("http://localhost:80/user")
+                                .get("/api/v1/auth/user")
                                 .then()
                                 .statusCode(401)
 
                         given()
-                                .get("http://localhost:80/shows")
+                                .get("/api/v1/kino/shows")
                                 .then()
                                 .statusCode(200)
 
@@ -70,7 +68,7 @@ class E2EDockerIT {
     @Test
     fun testUnauthorizedAccess() {
 
-        given().get("/user")
+        given().get("/api/v1/auth/user")
                 .then()
                 .statusCode(401)
     }
