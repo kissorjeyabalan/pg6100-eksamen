@@ -40,7 +40,7 @@ class RegisterPage extends React.Component {
         }
 
         return(
-            <div>
+            <div className="container">
                 <h1>Sign up</h1>
                 <div>
                     <p>Username: </p>

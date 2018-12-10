@@ -30,6 +30,7 @@ hs_err_pid*
 *.iws
 **/target
 bundle.js
+**/node
 
 # osx specific
 .DS_Store

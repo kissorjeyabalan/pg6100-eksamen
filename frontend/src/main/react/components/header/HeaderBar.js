@@ -12,7 +12,7 @@ class HeaderBar extends React.Component {
    renderLoggedIn() {
        return (
            <div className="msgDiv">
-               <h3 className="notLoggedInMsg">Welcome, {this.props.userId}</h3>
+               <div className="notLoggedInMsg">Welcome, {this.props.userId}</div>
                <div className="btn btnPartHeader" onClick={this.props.doLogOut}>
                    Logout
                </div>
@@ -23,10 +23,9 @@ class HeaderBar extends React.Component {
    renderNotLoggedIn() {
        return (
            <div className="msgDiv">
-               <div className="notLoggedInMsg">You are not logged in!</div>
                <div className="btnPartHeader">
+                   <div className="notLoggedInMsg">You are not logged in!</div>
                    <Link className="btn" to="/login">Log in</Link>
-                   <br/>
                    <Link className="btn" to="/signup">Sign up</Link>
                </div>
            </div>
@@ -42,8 +41,8 @@ class HeaderBar extends React.Component {
        }
 
        return (
-           <div className="headerBar">
-               <Link className="btn home" to={"/"}>Home</Link>
+           <div className="header-bar">
+               <Link className="btn btn-home" to={"/"}>Home</Link>
                {content}
            </div>
        );

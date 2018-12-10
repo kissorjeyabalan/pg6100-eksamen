@@ -14,9 +14,11 @@ class App extends React.Component {
                 <div>
                     <HeaderBar/>
                     <Switch>
-                        <Route exact path="/" component={HomePage}/>
+                        <Route exact path="/moviepage"
+                               render={props => <MoviePage {...props} userId={this.state.id}/>}/>
                         <Route exact path="/login" component={LoginPage} />
                         <Route exact path="/signup" component={RegisterPage} />
+                        <Route exact path="/" component={HomePage}/>
                     </Switch>
                 </div>
             </BrowserRouter>
