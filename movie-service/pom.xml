@@ -12,6 +12,13 @@
     <artifactId>movie-service</artifactId>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>5.0.7</version>
+        </dependency>
+
         <dependency>
             <groupId>no.octopod.cinema</groupId>
             <artifactId>common</artifactId>

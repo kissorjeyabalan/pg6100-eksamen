@@ -15,11 +15,12 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
-        /*axios.get(`${ApiBase.MOVIE_API}?featured=true`).then(res => {
+        axios.get(`${ApiBase.MOVIE_API}?featured=true`).then(res => {
             let movies = res.data
             this.setState({featuredMovies: movies})
-        })*/
+        })
 
+        /*
         let fakeReply = {
             data: [
                 {
@@ -47,7 +48,7 @@ class HomePage extends React.Component {
 
         this.setState({
             featuredMovies: fakeReply.data
-        })
+        })*/
 
     }
 
