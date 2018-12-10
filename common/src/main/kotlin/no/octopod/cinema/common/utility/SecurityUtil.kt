@@ -11,4 +11,8 @@ object SecurityUtil {
         return false
     }
 
+    fun getUserId(authentication: Authentication): String {
+        return authentication.name
+    }
+
 }
