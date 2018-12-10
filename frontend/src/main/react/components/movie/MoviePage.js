@@ -21,12 +21,10 @@ class MoviePage extends React.Component {
         let movieId = this.props.id
 
         return(
-            <div>
+            <div className="container">
                 <div>
-                    <div>
-                        <h2>Movie-Detail-Page</h2>
-                        <p>{movieId}</p>
-                    </div>
+                    <h2>Movie-Detail-Page</h2>
+                    <p>{movieId}</p>
                 </div>
             </div>
         );

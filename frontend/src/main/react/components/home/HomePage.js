@@ -39,13 +39,11 @@ class HomePage extends React.Component {
         }
 
         return(
-            <div>
+            <div className="container">
                 <div>
-                    <div>
-                        <h2>Movie-Service</h2>
-                        <p>Here is a selection of this weeks featured movies</p>
-                        {featuredMovieList}
-                    </div>
+                    <h2>Movie-Service</h2>
+                    <p>Here is a selection of this weeks featured movies</p>
+                    {featuredMovieList}
                 </div>
             </div>
         );    
