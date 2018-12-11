@@ -3,10 +3,7 @@ package no.octopod.cinema.e2etests
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import no.octopod.cinema.common.dto.ShowDto
-import no.octopod.cinema.common.dto.TheaterDto
-import no.octopod.cinema.common.dto.TicketDto
-import no.octopod.cinema.common.dto.UserDto
+import no.octopod.cinema.common.dto.*
 import org.awaitility.Awaitility.await
 import org.hamcrest.CoreMatchers
 import org.junit.*
@@ -488,7 +485,6 @@ class E2EDockerIT {
                 .statusCode(200)
     }
 
-    /*
     @Test
     fun testGetMovies() {
 
@@ -496,7 +492,47 @@ class E2EDockerIT {
                 .get("/api/v1/movies")
                 .then()
                 .statusCode(200)
-    }*/
+    }
+
+    @Test
+    fun testAdminPostAndGetMovie() {
+
+        val movie = "Movie 1"
+        val description = "Description of movie"
+        val image_path = "url"
+        val release_date = ZonedDateTime.now().withFixedOffsetZone().withNano(0)
+        val featured = true
+        val movieDto = MovieDto(
+                title = movie,
+                description = description,
+                image_path = image_path,
+                release_date = release_date,
+                featured = featured
+        )
+
+        val moviePath = given().auth()
+                .basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(movieDto)
+                .post("/api/v1/movies")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .get(moviePath)
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testGetOrder() {
+
+        given()
+                .get("/api/v1/order")
+                .then()
+                .statusCode(200)
+    }
 
     @Test
     fun testGetTicket() {
