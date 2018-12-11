@@ -6,8 +6,16 @@ spring:
     port: 6379
   session:
     store-type: redis
+  datasource:
+    url: "jdbc:postgresql://auth-db:5432/postgres"
+    username: "postgres"
+    password: ""
+    driver-class-name: "org.postgresql.Driver"
   jpa:
+    database: "postgresql"
     show-sql: true
+    hibernate:
+      ddl-auto: validate
 eureka:
   instance:
     preferIpAddress: true
