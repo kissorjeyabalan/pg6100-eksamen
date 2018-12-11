@@ -1,0 +1,9 @@
+eureka:
+  client:
+    enabled: false
+spring:
+  session:
+    store-type: none
+logging:
+  level:
+    org.springframework.security: debug

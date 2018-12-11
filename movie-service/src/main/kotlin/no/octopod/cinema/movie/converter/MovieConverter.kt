@@ -14,7 +14,7 @@ class MovieConverter {
                     title = movie.title,
                     description = movie.description,
                     image_path = movie.imagePath,
-                    release_date = movie.releaseDate,
+                    release_date = movie.releaseDate?.withFixedOffsetZone()?.withNano(0),
                     featured = movie.featured
             )
         }
@@ -25,7 +25,7 @@ class MovieConverter {
                 title = movieDto.title,
                 description = movieDto.description,
                 imagePath = movieDto.image_path,
-                releaseDate = movieDto.release_date,
+                releaseDate = movieDto.release_date?.withFixedOffsetZone()?.withNano(0),
                 featured = movieDto.featured
             )
         }

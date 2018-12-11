@@ -22,6 +22,7 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             .and()
             .authorizeRequests()
             .antMatchers(HttpMethod.GET, "/movies/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/movies/**").hasRole("ADMIN")
             .anyRequest().denyAll()
             .and()
             .csrf().disable()
