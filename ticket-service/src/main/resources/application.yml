@@ -14,19 +14,3 @@ eureka:
       enabled: true
     serviceUrl:
       defaultZone: http://eureka:8761/eureka/
----
-spring:
-  profiles:
-    active:
-    - local
-  port: 8087
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create
-    database: h2
-  session:
-    store-type: none
-eureka:
-  client:
-    enabled: false

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.octopod.cinema.kino.converter.ShowConverter
-import no.octopod.cinema.kino.dto.ShowDto
+import no.octopod.cinema.common.dto.ShowDto
 import no.octopod.cinema.kino.repository.ShowRepository
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -21,7 +21,6 @@ import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
 import no.octopod.cinema.kino.repository.TheaterRepository
 import org.springframework.http.MediaType
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @Api(value = "shows", description = "Handling of shows")
@@ -285,7 +284,7 @@ class ShowController {
 
         val showEntity = repo.findById(pathId).orElse(null)?: return ResponseEntity.status(404).build()
 
-        val theater = repo.findById(showEntity.cinemaId!!).orElse(null)?: return ResponseEntity.status(400).build()
+        val theater = theaterRepo.findById(showEntity.cinemaId!!).orElse(null)?: return ResponseEntity.status(400).build()
         if (!theater.seats!!.contains(seatId)) return ResponseEntity.status(400).build()
 
         val seatExists = showEntity.seats?.contains(seatId) ?: return ResponseEntity.status(404).build()

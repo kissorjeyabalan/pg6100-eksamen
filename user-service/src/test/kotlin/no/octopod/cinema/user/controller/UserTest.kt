@@ -147,7 +147,7 @@ class UserTest {
                 .body(originalUserDto)
                 .post("/users")
                 .then()
-                .statusCode(400)
+                .statusCode(409)
     }
 
     @Test

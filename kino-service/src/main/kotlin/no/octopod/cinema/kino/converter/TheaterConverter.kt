@@ -1,7 +1,7 @@
 package no.octopod.cinema.kino.converter
 
 import no.octopod.cinema.common.hateos.HalPage
-import no.octopod.cinema.kino.dto.TheaterDto
+import no.octopod.cinema.common.dto.TheaterDto
 import no.octopod.cinema.kino.entity.TheaterEntity
 import kotlin.streams.toList
 

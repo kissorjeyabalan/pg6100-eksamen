@@ -66,7 +66,7 @@ class TicketApi {
             return ResponseEntity.status(400).body(
                     WrappedResponse<HalPage<TicketDto>>(
                             code = 400,
-                            message = "Malformed limit og page number supplied"
+                            message = "Malformed limit or page number supplied"
                     ).validated()
             )
         }

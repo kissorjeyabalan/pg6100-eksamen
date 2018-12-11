@@ -41,8 +41,9 @@ class TicketTest {
 
         val userId = "1"
         val screeningId = "1"
+        val seatNum = "a1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), null)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), seat = seatNum)
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -124,8 +125,9 @@ class TicketTest {
     fun testUpdateTicket() {
         val userId = "1"
         val screeningId = "1"
+        val seatNum = "1a"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), seatNum)
 
         val path = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -147,7 +149,7 @@ class TicketTest {
                 .statusCode(200)
                 .body("data.data[0].userId", equalTo("1"))
 
-        val updatedDto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), path.split("/")[2])
+        val updatedDto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), "2b", id = path.split("/")[2])
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -167,7 +169,7 @@ class TicketTest {
     @Test
     fun testUpdateTicketWithNonExistentId() {
 
-        val dto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), "99")
+        val dto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), seat = "a1", id = "99")
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -194,8 +196,9 @@ class TicketTest {
     fun testPatchUserIdOnTicket() {
         val userId = "1"
         val screeningId = "1"
+        val seatNum = "a1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), seat = seatNum)
 
         val path = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -228,8 +231,9 @@ class TicketTest {
     fun testPatchScreeningIdOnTicket() {
         val userId = "1"
         val screeningId = "1"
+        val seatNum = "a1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), seat = seatNum)
 
         val path = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -259,7 +263,7 @@ class TicketTest {
 
     @Test
     fun testAuth() {
-        val dto = TicketDto("foo", "1")
+        val dto = TicketDto("foo", "1", seat = "a2")
 
         val resPath = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)

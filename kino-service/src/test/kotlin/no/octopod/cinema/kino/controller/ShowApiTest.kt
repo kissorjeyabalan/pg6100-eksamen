@@ -2,12 +2,12 @@ package no.octopod.cinema.kino.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.octopod.cinema.kino.ApiTestBase
-import no.octopod.cinema.kino.dto.ShowDto
+import no.octopod.cinema.common.dto.ShowDto
 import no.octopod.cinema.kino.repository.ShowRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import no.octopod.cinema.kino.dto.TheaterDto
+import no.octopod.cinema.common.dto.TheaterDto
 import no.octopod.cinema.kino.repository.TheaterRepository
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
@@ -1142,13 +1142,23 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .post("/shows/${pathDto.id}/seats/c1")
+                .delete("/shows/${pathDto.id}/seats/b2")
                 .then()
                 .statusCode(204)
 
         given()
                 .auth().basic("admin", "admin")
-                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(5))
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(3))
+
+        given()
+                .auth().basic("admin", "admin")
+                .post("/shows/${pathDto.id}/seats/b2")
+                .then()
+                .statusCode(204)
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(4))
     }
 
     @Test
