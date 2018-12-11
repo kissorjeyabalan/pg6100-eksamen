@@ -285,7 +285,7 @@ class ShowController {
 
         val showEntity = repo.findById(pathId).orElse(null)?: return ResponseEntity.status(404).build()
 
-        val theater = repo.findById(showEntity.cinemaId!!).orElse(null)?: return ResponseEntity.status(400).build()
+        val theater = theaterRepo.findById(showEntity.cinemaId!!).orElse(null)?: return ResponseEntity.status(400).build()
         if (!theater.seats!!.contains(seatId)) return ResponseEntity.status(400).build()
 
         val seatExists = showEntity.seats?.contains(seatId) ?: return ResponseEntity.status(404).build()

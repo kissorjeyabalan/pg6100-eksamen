@@ -1142,13 +1142,23 @@ class ShowApiTest: ApiTestBase() {
 
         given()
                 .auth().basic("admin", "admin")
-                .post("/shows/${pathDto.id}/seats/c1")
+                .delete("/shows/${pathDto.id}/seats/b2")
                 .then()
                 .statusCode(204)
 
         given()
                 .auth().basic("admin", "admin")
-                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(5))
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(3))
+
+        given()
+                .auth().basic("admin", "admin")
+                .post("/shows/${pathDto.id}/seats/b2")
+                .then()
+                .statusCode(204)
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/shows/${pathDto.id}").then().statusCode(200).body("data.availableSeats.size()", equalTo(4))
     }
 
     @Test
