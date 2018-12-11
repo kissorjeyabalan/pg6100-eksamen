@@ -134,7 +134,7 @@ class E2EDockerIT {
     @Test
     fun testPostAndGetUser() {
 
-        val phone = "12345678"
+        val phone = "22345678"
         val email = "test@test.abc"
         val username = "username3"
         val password = "password3"
