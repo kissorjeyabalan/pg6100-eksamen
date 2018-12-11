@@ -31,24 +31,5 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.NEVER)
     }
-
-    @Bean
-    fun userSecurity() : UserSecurity {
-        return UserSecurity()
-    }
 }
-
-/**
- * Custom check. Not only we need a user authenticated, but we also
- * need to make sure that a user can only access his/her data, and not the
- * one of the other users
- */
-class UserSecurity{
-    fun checkId(authentication: Authentication, id: String) : Boolean{
-        val current = (authentication.principal as UserDetails).username
-
-        return current == id
-    }
-}
-
 
