@@ -214,7 +214,7 @@ class E2EDockerIT {
                 .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(newDto)
-                .put("$API_BASE/$path")
+                .put("$API_BASE/kino$path")
                 .then()
                 .statusCode(204)
     }
@@ -269,7 +269,7 @@ class E2EDockerIT {
 
         given()
                 .cookie("SESSION", getAdminSessionCookie())
-                .get("$API_BASE/$path")
+                .get("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
                 .body("data.name", equalTo(name))
@@ -317,7 +317,7 @@ class E2EDockerIT {
 
         val showId = given()
                 .cookie("SESSION", getAdminSessionCookie())
-                .get("$API_BASE/$showPath")
+                .get("$API_BASE/kino$showPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -382,7 +382,7 @@ class E2EDockerIT {
 
         given()
                 .cookie("SESSION", getAdminSessionCookie())
-                .delete(path)
+                .delete("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
     }
@@ -433,7 +433,7 @@ class E2EDockerIT {
                 .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(newDto)
-                .put("$API_BASE/$path")
+                .put("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
     }
@@ -484,7 +484,7 @@ class E2EDockerIT {
                 .cookie("SESSION", getAdminSessionCookie())
                 .contentType("application/merge-patch+json")
                 .body("{\"movieId\":\"$newMovieId\", \"cinemaId\":$theaterId.id}")
-                .patch("$API_BASE/$path")
+                .patch("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
     }
