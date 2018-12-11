@@ -192,16 +192,6 @@ class AuthenticationTest {
                 .statusCode(400)
     }
 
-    @Test
-    fun testAdminCanAccessOthers() {
-        given().auth()
-                .basic("admin", "123")
-                .get("/users")
-                .then()
-                .statusCode(200)
-    }
-
-
     // TODO: Add source
     private fun registerUser(userId: String, password: String): String {
         val sessionCookie = given().contentType(ContentType.JSON)
