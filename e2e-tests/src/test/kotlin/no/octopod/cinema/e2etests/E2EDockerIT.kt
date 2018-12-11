@@ -5,11 +5,16 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import no.octopod.cinema.common.dto.ShowDto
 import no.octopod.cinema.common.dto.TheaterDto
+import no.octopod.cinema.common.dto.TicketDto
+import no.octopod.cinema.common.dto.UserDto
 import org.awaitility.Awaitility.await
+import org.hamcrest.CoreMatchers
 import org.junit.*
 import org.testcontainers.containers.DockerComposeContainer
 import java.io.File
 import org.hamcrest.CoreMatchers.*
+import org.hamcrest.Matchers
+import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
 
@@ -494,7 +499,7 @@ class E2EDockerIT {
     }*/
 
     @Test
-    fun testGetTickets() {
+    fun testGetTicket() {
 
         val username = "username2"
         val password = "password2"
@@ -506,6 +511,115 @@ class E2EDockerIT {
                 .get("/api/v1/tickets?userId=$username")
                 .then()
                 .statusCode(200)
+    }
+
+    @Test
+    fun testAdminPostAndGetTicket() {
+
+        val userId = "testAdminPostAndGetTicket"
+        val screeningId = "1"
+        val ticketDto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), null)
+
+        val ticketPath = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(ticketDto)
+                .post("/api/v1/tickets")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().auth().basic("admin", "admin")
+                .get(ticketPath)
+                .then()
+                .statusCode(200)
+                .body("data.data.size()", Matchers.equalTo(1))
+    }
+
+    @Test
+    fun testAdminDeleteTicket() {
+
+        val userId = "testAdminDeleteTicket"
+        val screeningId = "1"
+        val ticketDto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), null)
+
+        val ticketPath = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(ticketDto)
+                .post("/api/v1/tickets")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().auth().basic("admin", "admin")
+                .delete(ticketPath)
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminPutTicket() {
+
+        val userId = "testAdminPutTicket"
+        val screeningId = "1"
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
+
+        val path = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/tickets")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
+                .then()
+                .statusCode(200)
+                .body("data.data.size()", Matchers.equalTo(1))
+
+        given().auth().basic("admin", "admin")
+                .get("/tickets")
+                .then()
+                .statusCode(200)
+                .body("data.data[0].userId", Matchers.equalTo("1"))
+
+        val newUserId = "testAdminPutTicket-new"
+        val newScreeningId = "2"
+        val updatedDto = TicketDto(newUserId, newScreeningId, ZonedDateTime.now().withNano(0), path.split("/")[2])
+
+        given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(updatedDto)
+                .put(path)
+                .then()
+                .statusCode(204)
+    }
+
+    @Test
+    fun testAdminPatchTicket() {
+
+        val userId = "testAdminPatchTicket"
+        val screeningId = "1"
+
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
+
+        val path = given().auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/tickets")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val newScreeningId = "2"
+        val body = "{\"screeningId\":\"$newScreeningId\"}"
+
+        given().auth().basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .body(body)
+                .patch(path)
+                .then()
+                .statusCode(204)
     }
 
     @Test
