@@ -3,6 +3,7 @@ package no.octopod.cinema.e2etests
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import no.octopod.cinema.auth.dto.AuthDto
 import no.octopod.cinema.common.dto.*
 import org.awaitility.Awaitility.await
 import org.hamcrest.CoreMatchers
@@ -63,6 +64,8 @@ class E2EDockerIT {
         }
     }
 
+    private val API_BASE = "/api/v1"
+
     @Test
     fun testUnauthorizedAccess() {
 
@@ -107,10 +110,10 @@ class E2EDockerIT {
 
         val name = "testAdminPostAndGetTheater"
         val seats = mutableListOf("a1")
-        val dto = "{\"name\":\"$name\", \"seats\":\"$seats\"}"
+        val dto = TheaterDto(name = name, seats = seats)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/theaters")
@@ -119,8 +122,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
-                .get(path)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/$path")
                 .then()
                 .statusCode(200)
                 .body("data.name", equalTo(name))
@@ -132,10 +135,10 @@ class E2EDockerIT {
 
         val name = "testAdminDeleteTheater"
         val seats = mutableListOf("a1")
-        val dto = "{\"name\":\"$name\", \"seats\":\"$seats\"}"
+        val dto = TheaterDto(name = name, seats = seats)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/theaters")
@@ -144,7 +147,7 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .delete(path)
                 .then()
                 .statusCode(200)
@@ -155,10 +158,10 @@ class E2EDockerIT {
 
         val name = "testAdminPatchTheater1"
         val seats = mutableListOf("a1")
-        val dto = "{\"name\":\"$name\", \"seats\":\"$seats\"}"
+        val dto = TheaterDto(name = name, seats = seats)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/theaters")
@@ -169,12 +172,13 @@ class E2EDockerIT {
 
         val newName = "testAdminPatchTheater2"
         val newSeats = mutableListOf("b1")
+        val newDto = TheaterDto(name = newName, seats = newSeats)
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType("application/merge-patch+json")
-                .body("{\"name\":\"$newName\", \"seats\":\"$newSeats\"}")
-                .patch(path)
+                .body(newDto)
+                .patch("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
     }
@@ -193,8 +197,8 @@ class E2EDockerIT {
                 .then()
                 .statusCode(200)
 
-        /*val path = given()
-                .auth().basic("admin", "123")
+        val path = given()
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/theaters")
@@ -204,15 +208,16 @@ class E2EDockerIT {
 
         val newName = "testAdminPutTheater2"
         val newSeats = mutableListOf("a1")
+        val newDto = TheaterDto(name = newName, seats = newSeats)
 
 
         given()
-                .auth().basic("admin", "123")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
-                .body("{\"name\":\"$newName\", \"seats\":\"$newSeats\"}")
-                .put(path)
+                .body(newDto)
+                .put("$API_BASE/$path")
                 .then()
-                .statusCode(204)*/
+                .statusCode(204)
     }
 
     @Test
@@ -232,7 +237,7 @@ class E2EDockerIT {
         val theaterDto = TheaterDto(name = name, seats = seats)
 
         val theaterPath = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(theaterDto)
                 .post("/api/v1/kino/theaters")
@@ -241,8 +246,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         val theaterId = given()
-                .auth().basic("admin", "admin")
-                .get(theaterPath)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/$theaterPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -255,7 +260,7 @@ class E2EDockerIT {
         val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/shows")
@@ -264,8 +269,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
-                .get(path)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/$path")
                 .then()
                 .statusCode(200)
                 .body("data.name", equalTo(name))
@@ -280,7 +285,7 @@ class E2EDockerIT {
         val theaterDto = TheaterDto(name = name, seats = seats)
 
         val theaterPath = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(theaterDto)
                 .post("/api/v1/kino/theaters")
@@ -289,8 +294,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         val theaterId = given()
-                .auth().basic("admin", "admin")
-                .get(theaterPath)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/kino$theaterPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -303,7 +308,7 @@ class E2EDockerIT {
         val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
 
         val showPath = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/shows")
@@ -312,8 +317,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         val showId = given()
-                .auth().basic("admin", "admin")
-                .get(showPath)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/$showPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -323,14 +328,14 @@ class E2EDockerIT {
                 .getObject("data", TheaterDto::class.java)
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .delete("/api/v1/kino/shows/${showId.id}/seats/a2")
                 .then()
                 .statusCode(204)
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .post("/api/v1/kino/shows/${showId.id}/seats/a2")
                 .then()
                 .statusCode(204)
@@ -345,7 +350,7 @@ class E2EDockerIT {
         val theaterDto = TheaterDto(name = name, seats = seats)
 
         val theaterPath = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(theaterDto)
                 .post("/api/v1/kino/theaters")
@@ -354,8 +359,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         val theaterId = given()
-                .auth().basic("admin", "admin")
-                .get(theaterPath)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/kino$theaterPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -368,7 +373,7 @@ class E2EDockerIT {
         val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/shows")
@@ -377,7 +382,7 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .delete(path)
                 .then()
                 .statusCode(200)
@@ -391,7 +396,7 @@ class E2EDockerIT {
         val theaterDto = TheaterDto(name = name, seats = seats)
 
         val theaterPath = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(theaterDto)
                 .post("/api/v1/kino/theaters")
@@ -400,8 +405,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         val theaterId = given()
-                .auth().basic("admin", "admin")
-                .get(theaterPath)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/kino$theaterPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -417,7 +422,7 @@ class E2EDockerIT {
         val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/shows")
@@ -426,10 +431,10 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(newDto)
-                .put(path)
+                .put("$API_BASE/$path")
                 .then()
                 .statusCode(200)
     }
@@ -442,7 +447,7 @@ class E2EDockerIT {
         val theaterDto = TheaterDto(name = name, seats = seats)
 
         val theaterPath = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(theaterDto)
                 .post("/api/v1/kino/theaters")
@@ -451,8 +456,8 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         val theaterId = given()
-                .auth().basic("admin", "admin")
-                .get(theaterPath)
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/kino$theaterPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -468,7 +473,7 @@ class E2EDockerIT {
         val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id)
 
         val path = given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .post("/api/v1/kino/shows")
@@ -477,10 +482,10 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .contentType("application/merge-patch+json")
                 .body(newDto)
-                .patch(path)
+                .patch("$API_BASE/$path")
                 .then()
                 .statusCode(200)
     }
@@ -520,7 +525,7 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .get(moviePath)
+                .get("$API_BASE/$moviePath")
                 .then()
                 .statusCode(200)
     }
@@ -529,7 +534,7 @@ class E2EDockerIT {
     fun testGetOrder() {
 
         given()
-                .get("/api/v1/order")
+                .get("/api/v1/orders")
                 .then()
                 .statusCode(200)
     }
@@ -556,7 +561,7 @@ class E2EDockerIT {
         val screeningId = "1"
         val ticketDto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), null)
 
-        val ticketPath = given().auth().basic("admin", "admin")
+        val ticketPath = given().cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(ticketDto)
                 .post("/api/v1/tickets")
@@ -564,8 +569,8 @@ class E2EDockerIT {
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().auth().basic("admin", "admin")
-                .get(ticketPath)
+        given().cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/$ticketPath")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", Matchers.equalTo(1))
@@ -578,7 +583,7 @@ class E2EDockerIT {
         val screeningId = "1"
         val ticketDto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), null)
 
-        val ticketPath = given().auth().basic("admin", "admin")
+        val ticketPath = given().cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(ticketDto)
                 .post("/api/v1/tickets")
@@ -586,8 +591,8 @@ class E2EDockerIT {
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().auth().basic("admin", "admin")
-                .delete(ticketPath)
+        given().cookie("SESSION", getAdminSessionCookie())
+                .delete("$API_BASE/$ticketPath")
                 .then()
                 .statusCode(200)
     }
@@ -599,22 +604,22 @@ class E2EDockerIT {
         val screeningId = "1"
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
-        val path = given().auth().basic("admin", "admin")
+        val path = given().cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
-                .post("/tickets")
+                .post("/api/v1/tickets")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
 
-        given().auth().basic("admin", "admin")
-                .get("/tickets")
+        given().cookie("SESSION", getAdminSessionCookie())
+                .get("/api/v1/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data.size()", Matchers.equalTo(1))
 
-        given().auth().basic("admin", "admin")
-                .get("/tickets")
+        given().cookie("SESSION", getAdminSessionCookie())
+                .get("/api/v1/tickets")
                 .then()
                 .statusCode(200)
                 .body("data.data[0].userId", Matchers.equalTo("1"))
@@ -623,10 +628,10 @@ class E2EDockerIT {
         val newScreeningId = "2"
         val updatedDto = TicketDto(newUserId, newScreeningId, ZonedDateTime.now().withNano(0), path.split("/")[2])
 
-        given().auth().basic("admin", "admin")
+        given().cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(updatedDto)
-                .put(path)
+                .put("$API_BASE/$path")
                 .then()
                 .statusCode(204)
     }
@@ -636,13 +641,12 @@ class E2EDockerIT {
 
         val userId = "testAdminPatchTicket"
         val screeningId = "1"
-
         val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
-        val path = given().auth().basic("admin", "admin")
+        val path = given().cookie("SESSION", getAdminSessionCookie())
                 .contentType(ContentType.JSON)
                 .body(dto)
-                .post("/tickets")
+                .post("/api/v1/tickets")
                 .then()
                 .statusCode(201)
                 .extract().header("Location")
@@ -650,10 +654,10 @@ class E2EDockerIT {
         val newScreeningId = "2"
         val body = "{\"screeningId\":\"$newScreeningId\"}"
 
-        given().auth().basic("admin", "admin")
+        given().cookie("SESSION", getAdminSessionCookie())
                 .contentType("application/merge-patch+json")
                 .body(body)
-                .patch(path)
+                .patch("$API_BASE/$path")
                 .then()
                 .statusCode(204)
     }
@@ -665,13 +669,14 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username3"
         val password = "password3"
+        val dto = UserDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType(ContentType.JSON)
-                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .body(dto)
                 .post("/api/v1/users")
                 .then()
                 .statusCode(201)
@@ -690,24 +695,26 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username4"
         val password = "password4"
+        val dto = UserDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType(ContentType.JSON)
-                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .body(dto)
                 .post("/api/v1/users")
                 .then()
                 .statusCode(201)
 
         val newEmail = "replacement4@replacement.abc"
         val newUsername = "username4-1"
+        val newDto = UserDto(email = newEmail, name = newUsername)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType(ContentType.JSON)
-                .body("{\"phone\":\"$phone\", \"email\":\"$newEmail\", \"name\":\"$newUsername\"}")
+                .body(newDto)
                 .put("/api/v1/users/$phone")
                 .then()
                 .statusCode(204)
@@ -720,24 +727,26 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username5"
         val password = "password5"
+        val dto = UserDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType(ContentType.JSON)
-                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .body(dto)
                 .post("/api/v1/users")
                 .then()
                 .statusCode(201)
 
         val newEmail = "replacement5@replacement.abc"
         val newUsername = "username5-1"
+        val newDto = UserDto(email = newEmail, name = newUsername)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType("application/merge-patch+json")
-                .body("{\"email\":\"$newEmail\", \"name\":\"$newUsername\"}")
+                .body(newDto)
                 .patch("/api/v1/users/$phone")
                 .then()
                 .statusCode(204)
@@ -775,19 +784,20 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username6"
         val password = "password6"
+        val dto = UserDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType(ContentType.JSON)
-                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .body(dto)
                 .post("/api/v1/users")
                 .then()
                 .statusCode(201)
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .get("/api/v1/users/$phone")
                 .then()
                 .statusCode(200)
@@ -797,7 +807,7 @@ class E2EDockerIT {
     fun testAdminGetAll() {
 
         given()
-                .auth().basic("admin", "123")
+                .cookie("SESSION", getAdminSessionCookie())
                 .get("/api/v1/users")
                 .then()
                 .statusCode(200)
@@ -810,19 +820,20 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username6"
         val password = "password6"
+        val dto = UserDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
         given()
                 .cookie("SESSION", authCookie)
                 .contentType(ContentType.JSON)
-                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .body(dto)
                 .post("/api/v1/users")
                 .then()
                 .statusCode(201)
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .delete("/api/v1/users/$phone")
                 .then()
                 .statusCode(204)
@@ -834,9 +845,20 @@ class E2EDockerIT {
         val phone = "testAdminDeleteNonExistentUser"
 
         given()
-                .auth().basic("admin", "admin")
+                .cookie("SESSION", getAdminSessionCookie())
                 .delete("/api/v1/users/$phone")
                 .then()
                 .statusCode(404)
+    }
+
+    fun getAdminSessionCookie(): String {
+        return given()
+                .contentType(ContentType.JSON)
+                .body(AuthDto("admin", "admin"))
+                .post("/api/v1/auth/login")
+                .then()
+                .statusCode(204)
+                .header("Set-Cookie", notNullValue())
+                .extract().cookie("SESSION")
     }
 }
