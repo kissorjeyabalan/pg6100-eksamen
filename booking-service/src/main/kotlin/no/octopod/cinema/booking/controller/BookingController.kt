@@ -27,7 +27,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @RequestMapping(
-        path = ["/order"],
+        path = ["/orders"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
 @RestController
@@ -38,7 +38,7 @@ class BookingController {
     @Autowired private lateinit var orderRepo: OrderRepository
 
     @Value("\${kinoApiAddress}") private lateinit var kinoApiAddress: String
-    @Value("\${ticketApiAddress") private lateinit var ticketApiAddress: String
+    @Value("\${ticketApiAddress}") private lateinit var ticketApiAddress: String
     @Value("\${systemUser}") private lateinit var systemUser: String
     @Value("\${systemPwd}") private lateinit var systemPwd: String
 

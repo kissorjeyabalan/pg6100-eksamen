@@ -20,19 +20,12 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             .httpBasic()
             .and()
             .authorizeRequests()
-            .anyRequest().permitAll()
+            .antMatchers(HttpMethod.POST, "/orders/reserve").authenticated()
+            .anyRequest().denyAll()
             .and()
             .csrf().disable()
             .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-    }
-
-    override fun configure(auth: AuthenticationManagerBuilder) {
-
-        auth.inMemoryAuthentication()
-                .withUser("foo").password("{noop}123").roles("USER").and()
-                .withUser("bar").password("{noop}123").roles("USER").and()
-                .withUser("admin").password("{noop}admin").roles("ADMIN", "USER")
+            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
     }
 }
 
