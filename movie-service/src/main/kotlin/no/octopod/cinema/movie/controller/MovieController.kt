@@ -33,6 +33,7 @@ class MovieController {
         }
 
         val entity = MovieConverter.transform(movieDto)
+        entity.releaseDate = entity.releaseDate
 
         val saved = repo.save(entity)
         return ResponseEntity.created(URI.create("/movies/${saved.id}")).build()
@@ -61,7 +62,7 @@ class MovieController {
             page: Int,
             @RequestParam("limit", defaultValue = "10")
             limit: Int,
-            @RequestParam("featured", defaultValue = "false")
+            @RequestParam("featuredOnly", defaultValue = "false")
             featured: Boolean
     ): ResponseEntity<WrappedResponse<HalPage<MovieDto>>> {
         if (page < 1 || limit < 1) {
@@ -83,14 +84,14 @@ class MovieController {
 
         val uriBuilder = UriComponentsBuilder.fromPath("/movies")
         dto._self = HalLink(uriBuilder.cloneBuilder()
-                .queryParam("featured", featured)
+                .queryParam("featuredOnly", featured)
                 .queryParam("page", page)
                 .queryParam("limit", limit)
                 .build().toString())
 
         if (entityList.isNotEmpty() && page > 1) {
             dto.previous = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("featured", featured)
+                    .queryParam("featuredOnly", featured)
                     .queryParam("page", (page - 1))
                     .queryParam("limit", limit)
                     .build().toString())
@@ -98,7 +99,7 @@ class MovieController {
 
         if ((page * limit) < entityList.size) {
             dto.next = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("featured", featured)
+                    .queryParam("featuredOnly", featured)
                     .queryParam("page", (page + 1))
                     .queryParam("limit", limit)
                     .build().toString())

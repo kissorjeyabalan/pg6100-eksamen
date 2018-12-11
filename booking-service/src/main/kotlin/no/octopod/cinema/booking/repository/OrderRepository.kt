@@ -5,4 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface OrderRepository: CrudRepository<OrderEntity, Long>
+interface OrderRepository: CrudRepository<OrderEntity, Long> {
+    fun findAllByUserId(userId: String): MutableIterable<OrderEntity>
+}

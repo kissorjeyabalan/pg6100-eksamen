@@ -9,6 +9,7 @@ import java.util.*
 interface SeatReservationRepository: CrudRepository<SeatReservationEntity, Long> {
     fun countByUserIdAndScreeningId(userId: String, screeningId: Long): Long
     fun existsBySeatAndScreeningId(seat: String, screeningId: Long): Boolean
+    fun existsByUserIdAndScreeningIdAndSeat(userId: String, screeningId: Long, seat: String): Boolean
     fun findAllByUserIdAndScreeningId(userId: String, screeningId: Long): List<SeatReservationEntity>
     fun findBySeatAndScreeningId(seat: String, screeningId: Long): Optional<SeatReservationEntity>
     fun deleteAllByUserIdAndScreeningId(userId: String, screeningId: Long): Void

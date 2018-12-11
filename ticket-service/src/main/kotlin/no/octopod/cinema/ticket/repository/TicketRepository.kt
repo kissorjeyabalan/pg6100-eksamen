@@ -19,13 +19,11 @@ interface TicketRepository : CrudRepository<Ticket, Long>, TicketRepositoryCusto
 
 @Transactional
 interface TicketRepositoryCustom {
+    fun createTicket(userId: String, screeningId: String, seat: String): Long
 
+    fun createTicket(userId: String, screeningId: String, timeOfPurchase: ZonedDateTime, seat: String): Long
 
-    fun createTicket(userId: String, screeningId: String): Long
-
-    fun createTicket(userId: String, screeningId: String, timeOfPurchase: ZonedDateTime): Long
-
-    fun updateTicket(ticketId: Long, userId: String, screeningId: String, timeOfPurchase: ZonedDateTime) : Boolean
+    fun updateTicket(ticketId: Long, userId: String, screeningId: String, timeOfPurchase: ZonedDateTime, seat: String) : Boolean
 
 }
 
@@ -36,14 +34,14 @@ class TicketRepositoryImpl : TicketRepositoryCustom {
     @Autowired
     private lateinit var em: EntityManager
 
-    override fun createTicket(userId: String, screeningId: String): Long {
-        val entity = Ticket(userId, screeningId, ZonedDateTime.now().withNano(0))
+    override fun createTicket(userId: String, screeningId: String, seat: String): Long {
+        val entity = Ticket(userId, screeningId, ZonedDateTime.now().withNano(0), seat)
         em.persist(entity)
         return entity.id!!
     }
 
-    override fun createTicket(userId: String, screeningId: String, timeOfPurchase: ZonedDateTime): Long {
-        val entity = Ticket(userId, screeningId, timeOfPurchase)
+    override fun createTicket(userId: String, screeningId: String, timeOfPurchase: ZonedDateTime, seat: String): Long {
+        val entity = Ticket(userId, screeningId, timeOfPurchase, seat)
         em.persist(entity)
         return entity.id!!
     }
@@ -51,11 +49,13 @@ class TicketRepositoryImpl : TicketRepositoryCustom {
     override fun updateTicket(ticketId: Long,
                         userId: String,
                         screeningId: String,
-                        timeOfPurchase: ZonedDateTime): Boolean {
+                        timeOfPurchase: ZonedDateTime,
+                        seat: String): Boolean {
         val ticket = em.find(Ticket::class.java, ticketId) ?: return false
         ticket.userId = userId
         ticket.screeningId = screeningId
         ticket.timeOfPurchase = timeOfPurchase
+        ticket.seat = seat
         return true
     }
 

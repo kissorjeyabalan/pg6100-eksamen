@@ -13,5 +13,6 @@ class OrderEntity(
         var userId: String? = null,
         var price: Int? = null,
         var screeningId: Long? = null,
-        var paymentToken: String? = null
+        var paymentToken: String? = null,
+        var tickets: List<Long>? = null
 )
