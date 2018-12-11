@@ -3,6 +3,8 @@ package no.octopod.cinema.e2etests
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import no.octopod.cinema.common.dto.ShowDto
+import no.octopod.cinema.common.dto.TheaterDto
 import org.awaitility.Awaitility.await
 import org.junit.*
 import org.testcontainers.containers.DockerComposeContainer
@@ -99,6 +101,119 @@ class E2EDockerIT {
     }
 
     @Test
+    fun testAdminPostAndGetTheater() {
+
+        val name = "testAdminPostAndGetTheater"
+        val seats = mutableListOf("a1")
+        val dto = "{\"name\":\"$name\", \"seats\":\"$seats\"}"
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("data.name", equalTo(name))
+                .body("data.seats.size()", equalTo(seats.size))
+    }
+
+    @Test
+    fun testAdminDeleteTheater() {
+
+        val name = "testAdminDeleteTheater"
+        val seats = mutableListOf("a1")
+        val dto = "{\"name\":\"$name\", \"seats\":\"$seats\"}"
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete(path)
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminPatchTheater() {
+
+        val name = "testAdminPatchTheater1"
+        val seats = mutableListOf("a1")
+        val dto = "{\"name\":\"$name\", \"seats\":\"$seats\"}"
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+
+        val newName = "testAdminPatchTheater2"
+        val newSeats = mutableListOf("b1")
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .body("{\"name\":\"$newName\", \"seats\":\"$newSeats\"}")
+                .patch(path)
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminPutTheater() {
+
+        val name = "testAdminPutTheater1"
+        val seats = mutableListOf("a1")
+        val dto = "{\"name\":\"$name\", \"seats\":$seats}"
+
+        given()
+                .auth()
+                .basic("admin", "123")
+                .get("/api/v1/auth/user")
+                .then()
+                .statusCode(200)
+
+        /*val path = given()
+                .auth().basic("admin", "123")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val newName = "testAdminPutTheater2"
+        val newSeats = mutableListOf("a1")
+
+
+        given()
+                .auth().basic("admin", "123")
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"$newName\", \"seats\":\"$newSeats\"}")
+                .put(path)
+                .then()
+                .statusCode(204)*/
+    }
+
+    @Test
     fun testGetShows() {
 
         given()
@@ -108,13 +223,275 @@ class E2EDockerIT {
     }
 
     @Test
+    fun testAdminPostAndGetShow() {
+
+        val name = "testAdminPostAndGetShow"
+        val seats = mutableListOf("a1")
+        val theaterDto = TheaterDto(name = name, seats = seats)
+
+        val theaterPath = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val theaterId = given()
+                .auth().basic("admin", "admin")
+                .get(theaterPath)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        val movieId = 1L
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .get(path)
+                .then()
+                .statusCode(200)
+                .body("data.name", equalTo(name))
+                .body("data.seats.size()", equalTo(seats.size))
+    }
+
+    @Test
+    fun testAdminPostAndDeleteSeatInShow() {
+
+        val name = "testAdminPostAndDeleteSeatInShow"
+        val seats = mutableListOf("a1", "a2")
+        val theaterDto = TheaterDto(name = name, seats = seats)
+
+        val theaterPath = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val theaterId = given()
+                .auth().basic("admin", "admin")
+                .get(theaterPath)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        val movieId = 1L
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+
+        val showPath = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val showId = given()
+                .auth().basic("admin", "admin")
+                .get(showPath)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/api/v1/kino/shows/${showId.id}/seats/a2")
+                .then()
+                .statusCode(204)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .post("/api/v1/kino/shows/${showId.id}/seats/a2")
+                .then()
+                .statusCode(204)
+                .extract().header("Location")
+    }
+
+    @Test
+    fun testAdminDeleteShow() {
+
+        val name = "testAdminDeleteShow"
+        val seats = mutableListOf("a1")
+        val theaterDto = TheaterDto(name = name, seats = seats)
+
+        val theaterPath = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val theaterId = given()
+                .auth().basic("admin", "admin")
+                .get(theaterPath)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        val movieId = 1L
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete(path)
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminPutShow() {
+
+        val name = "testAdminPutShow"
+        val seats = mutableListOf("a1")
+        val theaterDto = TheaterDto(name = name, seats = seats)
+
+        val theaterPath = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val theaterId = given()
+                .auth().basic("admin", "admin")
+                .get(theaterPath)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        val movieId = 1L
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+
+        val newMovieId = 2L
+        val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(newDto)
+                .put(path)
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminPatchShow() {
+
+        val name = "testAdminPatchShow"
+        val seats = mutableListOf("a1")
+        val theaterDto = TheaterDto(name = name, seats = seats)
+
+        val theaterPath = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val theaterId = given()
+                .auth().basic("admin", "admin")
+                .get(theaterPath)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        val movieId = 1L
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+
+        val newMovieId = 2L
+        val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id)
+
+        val path = given()
+                .auth().basic("admin", "admin")
+                .contentType(ContentType.JSON)
+                .body(dto)
+                .post("/api/v1/kino/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        given()
+                .auth().basic("admin", "admin")
+                .contentType("application/merge-patch+json")
+                .body(newDto)
+                .patch(path)
+                .then()
+                .statusCode(200)
+    }
+
+    /*
+    @Test
     fun testGetMovies() {
 
         given()
                 .get("/api/v1/movies")
                 .then()
                 .statusCode(200)
-    }
+    }*/
 
     @Test
     fun testGetTickets() {
@@ -239,5 +616,77 @@ class E2EDockerIT {
                 .extract().cookie("SESSION")
 
         return session
+    }
+
+    @Test
+    fun testAdminGetAnotherUser() {
+
+        val phone = "testAdminGetAnotherUser"
+        val email = "test@test.abc"
+        val username = "username6"
+        val password = "password6"
+
+        val authCookie = registerAuthentication(phone, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType(ContentType.JSON)
+                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .post("/api/v1/users")
+                .then()
+                .statusCode(201)
+
+        given()
+                .auth().basic("admin", "admin")
+                .get("/api/v1/users/$phone")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminGetAll() {
+
+        given()
+                .auth().basic("admin", "123")
+                .get("/api/v1/users")
+                .then()
+                .statusCode(200)
+    }
+
+    @Test
+    fun testAdminDeleteUser() {
+
+        val phone = "testAdminGetUser"
+        val email = "test@test.abc"
+        val username = "username6"
+        val password = "password6"
+
+        val authCookie = registerAuthentication(phone, password)
+
+        given()
+                .cookie("SESSION", authCookie)
+                .contentType(ContentType.JSON)
+                .body("{\"phone\":\"$phone\", \"email\":\"$email\", \"name\":\"$username\"}")
+                .post("/api/v1/users")
+                .then()
+                .statusCode(201)
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/api/v1/users/$phone")
+                .then()
+                .statusCode(204)
+    }
+
+    @Test
+    fun testAdminDeleteNonExistentUser() {
+
+        val phone = "testAdminDeleteNonExistentUser"
+
+        given()
+                .auth().basic("admin", "admin")
+                .delete("/api/v1/users/$phone")
+                .then()
+                .statusCode(404)
     }
 }
