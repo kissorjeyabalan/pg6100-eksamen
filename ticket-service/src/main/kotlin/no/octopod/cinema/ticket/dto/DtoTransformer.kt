@@ -11,7 +11,9 @@ object DtoTransformer {
         return TicketDto(ticket.userId,
                 ticket.screeningId,
                 ticket.timeOfPurchase,
-                ticket.id.toString())
+                ticket.seat,
+                ticket.id.toString()
+        )
     }
 
     fun transform(ticketList: List<Ticket>,

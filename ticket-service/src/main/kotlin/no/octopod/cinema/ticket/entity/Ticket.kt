@@ -19,6 +19,9 @@ class Ticket (
         @get:NotNull
         var timeOfPurchase: ZonedDateTime,
 
+        @get:NotBlank
+        var seat: String,
+
         @get:Id @get:GeneratedValue
         var id: Long? = null
 )

@@ -86,6 +86,8 @@ class TicketApi {
                 .fromPath("/tickets")
 
         dto._self = HalLink(builder.cloneBuilder()
+                .queryParam("screeningId", screeningId)
+                .queryParam("userId", userId)
                 .queryParam("page", page)
                 .queryParam("limit", limit)
                 .build().toString()
@@ -93,6 +95,8 @@ class TicketApi {
 
         if (!ticketList.isEmpty() && pageInt > 0) {
             dto.previous = HalLink(builder.cloneBuilder()
+                    .queryParam("screeningId", screeningId)
+                    .queryParam("userId", userId)
                     .queryParam("page", (pageInt - 1).toString())
                     .queryParam("limit", limit)
                     .build().toString()
@@ -101,6 +105,8 @@ class TicketApi {
 
         if (((pageInt) * limitInt) < ticketList.size) {
             dto.next = HalLink(builder.cloneBuilder()
+                    .queryParam("screeningId", screeningId)
+                    .queryParam("userId", userId)
                     .queryParam("page", (pageInt + 1).toString())
                     .queryParam("limit", limit)
                     .build().toString())
@@ -146,11 +152,11 @@ class TicketApi {
     fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
 
 
-        if(dto.userId == null || dto.screeningId == null) {
+        if(dto.userId.isNullOrEmpty()|| dto.screeningId.isNullOrEmpty() || dto.seat.isNullOrEmpty()) {
             return ResponseEntity.status(400).build()
         }
 
-        val id = repo.createTicket(dto.userId!!, dto.screeningId!!)
+        val id = repo.createTicket(dto.userId!!, dto.screeningId!!, dto.seat!!)
 
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
@@ -213,7 +219,7 @@ class TicketApi {
             )
         }
 
-        if (dto.userId == null || dto.screeningId == null || dto.timeOfPurchase == null) {
+        if (dto.userId.isNullOrEmpty() || dto.screeningId.isNullOrEmpty() || dto.timeOfPurchase == null || dto.seat.isNullOrEmpty()) {
             return ResponseEntity.status(400).body(
                     WrappedResponse<TicketDto>(
                             code = 400,
@@ -222,7 +228,7 @@ class TicketApi {
             )
         }
 
-        repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!)
+        repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!, dto.seat!!)
 
         return ResponseEntity.status(204).body(
                 WrappedResponse<TicketDto>(
@@ -275,6 +281,7 @@ class TicketApi {
         //either all modifications are done, or none.
         var newUserId = ticket.userId
         var newScreeningId = ticket.screeningId
+        var newSeat = ticket.seat
 
         if (jsonNode.has("userId")) {
             val userIdNode = jsonNode.get("userId")
@@ -296,9 +303,20 @@ class TicketApi {
             }
         }
 
+        if (jsonNode.has("seat")) {
+            val seatNode = jsonNode.get("seat")
+            if (seatNode.isTextual) {
+                newSeat = seatNode.asText()
+            } else {
+                //Invalid JSON. Non-string name
+                return ResponseEntity.status(400).build()
+            }
+        }
+
         //now that the input is validated, do the update
         ticket.userId = newUserId
         ticket.screeningId = newScreeningId
+        ticket.seat = newSeat
 
         repo.save(ticket)
 
