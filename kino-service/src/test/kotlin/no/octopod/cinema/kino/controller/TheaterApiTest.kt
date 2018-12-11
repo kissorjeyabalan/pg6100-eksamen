@@ -1,7 +1,7 @@
 package no.octopod.cinema.kino.controller
 
 import no.octopod.cinema.kino.ApiTestBase
-import no.octopod.cinema.kino.dto.TheaterDto
+import no.octopod.cinema.common.dto.TheaterDto
 import no.octopod.cinema.kino.repository.TheaterRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given

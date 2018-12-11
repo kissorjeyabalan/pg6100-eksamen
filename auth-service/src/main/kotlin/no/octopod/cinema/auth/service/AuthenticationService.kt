@@ -27,18 +27,6 @@ class AuthenticationService(
             return false
         }
     }
-
-    fun initializeDefaultUsers() {
-        try {
-            val hash = passwordEncoder.encode("admin")
-            val roles: Set<String> = setOf("ADMIN", "USER")
-
-            val user = AuthenticationEntity("admin", hash, roles.map { "ROLE_$it" }.toSet())
-            repo.save(user)
-        } catch (e: Exception) {
-            // do nothing
-        }
-    }
 }
 
 interface AuthenticationRepository : CrudRepository<AuthenticationEntity, String>

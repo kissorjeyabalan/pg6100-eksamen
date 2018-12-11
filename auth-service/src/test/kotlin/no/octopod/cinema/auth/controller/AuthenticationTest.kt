@@ -192,7 +192,6 @@ class AuthenticationTest {
                 .statusCode(400)
     }
 
-
     // TODO: Add source
     private fun registerUser(userId: String, password: String): String {
         val sessionCookie = given().contentType(ContentType.JSON)

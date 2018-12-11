@@ -75,7 +75,5 @@ class WebSecurityConfig(
                      WHERE x.username=? and y.authentication_entity_username=x.username
                      """)
                 .passwordEncoder(passwordEncoder)
-
-        authService.initializeDefaultUsers()
     }
 }
