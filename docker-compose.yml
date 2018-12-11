@@ -1,7 +1,14 @@
 version: '3.3'
 services:
+
     redis:
       image: "redis:latest"
+
+    auth-db:
+      image: "postgres:10"
+
+    movie-db:
+      image: "postgres:10"
 
     eureka:
       ports:
@@ -47,6 +54,7 @@ services:
       depends_on:
         - gateway
         - redis
+        - auth-db
 
     movie_service:
       build:
@@ -54,3 +62,4 @@ services:
       depends_on:
         - gateway
         - redis
+        - movie-db
