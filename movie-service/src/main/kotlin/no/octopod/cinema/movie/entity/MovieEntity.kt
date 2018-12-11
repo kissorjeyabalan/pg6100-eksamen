@@ -1,16 +1,14 @@
 package no.octopod.cinema.movie.entity
 
 import java.time.ZonedDateTime
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 @Entity
 class MovieEntity(
-    @get:Id @get:GeneratedValue
+    @get:Id @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
     @get:NotEmpty @Size(min = 1, max = 125)
