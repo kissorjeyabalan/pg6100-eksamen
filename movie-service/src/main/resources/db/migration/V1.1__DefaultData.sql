@@ -1,1 +1,1 @@
-INSERT INTO movie_entity (description, featured, image_path, release_date, title) VALUES ('desc', true, null, CURRENT_TIME, 'title');
+INSERT INTO movie_entity (description, featured, image_path, release_date, title) VALUES ('desc', true, null, make_timestamptz(2018, 11, 12, 12, 0, 0), 'title');
