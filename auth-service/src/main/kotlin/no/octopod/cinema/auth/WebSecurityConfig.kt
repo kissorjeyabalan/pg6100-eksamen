@@ -1,5 +1,6 @@
 package no.octopod.cinema.auth
 
+import no.octopod.cinema.auth.service.AuthenticationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,7 +24,9 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig : WebSecurityConfigurerAdapter()  {
+class WebSecurityConfig(
+        private val authService: AuthenticationService
+) : WebSecurityConfigurerAdapter()  {
 
     @Autowired lateinit var dataSource: DataSource
     @Autowired lateinit var passwordEncoder: PasswordEncoder
@@ -72,5 +75,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter()  {
                      WHERE x.username=? and y.authentication_entity_username=x.username
                      """)
                 .passwordEncoder(passwordEncoder)
+
+        authService.initializeDefaultUsers()
     }
 }
