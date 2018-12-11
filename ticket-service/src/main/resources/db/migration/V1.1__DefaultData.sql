@@ -1,0 +1,1 @@
+INSERT INTO ticket (description, featured, image_path, release_date, title) VALUES ('desc', true, null, CURRENT_TIME, 'title');

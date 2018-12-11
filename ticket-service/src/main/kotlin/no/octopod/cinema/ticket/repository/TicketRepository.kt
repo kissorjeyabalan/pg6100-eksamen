@@ -19,8 +19,6 @@ interface TicketRepository : CrudRepository<Ticket, Long>, TicketRepositoryCusto
 
 @Transactional
 interface TicketRepositoryCustom {
-
-
     fun createTicket(userId: String, screeningId: String, seat: String): Long
 
     fun createTicket(userId: String, screeningId: String, timeOfPurchase: ZonedDateTime, seat: String): Long
