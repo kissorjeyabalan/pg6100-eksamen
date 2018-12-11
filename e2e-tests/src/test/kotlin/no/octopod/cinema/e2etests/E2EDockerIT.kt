@@ -123,7 +123,7 @@ class E2EDockerIT {
 
         given()
                 .cookie("SESSION", getAdminSessionCookie())
-                .get("$API_BASE/$path")
+                .get("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
                 .body("data.name", equalTo(name))
@@ -148,9 +148,9 @@ class E2EDockerIT {
 
         given()
                 .cookie("SESSION", getAdminSessionCookie())
-                .delete(path)
+                .delete("$API_BASE/kino$path")
                 .then()
-                .statusCode(200)
+                .statusCode(204)
     }
 
     @Test
@@ -177,7 +177,7 @@ class E2EDockerIT {
         given()
                 .cookie("SESSION", getAdminSessionCookie())
                 .contentType("application/merge-patch+json")
-                .body(newDto)
+                .body("{\"name\":\"$newName\", \"seats\":$newSeats}")
                 .patch("$API_BASE/kino$path")
                 .then()
                 .statusCode(200)
@@ -187,12 +187,11 @@ class E2EDockerIT {
     fun testAdminPutTheater() {
 
         val name = "testAdminPutTheater1"
-        val seats = mutableListOf("a1")
-        val dto = "{\"name\":\"$name\", \"seats\":$seats}"
+        val seats: MutableList<String> = mutableListOf("a1")
+        val dto = TheaterDto(name = name, seats = seats)
 
         given()
-                .auth()
-                .basic("admin", "123")
+                .cookie("SESSION", getAdminSessionCookie())
                 .get("/api/v1/auth/user")
                 .then()
                 .statusCode(200)
@@ -247,7 +246,7 @@ class E2EDockerIT {
 
         val theaterId = given()
                 .cookie("SESSION", getAdminSessionCookie())
-                .get("$API_BASE/$theaterPath")
+                .get("$API_BASE/kino$theaterPath")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -257,7 +256,7 @@ class E2EDockerIT {
                 .getObject("data", TheaterDto::class.java)
 
         val movieId = 1L
-        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id, startTime = ZonedDateTime.now().withFixedOffsetZone().withNano(0))
 
         val path = given()
                 .cookie("SESSION", getAdminSessionCookie())
@@ -305,7 +304,7 @@ class E2EDockerIT {
                 .getObject("data", TheaterDto::class.java)
 
         val movieId = 1L
-        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id, startTime = ZonedDateTime.now().withFixedOffsetZone().withNano(0))
 
         val showPath = given()
                 .cookie("SESSION", getAdminSessionCookie())
@@ -370,7 +369,7 @@ class E2EDockerIT {
                 .getObject("data", TheaterDto::class.java)
 
         val movieId = 1L
-        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
+        val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id, startTime = ZonedDateTime.now().withFixedOffsetZone().withNano(0))
 
         val path = given()
                 .cookie("SESSION", getAdminSessionCookie())
@@ -419,7 +418,7 @@ class E2EDockerIT {
         val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
 
         val newMovieId = 2L
-        val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id)
+        val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id, startTime = ZonedDateTime.now().withFixedOffsetZone().withNano(0))
 
         val path = given()
                 .cookie("SESSION", getAdminSessionCookie())
@@ -470,7 +469,7 @@ class E2EDockerIT {
         val dto = ShowDto(movieId = movieId, cinemaId = theaterId.id)
 
         val newMovieId = 2L
-        val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id)
+        val newDto = ShowDto(movieId = newMovieId, cinemaId = theaterId.id, startTime = ZonedDateTime.now().withFixedOffsetZone().withNano(0))
 
         val path = given()
                 .cookie("SESSION", getAdminSessionCookie())
@@ -484,7 +483,7 @@ class E2EDockerIT {
         given()
                 .cookie("SESSION", getAdminSessionCookie())
                 .contentType("application/merge-patch+json")
-                .body(newDto)
+                .body("{\"movieId\":\"$newMovieId\", \"cinemaId\":$theaterId.id}")
                 .patch("$API_BASE/$path")
                 .then()
                 .statusCode(200)
@@ -525,7 +524,7 @@ class E2EDockerIT {
                 .extract().header("Location")
 
         given()
-                .get("$API_BASE/$moviePath")
+                .get("$API_BASE$moviePath")
                 .then()
                 .statusCode(200)
     }
@@ -709,7 +708,7 @@ class E2EDockerIT {
 
         val newEmail = "replacement4@replacement.abc"
         val newUsername = "username4-1"
-        val newDto = UserDto(email = newEmail, name = newUsername)
+        val newDto = UserDto(phone = phone, email = newEmail, name = newUsername)
 
         given()
                 .cookie("SESSION", authCookie)
@@ -746,7 +745,7 @@ class E2EDockerIT {
         given()
                 .cookie("SESSION", authCookie)
                 .contentType("application/merge-patch+json")
-                .body(newDto)
+                .body("{\"email\":\"$newEmail\", \"name\":\"$newUsername\"}")
                 .patch("/api/v1/users/$phone")
                 .then()
                 .statusCode(204)
