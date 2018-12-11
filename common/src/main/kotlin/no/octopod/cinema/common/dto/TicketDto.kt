@@ -14,6 +14,8 @@ data class TicketDto (
         @ApiModelProperty("The time when the ticket was bought")
         var timeOfPurchase: ZonedDateTime? = null,
 
+        var seat: String? = null,
+
         @ApiModelProperty("The id of the ticket")
         var id: String? = null
 )
