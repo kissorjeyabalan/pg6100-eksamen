@@ -1,0 +1,1 @@
+create table ticket (id SERIAL PRIMARY KEY , screening_id TEXT, time_of_purchase timestamp not null, user_id TEXT)
