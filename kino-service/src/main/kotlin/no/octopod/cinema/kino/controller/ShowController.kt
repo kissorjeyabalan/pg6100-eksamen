@@ -62,7 +62,7 @@ class ShowController {
         val theater = theaterRepo.findById(cinemaId).orElse(null)
                 ?: return ResponseEntity.status(400).build()
 
-        val showEntity = ShowEntity(startTime = dto.startTime!!.withFixedOffsetZone(), movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
+        val showEntity = ShowEntity(startTime = dto.startTime!!.withFixedOffsetZone().withNano(0), movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
 
         val created = repo.save(showEntity)
 
@@ -283,12 +283,13 @@ class ShowController {
             return ResponseEntity.status(404).build()
         }
 
-        val showEntity = repo.findById(pathId).orElse(null)
-        val seatExists = showEntity?.seats?.contains(seatId)
+        val showEntity = repo.findById(pathId).orElse(null)?: return ResponseEntity.status(404).build()
 
-        if (showEntity == null || seatExists == null) {
-            return ResponseEntity.status(404).build()
-        }
+        val theater = repo.findById(showEntity.cinemaId!!).orElse(null)?: return ResponseEntity.status(400).build()
+        if (!theater.seats!!.contains(seatId)) return ResponseEntity.status(400).build()
+
+        val seatExists = showEntity.seats?.contains(seatId) ?: return ResponseEntity.status(404).build()
+
         if (seatExists) {
             return ResponseEntity.status(409).build()
         }
@@ -340,7 +341,7 @@ class ShowController {
             return ResponseEntity.status(400).build()
         }
 
-        dto.startTime = dto.startTime!!.withFixedOffsetZone()
+        dto.startTime = dto.startTime!!.withFixedOffsetZone().withNano(0)
         val show = ShowConverter.transform(dto)
 
         repo.save(show)
@@ -410,7 +411,7 @@ class ShowController {
                 startTimeNode.isNull -> return ResponseEntity.status(400).build()
                 startTimeNode.isTextual ->
                     try {
-                        ZonedDateTime.parse(startTimeNode.asText()).withFixedOffsetZone()
+                        ZonedDateTime.parse(startTimeNode.asText()).withFixedOffsetZone().withNano(0)
                     } catch (e: Exception) {
                         return ResponseEntity.status(400).build()
                     }

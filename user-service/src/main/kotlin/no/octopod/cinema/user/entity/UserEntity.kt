@@ -29,12 +29,12 @@ data class UserEntity
 ) {
     @PrePersist
     fun onCreate() {
-        creationTime = ZonedDateTime.now()
-        updatedTime = ZonedDateTime.now()
+        creationTime = ZonedDateTime.now().withNano(0)
+        updatedTime = ZonedDateTime.now().withNano(0)
     }
 
     @PreUpdate
     fun onUpdate() {
-        updatedTime = ZonedDateTime.now()
+        updatedTime = ZonedDateTime.now().withNano(0)
     }
 }

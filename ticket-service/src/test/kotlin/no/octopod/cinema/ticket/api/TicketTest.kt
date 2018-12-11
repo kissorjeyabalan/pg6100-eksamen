@@ -42,7 +42,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), null)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), null)
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -86,7 +86,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now(), ticketId)
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0), ticketId)
 
         given().auth().basic("admin", "admin")
                 .get("/tickets")
@@ -125,7 +125,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
         val path = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -147,7 +147,7 @@ class TicketTest {
                 .statusCode(200)
                 .body("data.data[0].userId", equalTo("1"))
 
-        val updatedDto = TicketDto("2", "2", ZonedDateTime.now(), path.split("/")[2])
+        val updatedDto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), path.split("/")[2])
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -167,7 +167,7 @@ class TicketTest {
     @Test
     fun testUpdateTicketWithNonExistentId() {
 
-        val dto = TicketDto("2", "2", ZonedDateTime.now(), "99")
+        val dto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), "99")
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -180,7 +180,7 @@ class TicketTest {
     @Test
     fun testDeleteTicketWithNonExistentId() {
 
-        val dto = TicketDto("2", "2", ZonedDateTime.now(), "99")
+        val dto = TicketDto("2", "2", ZonedDateTime.now().withNano(0), "99")
 
         given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -195,7 +195,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
         val path = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -229,7 +229,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
         val path = given().auth().basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -310,7 +310,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
         given().auth().basic("admin", "admin")
                 .body(dto)
@@ -331,7 +331,7 @@ class TicketTest {
         val userId = "1"
         val screeningId = "1"
 
-        val dto = TicketDto(userId, screeningId, ZonedDateTime.now())
+        val dto = TicketDto(userId, screeningId, ZonedDateTime.now().withNano(0))
 
         given().auth().basic("admin", "admin")
                 .body(dto)

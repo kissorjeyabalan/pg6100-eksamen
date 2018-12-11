@@ -36,7 +36,7 @@ class TicketRepositoryImpl : TicketRepositoryCustom {
     private lateinit var em: EntityManager
 
     override fun createTicket(userId: String, screeningId: String): Long {
-        val entity = Ticket(userId, screeningId, ZonedDateTime.now())
+        val entity = Ticket(userId, screeningId, ZonedDateTime.now().withNano(0))
         em.persist(entity)
         return entity.id!!
     }
