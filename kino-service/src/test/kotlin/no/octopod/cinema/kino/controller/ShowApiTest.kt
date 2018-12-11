@@ -2,12 +2,12 @@ package no.octopod.cinema.kino.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.octopod.cinema.kino.ApiTestBase
-import no.octopod.cinema.kino.dto.ShowDto
+import no.octopod.cinema.common.dto.ShowDto
 import no.octopod.cinema.kino.repository.ShowRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import no.octopod.cinema.kino.dto.TheaterDto
+import no.octopod.cinema.common.dto.TheaterDto
 import no.octopod.cinema.kino.repository.TheaterRepository
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Throwables
 import no.octopod.cinema.kino.converter.TheaterConverter
-import no.octopod.cinema.kino.dto.TheaterDto
+import no.octopod.cinema.common.dto.TheaterDto
 import no.octopod.cinema.kino.repository.TheaterRepository
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
