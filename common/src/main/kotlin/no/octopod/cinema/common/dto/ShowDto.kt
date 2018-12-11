@@ -1,4 +1,4 @@
-package no.octopod.cinema.kino.dto
+package no.octopod.cinema.common.dto
 
 import io.swagger.annotations.ApiModelProperty
 import java.time.ZonedDateTime
