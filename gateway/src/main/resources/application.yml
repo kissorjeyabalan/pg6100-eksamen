@@ -8,6 +8,18 @@ spring:
     store-type: redis
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+            - POST
+            - GET
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+            - HEAD
       discovery:
         locator:
           enabled: true
