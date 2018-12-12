@@ -13,7 +13,6 @@ spring:
           enabled: true
       routes:
       - id: user-service
-        # "lb" stands for Load-Balance, which is done with Ribbon
         uri: lb://user-service
         predicates:
         - Path=/api/v1/users/**

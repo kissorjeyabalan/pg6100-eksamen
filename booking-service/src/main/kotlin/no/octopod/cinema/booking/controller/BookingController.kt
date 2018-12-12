@@ -16,6 +16,7 @@ import no.octopod.cinema.common.hateos.HalPage
 import no.octopod.cinema.common.utility.SecurityUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cloud.netflix.ribbon.RibbonClient
 import org.springframework.http.*
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
@@ -40,13 +41,11 @@ class BookingController {
     @Autowired private lateinit var seatReserverationRepo: SeatReservationRepository
     @Autowired private lateinit var orderRepo: OrderRepository
 
-    @Value("\${kinoApiAddress}") private lateinit var kinoApiAddress: String
-    @Value("\${ticketApiAddress}") private lateinit var ticketApiAddress: String
     @Value("\${systemUser}") private lateinit var systemUser: String
     @Value("\${systemPwd}") private lateinit var systemPwd: String
 
 
-    private val client: RestTemplate = RestTemplate()
+    @Autowired lateinit var client: RestTemplate
 
     @PostMapping(path = ["/reserve"])
     fun toggleSeatReservation(
@@ -71,7 +70,7 @@ class BookingController {
             // remove from seats
             try {
                 val statusCode = client.exchange(
-                        "$kinoApiAddress/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
+                        "http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
                         HttpMethod.DELETE,
                         getSystemAuthorizationHeader(),
                         Any::class.java
@@ -95,7 +94,7 @@ class BookingController {
             // add back to seats
             try {
                 val statusCode = client.exchange(
-                        "$kinoApiAddress/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
+                        "http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
                         HttpMethod.POST,
                         getSystemAuthorizationHeader(),
                         Any::class.java
@@ -153,7 +152,7 @@ class BookingController {
             )
 
             val exchangeResponse = client.exchange(
-                    "$ticketApiAddress/tickets",
+                    "http://ticket-service/tickets",
                     HttpMethod.POST,
                     getSystemAuthorizationHeader(mapper.writeValueAsString(ticket)),
                     Any::class.java
@@ -179,7 +178,7 @@ class BookingController {
             for (ticketId in ticketIds) {
                 try {
                     client.exchange(
-                            "$ticketApiAddress/tickets/$ticketId",
+                            "http://ticket-service/tickets/$ticketId",
                             HttpMethod.DELETE,
                             getSystemAuthorizationHeader(),
                             Any::class.java

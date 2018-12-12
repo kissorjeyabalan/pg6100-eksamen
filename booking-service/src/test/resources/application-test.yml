@@ -1,0 +1,18 @@
+systemUser: admin
+systemPwd: admin
+
+spring:
+  session:
+    store-type: none
+eureka:
+  client:
+    enabled: false
+
+
+kino-service:
+  ribbon:
+    listOfServers: localhost:8099
+
+ticket-service:
+  ribbon:
+    listOfServers: localhost:8099
