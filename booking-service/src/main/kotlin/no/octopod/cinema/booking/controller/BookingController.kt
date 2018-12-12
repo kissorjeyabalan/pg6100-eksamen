@@ -2,9 +2,9 @@ package no.octopod.cinema.booking.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.octopod.cinema.booking.converter.OrderConverter
-import no.octopod.cinema.booking.dto.OrderDto
-import no.octopod.cinema.booking.dto.SeatDto
-import no.octopod.cinema.booking.dto.SendOrderDto
+import no.octopod.cinema.common.dto.OrderDto
+import no.octopod.cinema.common.dto.SeatDto
+import no.octopod.cinema.common.dto.SendOrderDto
 import no.octopod.cinema.booking.entity.OrderEntity
 import no.octopod.cinema.booking.entity.SeatReservationEntity
 import no.octopod.cinema.booking.repository.OrderRepository
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.lang.Exception
@@ -32,7 +33,9 @@ import java.util.*
 )
 @RestController
 class BookingController {
-    private val MAX_RESERVATIONS_PER_USER = 5
+    companion object {
+        const val MAX_RESERVATIONS_PER_USER = 5
+    }
 
     @Autowired private lateinit var seatReserverationRepo: SeatReservationRepository
     @Autowired private lateinit var orderRepo: OrderRepository
@@ -62,7 +65,7 @@ class BookingController {
                     seatReserverationRepo.countByUserIdAndScreeningId(userId, seatDto.screening_id!!.toLong())
 
             if (currentUserReservations >= MAX_RESERVATIONS_PER_USER) {
-                return ResponseEntity.status(403).build()
+                return ResponseEntity.status(400).build()
             }
 
             // remove from seats
@@ -84,10 +87,9 @@ class BookingController {
                             )
                     )
                 }
-            } catch (e: Exception) {
-                return ResponseEntity.status(500).build()
+            } catch (e: HttpClientErrorException) {
+                return ResponseEntity.status(404).build()
             }
-
             return ResponseEntity.status(204).build()
         } else if (reservedSeat.userId == userId) {
             // add back to seats
@@ -99,14 +101,15 @@ class BookingController {
                         Any::class.java
                 ).statusCodeValue
 
-                if (statusCode == 204) {
+               if (statusCode == 204) {
                     seatReserverationRepo.delete(reservedSeat)
+                    return ResponseEntity.status(204).build()
                 }
             } catch (e: Exception) {
-                return ResponseEntity.status(500).build()
+                return ResponseEntity.status(400).build()
             }
         } else if (reservedSeat.userId != null && reservedSeat.userId != userId) {
-            return ResponseEntity.status(409).build()
+            return ResponseEntity.status(404).build()
         }
 
         /**
@@ -128,7 +131,7 @@ class BookingController {
             return ResponseEntity.status(400).build()
         }
 
-        var ticketIds: MutableList<Long> = mutableListOf()
+        val ticketIds: MutableList<Long> = mutableListOf()
         var success = true
         val mapper = ObjectMapper()
 
@@ -138,28 +141,31 @@ class BookingController {
                     screeningId = sendOrderDto.screening_id!!.toLong(),
                     seat = seat
             )
-            if (seatIsReservedByUser) {
-                val ticket = TicketDto(
-                        userId = SecurityUtil.getUserId(authentication),
-                        screeningId = sendOrderDto.screening_id,
-                        seat = seat
-                )
+            if (!seatIsReservedByUser) {
+                success = false
+                break
+            }
 
-                val exchangeResponse = client.exchange(
-                        "$ticketApiAddress/tickets",
-                        HttpMethod.POST,
-                        getSystemAuthorizationHeader(mapper.writeValueAsString(ticket)),
-                        Any::class.java
-                )
+            val ticket = TicketDto(
+                    userId = SecurityUtil.getUserId(authentication),
+                    screeningId = sendOrderDto.screening_id,
+                    seat = seat
+            )
 
-                val ticketId = exchangeResponse.headers.location?.fragment?.split("/")?.get(1)
-                if (ticketId?.toLongOrNull() != null) {
-                    ticketIds.add(ticketId.toLong())
-                }
+            val exchangeResponse = client.exchange(
+                    "$ticketApiAddress/tickets",
+                    HttpMethod.POST,
+                    getSystemAuthorizationHeader(mapper.writeValueAsString(ticket)),
+                    Any::class.java
+            )
 
-                if (exchangeResponse.statusCodeValue != 200) {
-                    success = false
-                }
+            val ticketId = exchangeResponse.headers.location?.toString()?.split("/")?.get(2)
+            if (ticketId?.toLongOrNull() != null) {
+                ticketIds.add(ticketId.toLong())
+            }
+
+            if (exchangeResponse.statusCodeValue != 201) {
+                success = false
             }
         }
 
@@ -171,12 +177,16 @@ class BookingController {
 
         if (!success) {
             for (ticketId in ticketIds) {
-                client.exchange(
-                        "$ticketApiAddress/tickets/$ticketId",
-                        HttpMethod.DELETE,
-                        getSystemAuthorizationHeader(),
-                        Any::class.java
-                )
+                try {
+                    client.exchange(
+                            "$ticketApiAddress/tickets/$ticketId",
+                            HttpMethod.DELETE,
+                            getSystemAuthorizationHeader(),
+                            Any::class.java
+                    )
+                } catch (e: Exception) {
+                    // dont do anything intentionally
+                }
             }
             return ResponseEntity.status(400).build()
         }
@@ -197,18 +207,18 @@ class BookingController {
     @GetMapping(path = ["/{orderId}"])
     fun getById(
             @PathVariable("orderId")
-            orderId: String,
+            orderId: Long,
             authentication: Authentication
     ): ResponseEntity<WrappedResponse<OrderDto>> {
-        if (!SecurityUtil.isAuthenticatedOrAdmin(authentication)) {
+
+        val orderEntity = orderRepo.findById(orderId).orElse(null)
+        if (!SecurityUtil.isAuthenticatedOrAdmin(authentication, orderEntity.userId)) {
             return ResponseEntity.status(403).build()
         }
 
-        if (orderId.toLongOrNull() == null) {
+        if (orderEntity == null) {
             return ResponseEntity.status(404).build()
         }
-        val orderEntity = orderRepo.findById(orderId.toLong()).orElse(null) ?:
-            return ResponseEntity.status(404).build()
 
         val dto = OrderConverter.transform(orderEntity)
 
