@@ -1,4 +1,4 @@
-package no.octopod.cinema.booking.dto
+package no.octopod.cinema.common.dto
 
 class SendOrderDto(
     var screening_id: String? = null,

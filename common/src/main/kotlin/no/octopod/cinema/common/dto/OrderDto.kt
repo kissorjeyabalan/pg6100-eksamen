@@ -1,4 +1,4 @@
-package no.octopod.cinema.booking.dto
+package no.octopod.cinema.common.dto
 
 import java.time.ZonedDateTime
 import javax.persistence.Entity
