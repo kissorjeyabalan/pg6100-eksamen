@@ -15,6 +15,8 @@ class FakeWebSecurityConfig: WebSecurityConfig() {
         super.configure(http)
         http.httpBasic()
                 .and()
+                .cors()
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
     }

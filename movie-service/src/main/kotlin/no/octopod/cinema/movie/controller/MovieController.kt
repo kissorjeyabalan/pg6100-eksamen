@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
+
 @RequestMapping(
         path = ["/movies"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
@@ -25,6 +26,8 @@ class MovieController {
     @Autowired
     lateinit var repo: MovieRepository
 
+
+    @CrossOrigin(origins = ["http://localhost:8080"])
     @PostMapping
     fun createMovie(
             @RequestBody movieDto: MovieDto
@@ -40,6 +43,7 @@ class MovieController {
         return ResponseEntity.created(URI.create("/movies/${saved.id}")).build()
     }
 
+    @CrossOrigin(origins = ["http://localhost:8080"])
     @GetMapping(path = ["/{movieId}"])
     fun getById(
             @PathVariable("movieId")
@@ -57,6 +61,7 @@ class MovieController {
         )
     }
 
+    @CrossOrigin(origins = ["http://localhost:8080"])
     @GetMapping(produces = [Format.HAL_V1])
     fun getAll(
             @RequestParam("page", defaultValue = "1")
