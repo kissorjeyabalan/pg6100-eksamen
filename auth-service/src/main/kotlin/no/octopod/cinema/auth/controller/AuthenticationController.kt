@@ -25,9 +25,8 @@ class AuthenticationController(
         private val userDetailsService: UserDetailsService
 ) {
 
-    @ApiOperation("Log in and set session")
+    @ApiOperation("Log in and get a session cookie back.")
     @PostMapping(path = ["/login"], consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    @ApiResponse(code = 204, message = "Successfully logged in")
     fun login(@RequestBody creds: AuthDto): ResponseEntity<Void> {
         if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
             return ResponseEntity.status(400).build()
@@ -53,7 +52,6 @@ class AuthenticationController(
 
     @ApiOperation("Create a new user")
     @PostMapping(path = ["/register"], consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    @ApiResponse(code = 201, message = "Successfully created new user")
     fun register(@RequestBody creds: AuthDto): ResponseEntity<Void> {
         if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
             return ResponseEntity.status(400).build()
