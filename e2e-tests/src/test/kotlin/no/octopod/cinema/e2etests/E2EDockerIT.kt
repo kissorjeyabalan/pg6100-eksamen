@@ -560,6 +560,40 @@ class E2EDockerIT {
     fun testCreateOrderWithoutReservation() {
 
         val orderDto = SendOrderDto()
+
+        given().cookie("SESSION", getAdminSessionCookie())
+                .contentType(ContentType.JSON)
+                .body(orderDto)
+                .post("$API_BASE/orders")
+                .then()
+                .statusCode(400)
+    }
+
+    @Test
+    fun testCreateAndGetOrder() {
+
+        val seatDto = SeatDto(seat = "a1", screening_id = "1")
+
+        given().cookie("SESSION", getAdminSessionCookie())
+                .contentType(ContentType.JSON)
+                .body(seatDto)
+                .post("$API_BASE/orders/reserve")
+                .then()
+                .statusCode(204)
+
+        val orderDto = SendOrderDto(screening_id = seatDto.screening_id, seats = listOf("a1"), payment_token = "aaa")
+
+        val orderPath = given().cookie("SESSION", getAdminSessionCookie())
+                .contentType(ContentType.JSON)
+                .body(orderDto)
+                .post("$API_BASE/orders")
+                .then()
+                .statusCode(204)
+
+        given().cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE$orderPath")
+                .then()
+                .statusCode(200)
     }
 
     @Test
