@@ -19,6 +19,7 @@ import java.net.URI
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
 @RestController
+@CrossOrigin
 class MovieController {
 
     @Autowired

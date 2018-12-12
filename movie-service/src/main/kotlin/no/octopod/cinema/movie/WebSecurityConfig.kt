@@ -16,6 +16,8 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
         http
             .httpBasic()
             .and()
+            .cors()
+            .and()
             .authorizeRequests()
             .antMatchers(HttpMethod.GET, "/movies/**").permitAll()
             .antMatchers(HttpMethod.POST, "/movies/**").permitAll()
