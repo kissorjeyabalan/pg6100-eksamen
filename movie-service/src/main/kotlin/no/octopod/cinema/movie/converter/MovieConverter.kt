@@ -41,7 +41,8 @@ class MovieConverter {
             val pageDto = HalPage<MovieDto>()
             pageDto.data = dtoList
             pageDto.count = entities.size.toLong()
-            pageDto.pages = ((pageDto.count / limit + 1)).toInt()
+            pageDto.pages = ((pageDto.count / limit)).toInt()
+            if (pageDto.pages == 0) pageDto.pages += 1
 
             return pageDto
         }

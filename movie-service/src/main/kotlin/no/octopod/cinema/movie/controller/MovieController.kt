@@ -32,10 +32,7 @@ class MovieController {
     @PostMapping
     @ApiOperation(value = "Add a movie to the database")
     fun createMovie(
-            @RequestParam(name = "Movie Object",
-                    value = "Object containing details about the movie to be inserted. " +
-                    "ID should not be sent. " +
-                    "Only title and release date is required.")
+            @ApiParam(name = "Movie Object", value = "Object containing details about the movie to be inserted. ID should not be sent. Only title and release date is required.")
             @RequestBody movieDto: MovieDto
     ): ResponseEntity<Void> {
         if (movieDto.title.isNullOrEmpty() || movieDto.release_date == null) {
