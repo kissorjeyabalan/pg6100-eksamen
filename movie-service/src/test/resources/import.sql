@@ -1,0 +1,3 @@
+INSERT INTO movie_entity (description, featured, image_path, release_date, title) VALUES ('test', true, null, CURRENT_TIMESTAMP, 'Grinchen');
+INSERT INTO movie_entity (description, featured, image_path, release_date, title) VALUES ('Stephanie (Anna Kendrick) forsøker å finne ut av sannheten bak hva som har skjedd med hennes beste venn Emily (Blake Lively), som plutselig har forsvunnet fra den lille byen de bor i.', true, null, make_timestamptz(2018, 11, 3, 12, 0, 0), 'A Simple Favor');
+INSERT INTO movie_entity (description, featured, image_path, release_date, title) VALUES ('Se Bradley Cooper og Lady Gaga i dette nydelige musikkdramaet!', true, null, make_timestamptz(2018, 11, 11, 11, 0, 0), 'A Star Is Born');
