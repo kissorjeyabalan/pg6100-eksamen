@@ -20,6 +20,19 @@ class HeaderBar extends React.Component {
        );
    }
 
+    renderAdmin() {
+        return (
+            <div className="msgDiv">
+                <div className="notLoggedInMsg">Welcome, {this.props.userId}</div>
+                <div className="btn btnPartHeader" onClick={this.props.doLogOut}>
+                    Logout
+                </div>
+                <Link to={"/admin"}>Click here to go Admin area</Link>
+            </div>
+        );
+    }
+
+
    renderNotLoggedIn() {
        return (
            <div className="msgDiv">

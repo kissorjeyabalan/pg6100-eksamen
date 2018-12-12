@@ -8,8 +8,6 @@ import rootReducer from './reducers/root-reducer';
 import {AUTHENTICATED} from './actions/action-types';
 import App from './components/App';
 import 'babel-polyfill';
-import axios from 'axios';
-import {logOut} from './actions/user-actions';
 
 const store = createStore(rootReducer, composeWithDevTools(
     applyMiddleware(thunk)

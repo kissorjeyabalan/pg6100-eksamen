@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import * as ApiBase from '../../global'
 import axios from 'axios'
@@ -31,7 +30,12 @@ class HomePage extends React.Component {
                 {this.state.featuredMovies.map(m =>
                     <div key={m.id} className="movie-list-card">
                         <p className="movie-title" >Title: {m.title}</p>
-                        <p className="movie-desce" >Description: {m.description}</p>
+                        <p className="movie-desc" >Description: {m.description}</p>
+                        <Link to={"/moviepage?movieId=" + m.id}>
+                            <button className="btn">
+                                Details
+                            </button>
+                        </Link>
                     </div>
                 )}
             </div>
