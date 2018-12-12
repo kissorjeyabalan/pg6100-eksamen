@@ -2,6 +2,7 @@ package no.octopod.cinema.auth.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import io.swagger.annotations.ApiResponse
 import no.octopod.cinema.auth.dto.AuthDto
 import no.octopod.cinema.auth.service.AuthenticationService
@@ -27,7 +28,11 @@ class AuthenticationController(
 
     @ApiOperation("Log in and get a session cookie back.")
     @PostMapping(path = ["/login"], consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun login(@RequestBody creds: AuthDto): ResponseEntity<Void> {
+    fun login(
+            @ApiParam()
+            @RequestBody
+            creds: AuthDto
+    ): ResponseEntity<Void> {
         if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
             return ResponseEntity.status(400).build()
         }

@@ -23,6 +23,7 @@ class AuthApplication {
         return BCryptPasswordEncoder()
     }
 
+    @Bean
     fun swaggerApi(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
@@ -33,8 +34,8 @@ class AuthApplication {
 
     private fun apiInfo(): ApiInfo {
         return ApiInfoBuilder()
-                .title("User Administration")
-                .description("API for user authentication and other user-related requests.")
+                .title("Authentication")
+                .description("API for user authentication")
                 .version("0.0.1")
                 .build()
     }

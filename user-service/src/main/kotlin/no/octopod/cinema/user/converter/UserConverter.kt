@@ -1,14 +1,14 @@
 package no.octopod.cinema.user.converter
 
 import no.octopod.cinema.user.entity.UserEntity
-import no.octopod.cinema.common.dto.UserDto
+import no.octopod.cinema.common.dto.UserInfoDto
 import no.octopod.cinema.common.hateos.HalPage
 import kotlin.streams.toList
 
 class UserConverter {
     companion object {
-        fun transform(entity: UserEntity): UserDto {
-            return UserDto(
+        fun transform(entity: UserEntity): UserInfoDto {
+            return UserInfoDto(
                     phone = entity.phone.toString(),
                     email = entity.email.toString(),
                     name = entity.name.toString(),
@@ -17,7 +17,7 @@ class UserConverter {
             )
         }
 
-        fun transform(dto: UserDto): UserEntity {
+        fun transform(dto: UserInfoDto): UserEntity {
             return UserEntity(
                     dto.phone,
                     dto.email,
@@ -25,19 +25,19 @@ class UserConverter {
             )
         }
 
-        fun transform(entities: Iterable<UserEntity>): List<UserDto> {
+        fun transform(entities: Iterable<UserEntity>): List<UserInfoDto> {
             return entities.map { transform(it) }
         }
 
-        fun transform(entities: List<UserEntity>, page: Int, limit: Int): HalPage<UserDto> {
+        fun transform(entities: List<UserEntity>, page: Int, limit: Int): HalPage<UserInfoDto> {
             val offset = ((page -1) * limit).toLong()
-            val dtoList: MutableList<UserDto> = entities.stream()
+            val dtoList: MutableList<UserInfoDto> = entities.stream()
                     .skip(offset)
                     .limit(limit.toLong())
                     .map { transform(it) }
                     .toList().toMutableList()
 
-            val pageDto = HalPage<UserDto>()
+            val pageDto = HalPage<UserInfoDto>()
             pageDto.data = dtoList
             pageDto.count = entities.size.toLong()
             pageDto.pages = ((pageDto.count / limit)).toInt()

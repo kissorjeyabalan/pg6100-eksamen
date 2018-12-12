@@ -1,5 +1,8 @@
 package no.octopod.cinema.movie.controller
 
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.dto.MovieDto
 import no.octopod.cinema.common.dto.WrappedResponse
 import no.octopod.cinema.common.hateos.Format
@@ -19,6 +22,7 @@ import java.net.URI
         path = ["/movies"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
 )
+@Api(value = "movies", description = "API for retrieving and creating new movies to be presented")
 @RestController
 class MovieController {
 
@@ -26,7 +30,12 @@ class MovieController {
     lateinit var repo: MovieRepository
 
     @PostMapping
+    @ApiOperation(value = "Add a movie to the database")
     fun createMovie(
+            @RequestParam(name = "Movie Object",
+                    value = "Object containing details about the movie to be inserted. " +
+                    "ID should not be sent. " +
+                    "Only title and release date is required.")
             @RequestBody movieDto: MovieDto
     ): ResponseEntity<Void> {
         if (movieDto.title.isNullOrEmpty() || movieDto.release_date == null) {
@@ -41,8 +50,10 @@ class MovieController {
     }
 
     @GetMapping(path = ["/{movieId}"])
+    @ApiOperation(value = "Retrieve a specific movie")
     fun getById(
             @PathVariable("movieId")
+            @ApiParam("Internal ID of Movie")
             movieId: String
     ): ResponseEntity<WrappedResponse<MovieDto>> {
         val id = movieId.toLongOrNull() ?: return ResponseEntity.status(404).build()
@@ -58,12 +69,14 @@ class MovieController {
     }
 
     @GetMapping(produces = [Format.HAL_V1])
+    @ApiOperation("Retrieve all movies")
     fun getAll(
             @RequestParam("page", defaultValue = "1")
             page: Int,
             @RequestParam("limit", defaultValue = "10")
             limit: Int,
             @RequestParam("featuredOnly", defaultValue = "false")
+            @ApiParam("True to get only featured movies, false to get all movies including featured")
             featured: Boolean
     ): ResponseEntity<WrappedResponse<HalPage<MovieDto>>> {
         if (page < 1 || limit < 1) {

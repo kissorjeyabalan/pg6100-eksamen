@@ -1,6 +1,9 @@
 package no.octopod.cinema.booking.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import no.octopod.cinema.booking.converter.OrderConverter
 import no.octopod.cinema.common.dto.OrderDto
 import no.octopod.cinema.common.dto.SeatDto
@@ -28,6 +31,7 @@ import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
 
+@Api(value = "orders", description = "Place Orders & Reserve Seats")
 @RequestMapping(
         path = ["/orders"],
         produces = [(MediaType.APPLICATION_JSON_VALUE)]
@@ -41,14 +45,18 @@ class BookingController {
     @Autowired private lateinit var seatReserverationRepo: SeatReservationRepository
     @Autowired private lateinit var orderRepo: OrderRepository
 
+    // Get admin user and password, used for system calls to sensistive api's
     @Value("\${systemUser}") private lateinit var systemUser: String
     @Value("\${systemPwd}") private lateinit var systemPwd: String
-
-
     @Autowired lateinit var client: RestTemplate
 
+
     @PostMapping(path = ["/reserve"])
+    @ApiOperation(value = "Toggle reservation",
+            notes = "Toggles the reservation of a specific seat for a specific screening")
     fun toggleSeatReservation(
+            @ApiParam(name = "Seat and Screening",
+                    value = "An object containing the seat to reserve, and which screening to reserve the seat for.")
             @RequestBody seatDto: SeatDto,
             authentication: Authentication
     ): ResponseEntity<Void> {
@@ -60,6 +68,7 @@ class BookingController {
 
         val reservedSeat = seatReserverationRepo.findBySeatAndScreeningId(seatDto.seat!!, seatDto.screening_id!!.toLong()).orElse(null)
         if (reservedSeat == null) {
+            // If the seat is not reserved, and the user has not reached their limit, reserve the seat for them
             val currentUserReservations =
                     seatReserverationRepo.countByUserIdAndScreeningId(userId, seatDto.screening_id!!.toLong())
 
@@ -67,7 +76,7 @@ class BookingController {
                 return ResponseEntity.status(400).build()
             }
 
-            // remove from seats
+            // remove from seats in show dto first
             try {
                 val statusCode = client.exchange(
                         "http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
@@ -76,6 +85,7 @@ class BookingController {
                         Any::class.java
                 ).statusCodeValue
 
+                // if the removal was successful, save the reservation
                 if (statusCode == 204) {
                     seatReserverationRepo.save(
                             SeatReservationEntity(
@@ -91,7 +101,7 @@ class BookingController {
             }
             return ResponseEntity.status(204).build()
         } else if (reservedSeat.userId == userId) {
-            // add back to seats
+            // add back to seats, since the seat was already reserved by this user
             try {
                 val statusCode = client.exchange(
                         "http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
@@ -108,6 +118,7 @@ class BookingController {
                 return ResponseEntity.status(400).build()
             }
         } else if (reservedSeat.userId != null && reservedSeat.userId != userId) {
+            // this seat does not exist anymore
             return ResponseEntity.status(404).build()
         }
 
@@ -120,7 +131,9 @@ class BookingController {
     }
 
     @PostMapping
+    @ApiOperation(value = "Create a successfully paid for order")
     fun createOrder(
+            @ApiParam(name = "Purchase Object", value = "An object to represent a paid for purchase, used to create the tickets")
             @RequestBody sendOrderDto: SendOrderDto,
             authentication: Authentication
     ) : ResponseEntity<Void> {
@@ -134,6 +147,7 @@ class BookingController {
         var success = true
         val mapper = ObjectMapper()
 
+        // Create the tickets
         for (seat in sendOrderDto.seats!!) {
             val seatIsReservedByUser = seatReserverationRepo.existsByUserIdAndScreeningIdAndSeat(
                     userId = SecurityUtil.getUserId(authentication),
@@ -141,6 +155,7 @@ class BookingController {
                     seat = seat
             )
             if (!seatIsReservedByUser) {
+                // seat wasnt reserved by this user
                 success = false
                 break
             }
@@ -174,6 +189,7 @@ class BookingController {
                 screeningId = sendOrderDto.screening_id!!.toLong()
         )
 
+        // revert the created tickets and refund the user
         if (!success) {
             for (ticketId in ticketIds) {
                 try {
@@ -204,7 +220,9 @@ class BookingController {
     }
 
     @GetMapping(path = ["/{orderId}"])
+    @ApiOperation(value = "Get an order by id")
     fun getById(
+            @ApiParam("The order ID")
             @PathVariable("orderId")
             orderId: Long,
             authentication: Authentication
@@ -228,6 +246,7 @@ class BookingController {
     }
 
     @GetMapping
+    @ApiOperation("Retrieve all the orders")
     fun getAll(
             @RequestParam("page", defaultValue = "1")
             page: Int,
@@ -237,6 +256,7 @@ class BookingController {
             userId: String?,
             authentication: Authentication
     ): ResponseEntity<WrappedResponse<HalPage<OrderDto>>> {
+        // return everything for admin, but if user, only the ones belonging to them
         if (!SecurityUtil.isAuthenticatedOrAdmin(authentication, userId)) {
             return ResponseEntity.status(403).build()
         }
@@ -293,6 +313,7 @@ class BookingController {
         )
     }
 
+    // For doing admin posts to ticket and show service
     private fun getSystemAuthorizationHeader(body: String? = null): HttpEntity<Any> {
         val headers = HttpHeaders()
         val auth = "$systemUser:$systemPwd"

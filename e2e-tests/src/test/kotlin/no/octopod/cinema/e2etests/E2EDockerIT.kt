@@ -730,7 +730,7 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username3"
         val password = "password3"
-        val dto = UserDto(phone = phone, email = email, name = username)
+        val dto = UserInfoDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
@@ -756,7 +756,7 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username4"
         val password = "password4"
-        val dto = UserDto(phone = phone, email = email, name = username)
+        val dto = UserInfoDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
@@ -770,7 +770,7 @@ class E2EDockerIT {
 
         val newEmail = "replacement4@replacement.abc"
         val newUsername = "username4-1"
-        val newDto = UserDto(phone = phone, email = newEmail, name = newUsername)
+        val newDto = UserInfoDto(phone = phone, email = newEmail, name = newUsername)
 
         given()
                 .cookie("SESSION", authCookie)
@@ -788,7 +788,7 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username5"
         val password = "password5"
-        val dto = UserDto(phone = phone, email = email, name = username)
+        val dto = UserInfoDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
@@ -802,7 +802,7 @@ class E2EDockerIT {
 
         val newEmail = "replacement5@replacement.abc"
         val newUsername = "username5-1"
-        val newDto = UserDto(email = newEmail, name = newUsername)
+        val newDto = UserInfoDto(email = newEmail, name = newUsername)
 
         given()
                 .cookie("SESSION", authCookie)
@@ -820,7 +820,7 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username6"
         val password = "password6"
-        val dto = UserDto(phone = phone, email = email, name = username)
+        val dto = UserInfoDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 
@@ -856,7 +856,7 @@ class E2EDockerIT {
         val email = "test@test.abc"
         val username = "username6"
         val password = "password6"
-        val dto = UserDto(phone = phone, email = email, name = username)
+        val dto = UserInfoDto(phone = phone, email = email, name = username)
 
         val authCookie = registerAuthentication(phone, password)
 

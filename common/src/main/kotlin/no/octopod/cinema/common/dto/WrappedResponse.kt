@@ -1,5 +1,6 @@
 package no.octopod.cinema.common.dto
 
+import io.swagger.annotations.ApiModelProperty
 import java.lang.IllegalStateException
 
 /**
@@ -7,9 +8,16 @@ import java.lang.IllegalStateException
  * https://github.com/arcuri82/testing_security_development_enterprise_systems/blob/0d021be271082fb2217520e5caaeb36a246887b0/advanced/rest/rest-dto/src/main/kotlin/org/tsdes/advanced/rest/dto/WrappedResponse.kt
  */
 open class WrappedResponse<T>(
+        @ApiModelProperty("Raw HTTP Response Code")
         var code: Int? = null,
+
+        @ApiModelProperty("Data returned by API")
         var data: T? = null,
+
+        @ApiModelProperty("Message if error")
         var message: String? = null,
+
+        @ApiModelProperty("Whether the request was success, error or failure")
         var status: ResponseStatus? = null
 ) {
     fun validated(): WrappedResponse<T> {

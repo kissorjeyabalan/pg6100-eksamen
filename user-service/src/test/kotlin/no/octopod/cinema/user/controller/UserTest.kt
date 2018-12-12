@@ -1,6 +1,6 @@
 package no.octopod.cinema.user.controller
 
-import no.octopod.cinema.common.dto.UserDto
+import no.octopod.cinema.common.dto.UserInfoDto
 import no.octopod.cinema.user.repository.UserRepository
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
@@ -38,7 +38,7 @@ class UserTest {
     @Test
     fun testCreateAndGetSpecificUserInfo() {
         val phone = "12345678"
-        val originalUserDto = UserDto(phone = phone, email = "test@test.xyz", name = "Test User")
+        val originalUserDto = UserInfoDto(phone = phone, email = "test@test.xyz", name = "Test User")
 
         val userInfoPath = given().auth()
                 .basic(phone, "123")
@@ -63,7 +63,7 @@ class UserTest {
 
     @Test
     fun testDelete() {
-        val originalUserDto = UserDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
+        val originalUserDto = UserInfoDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
 
         val userInfoPath = given().auth()
                 .basic("admin", "admin")
@@ -88,7 +88,7 @@ class UserTest {
     }
     @Test
     fun createFailsWhenInvalidContentSupplied() {
-        val originalUserDto = UserDto()
+        val originalUserDto = UserInfoDto()
 
         given().auth()
                 .basic("12345678", "123")
@@ -131,7 +131,7 @@ class UserTest {
     @Test
     fun testCreateFailsWhenUserAlreadyExists() {
         val phone = "12345678"
-        val originalUserDto = UserDto(phone = phone, email = "test@test.xyz", name = "Test User")
+        val originalUserDto = UserInfoDto(phone = phone, email = "test@test.xyz", name = "Test User")
 
         given().auth()
                 .basic(phone, "123")
@@ -163,8 +163,8 @@ class UserTest {
 
     @Test
     fun testGetAll() {
-        val userDto1 = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
-        val userDto2 = UserDto(phone = "87654321", email = "test2@test2.xyz", name = "Test User 2")
+        val userDto1 = UserInfoDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val userDto2 = UserInfoDto(phone = "87654321", email = "test2@test2.xyz", name = "Test User 2")
 
         given().auth()
                 .basic("admin", "admin")
@@ -212,8 +212,8 @@ class UserTest {
 
     @Test
     fun testGetAllWithPaginationAndLimit() {
-        val userDto1 = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
-        val userDto2 = UserDto(phone = "87654321", email = "test2@test2.xyz", name = "Test User 2")
+        val userDto1 = UserInfoDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val userDto2 = UserInfoDto(phone = "87654321", email = "test2@test2.xyz", name = "Test User 2")
 
         given().auth()
                 .basic("admin", "admin")
@@ -261,7 +261,7 @@ class UserTest {
 
     @Test
     fun testReplaceUserWithInvalidRequestBody() {
-        val originalUserInfoDto = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val originalUserInfoDto = UserInfoDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
         val resourcePath = given().auth()
                 .basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -311,7 +311,7 @@ class UserTest {
 
     @Test
     fun testReplaceUserWithValidRequestBody() {
-        val originalUserInfoDto = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val originalUserInfoDto = UserInfoDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
         val resourcePath = given().auth()
                 .basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -326,7 +326,7 @@ class UserTest {
                 .get(resourcePath)
                 .then()
                 .statusCode(200)
-                .extract().body().jsonPath().getObject("data", UserDto::class.java)
+                .extract().body().jsonPath().getObject("data", UserInfoDto::class.java)
 
 
         userInfoDtoFromServer.email = "new@test1.xyz"
@@ -352,7 +352,7 @@ class UserTest {
 
     @Test
     fun testReplaceUserCreatesNewResourceIfNotExists() {
-        val nonExistingUserDto = UserDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
+        val nonExistingUserDto = UserInfoDto(phone = "12345678", email = "test1@test1.xyz", name = "Test User 1")
         given().auth()
                 .basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -371,7 +371,7 @@ class UserTest {
 
     @Test
     fun testJsonMergePatchWithValidRequestBody() {
-        val originalUserInfoDto = UserDto("12345678", email = "test1@test1.xyz", name = "Test User")
+        val originalUserInfoDto = UserInfoDto("12345678", email = "test1@test1.xyz", name = "Test User")
         val resourcePath = given().auth()
                 .basic("admin", "admin")
                 .contentType(ContentType.JSON)
@@ -405,7 +405,7 @@ class UserTest {
 
     @Test
     fun testJsonMergePatchWithInvalidRequestBody() {
-        val originalUserInfoDto = UserDto("12345678", email = "test1@test1.xyz", name = "Test User")
+        val originalUserInfoDto = UserInfoDto("12345678", email = "test1@test1.xyz", name = "Test User")
         val resourcePath = given().auth()
                 .basic("admin", "admin")
                 .contentType("application/merge-patch+json")
@@ -601,7 +601,7 @@ class UserTest {
 
     @Test
     fun testUserCanOnlyPostTheirOwnInfoAndAdminAny() {
-        val userInfoDto = UserDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
+        val userInfoDto = UserInfoDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
 
         given().auth()
                 .basic(userInfoDto.phone, "123")
@@ -637,7 +637,7 @@ class UserTest {
 
     @Test
     fun testUserCanOnlyReplaceTheirOwnInfoAndAdminAny() {
-        val userInfoDto = UserDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
+        val userInfoDto = UserInfoDto(phone = "12345678", email = "test@test.xyz", name = "Test User")
 
         given().auth()
                 .basic(userInfoDto.phone, "123")
