@@ -1,6 +1,6 @@
 package no.octopod.cinema.booking.converter
 
-import no.octopod.cinema.booking.dto.OrderDto
+import no.octopod.cinema.common.dto.OrderDto
 import no.octopod.cinema.booking.entity.OrderEntity
 import no.octopod.cinema.common.hateos.HalPage
 import kotlin.streams.toList

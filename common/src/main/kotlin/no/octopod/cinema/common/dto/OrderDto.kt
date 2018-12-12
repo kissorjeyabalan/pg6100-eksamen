@@ -1,9 +1,6 @@
 package no.octopod.cinema.common.dto
 
 import java.time.ZonedDateTime
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 
 data class OrderDto(
         var id: Long? = null,
