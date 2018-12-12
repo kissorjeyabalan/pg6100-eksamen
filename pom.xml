@@ -9,13 +9,12 @@
         <module>eureka</module>
         <module>gateway</module>
         <module>common</module>
-        <module>user-service</module>
-        <module>kino-service</module>
-        <module>frontend</module>
         <module>auth-service</module>
-        <module>ticket-service</module>
+        <module>booking-service</module>
+        <module>kino-service</module>
         <module>movie-service</module>
-        <module>e2e-tests</module>
+        <module>ticket-service</module>
+        <module>user-service</module>
     </modules>
 
     <properties>
