@@ -1,5 +1,6 @@
 package no.octopod.cinema.kino
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -13,11 +14,14 @@ import org.springframework.security.config.http.SessionCreationPolicy
 @EnableWebSecurity
 class WebSecurityConfig: WebSecurityConfigurerAdapter() {
 
+
     override fun configure(http: HttpSecurity) {
         http
             .httpBasic()
             .and()
             .authorizeRequests()
+            .antMatchers(HttpMethod.POST, "/shows/**").permitAll()
+            .antMatchers(HttpMethod.DELETE, "/shows/**").permitAll()
             .antMatchers(HttpMethod.GET, "/theaters/**").permitAll()
             .antMatchers(HttpMethod.GET, "/shows/**").permitAll()
             .antMatchers("/theaters/**").hasRole("ADMIN")

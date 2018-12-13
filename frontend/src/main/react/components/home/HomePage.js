@@ -14,10 +14,41 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
+        /*
         axios.get(`${ApiBase.MOVIE_API}?featured=true`).then(res => {
             let movies = res.data.data.data;
             this.setState({featuredMovies: movies})
+        })*/
+
+
+        let fakeReply = {
+            data: [
+                {
+                    id: 1,
+                    title: "he-man",
+                    description: "here is a loooooooooong description, dawdwada dwa d aw wda daw  dawd awdwad  d wd a w wd awd  dw"
+                },
+                {
+                    id: 2,
+                    title: "turtles",
+                    description: "here is a loooooooooong description, dawdwada dwa d aw wda daw  dawd awdwad  d wd a w wd awd  dw"
+                },
+                {
+                    id: 3,
+                    title: "barbie",
+                    description: "here is a loooooooooong description, dawdwada dwa d aw wda daw  dawd awdwad  d wd a w wd awd  dw"
+                },
+                {
+                    id: 4,
+                    title: "mega-man",
+                    description: "here is a loooooooooong description, dawdwada dwa d aw wda daw  dawd awdwad  d wd a w wd awd  dw"
+                },
+            ]
+        }
+         this.setState({
+            featuredMovies: fakeReply.data
         })
+
     }
 
     render() {

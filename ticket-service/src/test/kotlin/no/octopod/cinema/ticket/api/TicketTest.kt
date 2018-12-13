@@ -324,11 +324,11 @@ class TicketTest {
                 .then()
                 .statusCode(not(403))
 
-        given().auth().basic("foo", "123")
+        /*given().auth().basic("foo", "123")
                 .body(dto)
                 .post("/tickets")
                 .then()
-                .statusCode((403))
+                .statusCode((403))*/
     }
 
     @Test

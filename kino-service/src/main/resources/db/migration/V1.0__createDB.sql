@@ -1,10 +1,9 @@
 create table show_entity
   (
-    id bigint not null,
+    id BIGSERIAL PRIMARY KEY,
     cinema_id bigint not null,
     movie_id bigint not null,
-    start_time timestamp not null,
-    primary key (id)
+    start_time timestamp not null
   );
 
 create table show_entity_seats
@@ -15,10 +14,9 @@ create table show_entity_seats
 
 create table theater_entity
   (
-    id bigint not null,
+    id BIGSERIAL PRIMARY KEY,
     name varchar(255),
-    seats_max integer not null,
-    primary key (id)
+    seats_max integer not null
   );
 
 create table theater_entity_seats

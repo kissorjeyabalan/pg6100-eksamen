@@ -16,6 +16,8 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
                 .httpBasic()
                 .and()
                 .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/tickets").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/tickets/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/tickets/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/tickets/**").hasRole("ADMIN")
                 .antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui",
