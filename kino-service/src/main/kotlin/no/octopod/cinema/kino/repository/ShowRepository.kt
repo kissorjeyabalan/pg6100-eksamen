@@ -13,7 +13,4 @@ interface ShowRepository: CrudRepository<ShowEntity, Long> {
     fun deleteAllById(ids: List<Long>)
     fun findAllByCinemaId(id: Long): List<ShowEntity>
     fun findAllByCinemaIdAndMovieId(cinemaId: Long, movieId: Long): List<ShowEntity>
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    override fun findById(id: Long): Optional<ShowEntity>
 }

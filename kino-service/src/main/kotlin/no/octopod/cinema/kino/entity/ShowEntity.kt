@@ -21,6 +21,6 @@ class ShowEntity (
     @Column(name = "available_seats")
     var seats: MutableList<String>? = mutableListOf(),
 
-    @get:Id @get:GeneratedValue
+    @get:Id @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 )

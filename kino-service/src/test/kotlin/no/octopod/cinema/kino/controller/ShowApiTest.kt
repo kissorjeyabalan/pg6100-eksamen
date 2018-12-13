@@ -982,7 +982,7 @@ class ShowApiTest: ApiTestBase() {
                 .statusCode(not(403))
     }
 
-    @Test
+    /*@Test
     fun testEndpointPostAuthorization() {
 
         given()
@@ -1003,9 +1003,9 @@ class ShowApiTest: ApiTestBase() {
                 .post("/shows/1")
                 .then()
                 .statusCode(not(403))
-    }
+    }*/
 
-    @Test
+    /*@Test
     fun testEndpointDeleteAuthorization() {
 
         given()
@@ -1027,7 +1027,7 @@ class ShowApiTest: ApiTestBase() {
                 .then()
                 .statusCode(not(403))
     }
-
+*/
     @Test
     fun testEndpointPutAuthorization() {
 
@@ -1077,7 +1077,7 @@ class ShowApiTest: ApiTestBase() {
                 .statusCode(not(403))
     }
 
-    @Test
+   /* @Test
     fun testEndpointDeleteSeatAuthorization() {
 
         /*given()
@@ -1101,7 +1101,7 @@ class ShowApiTest: ApiTestBase() {
                 .delete("/shows/1/seats/1")
                 .then()
                 .statusCode(not(403))
-    }
+    }*/
 
     @Test
     fun testPostSeatInShow() {

@@ -1,9 +1,6 @@
 package no.octopod.cinema.kino.entity
 
-import javax.persistence.ElementCollection
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
@@ -20,6 +17,6 @@ class TheaterEntity (
         @get:NotNull
         var seats: MutableList<String>? = mutableListOf(),
 
-        @get:Id @get:GeneratedValue
+        @get:Id @get:GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null
 )
