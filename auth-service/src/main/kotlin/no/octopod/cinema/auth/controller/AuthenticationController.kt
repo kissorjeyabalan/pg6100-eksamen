@@ -3,9 +3,10 @@ package no.octopod.cinema.auth.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.auth.dto.AuthDto
 import no.octopod.cinema.auth.service.AuthenticationService
+import no.octopod.cinema.common.dto.WrappedResponse
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -32,15 +33,21 @@ class AuthenticationController(
             @ApiParam()
             @RequestBody
             creds: AuthDto
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
         if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid Request Body: Username or Password is empty."
+            )
         }
 
         val userDetails = try{
             userDetailsService.loadUserByUsername(creds.username!!)
         } catch (e: UsernameNotFoundException){
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid username/password"
+            )
         }
 
         val token = UsernamePasswordAuthenticationToken(userDetails, creds.password!!, userDetails.authorities)
@@ -52,19 +59,28 @@ class AuthenticationController(
             return ResponseEntity.status(204).build()
         }
 
-        return ResponseEntity.status(400).build()
+        return getWrappedResponse(
+                rawStatusCode = 400,
+                message = "Invalid username/password"
+        )
     }
 
     @ApiOperation("Create a new user")
     @PostMapping(path = ["/register"], consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun register(@RequestBody creds: AuthDto): ResponseEntity<Void> {
+    fun register(@RequestBody creds: AuthDto): ResponseEntity<WrappedResponse<Void>> {
         if ((creds.username.isNullOrEmpty() || creds.password.isNullOrEmpty())) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid Request Body: Username or password not supplied"
+            )
         }
 
         val registered = authService.createUser(creds.username!!, creds.password!!, setOf("USER"))
         if (!registered) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Username already in use"
+            )
         }
 
         val userDetails = userDetailsService.loadUserByUsername(creds.username)
@@ -81,10 +97,13 @@ class AuthenticationController(
 
     @ApiOperation("Get the currently logged in user roles")
     @RequestMapping(path = ["/user"])
-    fun getCurrentUser(user: Principal): ResponseEntity<Map<String, Any>> {
+    fun getCurrentUser(user: Principal): ResponseEntity<WrappedResponse<Map<String, Any>>> {
         val map = mutableMapOf<String, Any>()
         map["name"] = user.name
         map["roles"] = AuthorityUtils.authorityListToSet((user as Authentication).authorities)
-        return ResponseEntity.ok(map)
+        return getWrappedResponse(
+                rawStatusCode = 200,
+                data = map
+        )
     }
 }

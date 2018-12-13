@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.dto.MovieDto
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.common.dto.WrappedResponse
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
@@ -34,16 +35,22 @@ class MovieController {
     fun createMovie(
             @ApiParam(name = "Movie Object", value = "Object containing details about the movie to be inserted. ID should not be sent. Only title and release date is required.")
             @RequestBody movieDto: MovieDto
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
         if (movieDto.title.isNullOrEmpty() || movieDto.release_date == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Title or release date missing"
+            )
         }
 
         val entity = MovieConverter.transform(movieDto)
         entity.releaseDate = entity.releaseDate
 
         val saved = repo.save(entity)
-        return ResponseEntity.created(URI.create("/movies/${saved.id}")).build()
+        return ResponseEntity.created(URI.create("/movies/${saved.id}")).body(WrappedResponse(
+                code = 201,
+                message = "Movie created"
+        ))
     }
 
     @CrossOrigin(origins =["http://localhost:8080"])
@@ -54,8 +61,14 @@ class MovieController {
             @ApiParam("Internal ID of Movie")
             movieId: String
     ): ResponseEntity<WrappedResponse<MovieDto>> {
-        val id = movieId.toLongOrNull() ?: return ResponseEntity.status(404).build()
-        val movie = repo.findById(id).orElse(null) ?: return ResponseEntity.status(404).build()
+        val id = movieId.toLongOrNull() ?: return getWrappedResponse(
+                rawStatusCode = 404,
+                message = "Movie does not exist"
+        )
+        val movie = repo.findById(id).orElse(null) ?: return getWrappedResponse(
+                rawStatusCode = 404,
+                message = "Movie does not exist"
+        )
 
         val dto = MovieConverter.transform(movie)
         return ResponseEntity.ok(
