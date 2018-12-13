@@ -57,9 +57,14 @@ spring:
       - id: booking-service
         uri: lb://booking-service
         predicates:
-          - Path=/api/v1/orders/**
+        - Path=/api/v1/orders/**
         filters:
-          - StripPrefix=2
+        - StripPrefix=2
+      - id: frontend
+        uri: lb://frontend
+        predicates:
+        - Path:/**
+        - StripPrefix=0
 
 eureka:
   instance:

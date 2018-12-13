@@ -1,19 +1,22 @@
 import * as type from './action-types';
-import axios from 'axios';
-import {AUTH_API} from "../global";
+import {AUTH_API, axios} from "../global";
 
 const URL = '/users/';
 
+
+
+
 export function login(username, password, history) {
     return async (dispatch) => {
-
-        axios.post(`${AUTH_API}/login`, {username: username, password: password}).then(res => {
-                dispatch({type: type.AUTHENTICATED, data: res});
+        axios.post(`${AUTH_API}/login`, {username: username, password: password}).then(() => {
+            axios.get(`${AUTH_API}/user`).then(res => {
+                dispatch({type: type.AUTHENTICATED, data: res.data});
                 history.push('/');
-            }).catch(() => {
+            });
+        }).catch(() => {
             dispatch({type: type.AUTH_ERROR, data: 'Invalid email/password!'});
-        });
-    };
+        })
+    }
 }
 
 export function signUp(username, password, history) {

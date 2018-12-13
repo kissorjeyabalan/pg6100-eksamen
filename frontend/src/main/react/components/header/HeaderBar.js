@@ -48,10 +48,10 @@ class HeaderBar extends React.Component {
 
    render() {
        let content;
-       if (this.props.userId == null || !this.props.authenticated) {
+       if (!this.props.authenticated) {
            content = this.renderNotLoggedIn();
        } else {
-           content = this.renderLoggedIn();
+           content = this.renderAdmin();
        }
 
        return (

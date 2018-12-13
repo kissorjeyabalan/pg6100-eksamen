@@ -10,5 +10,5 @@ export const ORDER_API = "orders";
 export const axios = require("axios").default.create({
     headers: { "X-Requested-With": "XMLHttpRequest"},
     withCredentials: true,
-    baseURL: "http://bda1e937.ngrok.io/api/v1/"
+    baseURL: "http://localhost/api/v1/"
 });
