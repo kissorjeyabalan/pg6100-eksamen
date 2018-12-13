@@ -1,8 +1,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import axios from "axios/index";
-import * as ApiBase from "../../global";
+import {MOVIE_API, SHOW_API, axios} from "../../global";
 
 class MoviePage extends React.Component {
 
@@ -20,68 +19,31 @@ class MoviePage extends React.Component {
         if(this.movieId === null){
             this.state.error = "Unspecified book id";
         }
-
     }
 
     componentDidMount() {
-       /*
-        axios.get(`${ApiBase.MOVIE_API}/${this.movieId}`).then(res => {
+
+        axios.get(`${MOVIE_API}/${this.movieId}`).then(res => {
 
             let payload = res.data.data
+            console.log("movie api")
             console.log(payload)
             this.setState({movie: payload})
         })
 
-        axios.get(`${ApiBase.KINO_API}/${this.movieId}`).then(res => {
+        axios.get(`${SHOW_API}?movieId=${this.movieId}`).then(res => {
 
-            let payload = res.data.data
+            let payload = res.data.data.data
+            console.log("show api")
             console.log(payload)
             this.setState({screenings: payload})
         })
-        */
-        let fakeMovieReply = {
-            data:
-                {
-                    id: 1,
-                    title: "he-man",
-                    release_date:"dadddwadwa",
-                    description: "here is a loooooooooong descrda daw  dawd awdwad  d wd a w wd awd  dw"
-                }
-        }
-        this.setState({
-            movie: fakeMovieReply.data
-        })
-
-        let fakeScreeningReply = {
-            data:
-                [
-                    {
-                        startTime: "19:00",
-                        movieId: "1",
-                        cinemaId:"2",
-                        availableSeats: "10 seats",
-                        id: 1
-                    },
-                    {
-                        startTime: "20:00",
-                        movieId: "1",
-                        cinemaId:"2",
-                        availableSeats: "15 seats",
-                        id: 2
-                    }
-                ]
-
-        }
-        this.setState({
-            movie: fakeScreeningReply.data
-        })
-
     }
 
 
     render() {
 
-        let movie = <div>Loading</div>
+        let movie = <div>Loading movie</div>
 
         if(this.state.movie !== null) {
             movie = <div className="movie-container">
@@ -92,16 +54,15 @@ class MoviePage extends React.Component {
             </div>
         }
 
-        let screenings = <div>Loading</div>
+        let screenings = <div>Loading screenings</div>
 
         if(this.state.screenings !== null) {
-            movie = <div className="container">
+            screenings = <div className="container">
                 {this.state.screenings.map( s =>
-                    <div key={s.id} className="movie-list-card">
-                        <p>{s.startTime}</p>
-                        <p>{s.availableSeats}</p>
+                    <div key={s.id}>
+                        <p>Starttime: {s.startTime}</p>
+                        <p>Available Seats: {s.availableSeats}</p>
                     </div>
-
                 )}
             </div>
         }
@@ -110,6 +71,7 @@ class MoviePage extends React.Component {
             <div className="container">
                 <h2>Movie-Detail-Page</h2>
                 {movie}
+                {screenings}
             </div>
         );
     }

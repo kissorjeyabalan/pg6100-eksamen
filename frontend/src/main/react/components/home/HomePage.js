@@ -1,8 +1,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import * as ApiBase from '../../global'
-import axios from 'axios'
+import {MOVIE_API, axios} from "../../global";
 
 class HomePage extends React.Component {
 
@@ -14,13 +13,12 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
-        /*
-        axios.get(`${ApiBase.MOVIE_API}?featured=true`).then(res => {
+        axios.get(`${MOVIE_API}?featured=true`).then(res => {
             let movies = res.data.data.data;
             this.setState({featuredMovies: movies})
-        })*/
+        })
 
-
+        /*
         let fakeReply = {
             data: [
                 {
@@ -48,6 +46,7 @@ class HomePage extends React.Component {
          this.setState({
             featuredMovies: fakeReply.data
         })
+        */
 
     }
 
