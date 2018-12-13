@@ -43,6 +43,9 @@ class WebSecurityConfig(): WebSecurityConfigurerAdapter() {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/register").permitAll()
                 .antMatchers("/logout").permitAll()
+                .antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui",
+                        "/swagger-resources", "/swagger-resources/configuration/security",
+                        "/swagger-ui.html", "/webjars/**").hasRole("ADMIN")
                 .anyRequest().denyAll()
                 .and()
                 .csrf().disable()

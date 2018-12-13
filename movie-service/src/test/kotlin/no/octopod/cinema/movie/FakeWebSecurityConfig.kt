@@ -15,7 +15,7 @@ class FakeWebSecurityConfig: WebSecurityConfig() {
         super.configure(http)
         http.httpBasic()
                 .and()
-                .cors()
+                .authorizeRequests()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
@@ -23,6 +23,7 @@ class FakeWebSecurityConfig: WebSecurityConfig() {
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.inMemoryAuthentication()
+                .withUser("foo").password("{noop}123").roles("USER").and()
                 .withUser("admin").password("{noop}admin").roles("ADMIN", "USER")
     }
 }

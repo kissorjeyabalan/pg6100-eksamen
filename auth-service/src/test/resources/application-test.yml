@@ -16,3 +16,6 @@ spring:
     show-sql: true
   flyway:
     enabled: false
+
+  session:
+    store-type: redis

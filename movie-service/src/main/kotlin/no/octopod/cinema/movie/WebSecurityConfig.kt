@@ -21,6 +21,11 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             .authorizeRequests()
             .antMatchers(HttpMethod.GET, "/movies/**").permitAll()
             .antMatchers(HttpMethod.POST, "/movies/**").permitAll()
+            .antMatchers(
+                    "/v2/api-docs",
+                    "/swagger-resources/**",
+                    "/swagger-ui.html",
+                    "/webjars/**").hasRole("ADMIN")
             .anyRequest().denyAll()
             .and()
             .csrf().disable()

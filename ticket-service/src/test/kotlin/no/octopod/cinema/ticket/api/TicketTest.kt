@@ -15,10 +15,12 @@ import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.test.context.ActiveProfiles
 import java.time.ZonedDateTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 class TicketTest {
 
     @Autowired

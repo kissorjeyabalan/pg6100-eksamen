@@ -18,7 +18,7 @@ import java.time.ZonedDateTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class MovieTest {
     @LocalServerPort private var port = 0
     @Autowired lateinit var movieRepo: MovieRepository

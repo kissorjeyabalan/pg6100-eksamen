@@ -17,6 +17,7 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import org.testcontainers.containers.GenericContainer
@@ -24,6 +25,7 @@ import org.testcontainers.containers.GenericContainer
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = [AuthenticationTest.Companion.Initializer::class])
+@ActiveProfiles("test")
 class AuthenticationTest {
     @Autowired private lateinit var authRepo: AuthenticationRepository
     @LocalServerPort private var port = 0

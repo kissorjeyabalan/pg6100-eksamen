@@ -5,6 +5,7 @@ import org.springframework.boot.runApplication
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient
 import org.springframework.context.annotation.Bean
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
+import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import springfox.documentation.builders.ApiInfoBuilder
@@ -20,9 +21,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @EnableRedisRepositories
 class UserApplication {
 
+    @Bean
     fun swaggerApi(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
+                .ignoredParameterTypes(Authentication::class.java)
                 .select()
                 .paths(PathSelectors.any())
                 .build()
