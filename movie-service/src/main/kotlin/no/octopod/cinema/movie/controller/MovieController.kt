@@ -46,6 +46,7 @@ class MovieController {
         return ResponseEntity.created(URI.create("/movies/${saved.id}")).build()
     }
 
+    @CrossOrigin(origins =["http://localhost:8080"])
     @GetMapping(path = ["/{movieId}"])
     @ApiOperation(value = "Retrieve a specific movie")
     fun getById(
@@ -65,6 +66,7 @@ class MovieController {
         )
     }
 
+    @CrossOrigin(origins =["http://localhost:8080"])
     @GetMapping(produces = [Format.HAL_V1])
     @ApiOperation("Retrieve all movies")
     fun getAll(

@@ -5,5 +5,5 @@ import org.springframework.boot.runApplication
 class LocalApplicationRunner: MovieApplication()
 
 fun main(args: Array<String>) {
-    runApplication<LocalApplicationRunner>(*args, "--spring.profiles.active=test")
+    runApplication<LocalApplicationRunner>(*args, "--spring.profiles.active=test", "--server.port=8081")
 }

@@ -18,7 +18,6 @@ class HomePage extends React.Component {
             let movies = res.data.data.data
             this.setState({featuredMovies: movies})
         })
-
     }
 
     render() {
@@ -32,7 +31,7 @@ class HomePage extends React.Component {
                         <p className="movie-title" >Title: {m.title}</p>
                         <p className="movie-desc" >Description: {m.description}</p>
                         <Link to={"/moviepage?movieId=" + m.id}>
-                            <button className="btn">
+                            <button className="btn black">
                                 Details
                             </button>
                         </Link>
@@ -45,7 +44,7 @@ class HomePage extends React.Component {
             <div className="container">
                 <div className="header">
                     <h2>Movie-Service</h2>
-                    <p>Here is a selection of this weeks featured movies</p>
+                    <p>Here is a selection of this weeks featured movies<br/> Click to see screening info for each movie</p>
                 </div>
                 {featuredMovieList}
             </div>

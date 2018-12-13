@@ -40,6 +40,7 @@ class HeaderBar extends React.Component {
                    <div className="notLoggedInMsg">You are not logged in!</div>
                    <Link className="btn" to="/login">Log in</Link>
                    <Link className="btn" to="/signup">Sign up</Link>
+                   <Link className="btn" to="/admin">Admin</Link>
                </div>
            </div>
        );

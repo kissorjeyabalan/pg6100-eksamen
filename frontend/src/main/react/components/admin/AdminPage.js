@@ -15,6 +15,11 @@ class AdminPage extends React.Component {
         return(
             <div className="container">
                 This is the admin area
+
+                <p>Create a screening</p>
+
+
+
             </div>
         );
     }
