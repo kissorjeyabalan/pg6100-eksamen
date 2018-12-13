@@ -25,7 +25,7 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             .and()
             .csrf().disable()
             .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+            .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
     }
 }
 
