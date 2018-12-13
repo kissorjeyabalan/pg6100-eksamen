@@ -16,7 +16,7 @@ class HomePage extends React.Component {
     componentDidMount() {
         /*
         axios.get(`${ApiBase.MOVIE_API}?featured=true`).then(res => {
-            let movies = res.data.data.data
+            let movies = res.data.data.data;
             this.setState({featuredMovies: movies})
         })*/
 
