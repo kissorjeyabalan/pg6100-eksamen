@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.octopod.cinema.kino.converter.ShowConverter
 import no.octopod.cinema.common.dto.ShowDto
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.kino.repository.ShowRepository
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -45,21 +46,30 @@ class ShowController {
             @ApiParam("ShowEntity dto")
             @RequestBody dto: ShowDto
 
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
 
         if (dto.movieId == null || dto.cinemaId == null || dto.startTime == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid request body supplied"
+            )
         }
 
         val cinemaId: Long
         try {
             cinemaId = dto.cinemaId!!
         } catch (e: Exception) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid cinema ID supplied"
+            )
         }
 
         val theater = theaterRepo.findById(cinemaId).orElse(null)
-                ?: return ResponseEntity.status(400).build()
+                ?: return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Supplied theater does not exist"
+                )
 
         val showEntity = ShowEntity(startTime = dto.startTime!!.withFixedOffsetZone().withNano(0), movieId = dto.movieId!!, cinemaId = theater.id, seats = theater.seats!!.toMutableList())
 
@@ -70,7 +80,7 @@ class ShowController {
                         .fromPath("/shows/${created.id}")
                         .build()
                         .toUri()
-        ).build()
+        ).body(WrappedResponse<Void>(code = 201, message = "Show created").validated())
     }
 
     @ApiOperation("Get all shows")
@@ -99,11 +109,9 @@ class ShowController {
         val limitInt = limit.toInt()
 
         if (pageInt < 1 || limitInt < 1) {
-            return ResponseEntity.status(400).body(
-                    WrappedResponse<HalPage<ShowDto>>(
-                            code = 400,
-                            message = "Malformed limit supplied"
-                    ).validated()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Malformed limit supplied"
             )
         }
 
@@ -116,7 +124,10 @@ class ShowController {
                 theaterId = theater!!.toLong()
                 movieId = movie!!.toLong()
             } catch (e: Exception) {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Invalid theater ID or movie ID supplied"
+                )
             }
             repo.findAllByCinemaIdAndMovieId(theaterId, movieId)
 
@@ -126,7 +137,10 @@ class ShowController {
             try {
                 theaterId = theater!!.toLong()
             } catch (e: Exception) {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Invalid theater ID supplied"
+                )
             }
             repo.findAllByCinemaId(theaterId)
 
@@ -156,11 +170,9 @@ class ShowController {
                     .build().toString())
         }
 
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
+        return getWrappedResponse(
+                rawStatusCode = 200,
+                data = dto
         )
     }
 
@@ -178,21 +190,22 @@ class ShowController {
         try {
             pathId = id.toLong()
         } catch (e: Exception) {
-            /*
-                invalid id. But here we return 404 instead of 400,
-                as in the API we defined the id as string instead of long
-             */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
-        val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
+        val entity = repo.findById(pathId).orElse(null) ?:
+                return getWrappedResponse(
+                        rawStatusCode = 404,
+                        message = "Show not found"
+                )
         val dto = ShowConverter.transform(entity)
 
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
+        return getWrappedResponse(
+                rawStatusCode = 200,
+                data = dto
         )
     }
 
@@ -214,7 +227,10 @@ class ShowController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
         repo.deleteById(pathId)
@@ -244,14 +260,20 @@ class ShowController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
         val showEntity = repo.findById(pathId).orElse(null)
         val seatExists = showEntity?.seats?.contains(seatId)
 
         if (showEntity == null || seatExists == null || !seatExists) {
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show or Seat does not exist"
+            )
         }
 
         showEntity.seats!!.remove(seatId)
@@ -279,18 +301,37 @@ class ShowController {
         try {
             pathId = id.toLong()
         } catch (e: Exception) {
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
-        val showEntity = repo.findById(pathId).orElse(null)?: return ResponseEntity.status(404).build()
+        val showEntity = repo.findById(pathId).orElse(null)?: return getWrappedResponse(
+                rawStatusCode = 404,
+                message = "Show not found"
+        )
 
-        val theater = theaterRepo.findById(showEntity.cinemaId!!).orElse(null)?: return ResponseEntity.status(400).build()
-        if (!theater.seats!!.contains(seatId)) return ResponseEntity.status(400).build()
+        val theater = theaterRepo.findById(showEntity.cinemaId!!).orElse(null)?: return getWrappedResponse(
+                rawStatusCode = 500,
+                message = "Internal Server Error"
+        )
 
-        val seatExists = showEntity.seats?.contains(seatId) ?: return ResponseEntity.status(404).build()
+        if (!theater.seats!!.contains(seatId)) return getWrappedResponse(
+                rawStatusCode = 400,
+                message = "Seat already belongs to show"
+        )
+
+        val seatExists = showEntity.seats?.contains(seatId) ?: return getWrappedResponse(
+                rawStatusCode = 404,
+                message = "Show does not have supplied seat"
+        )
 
         if (seatExists) {
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Show already has this seat"
+            )
         }
 
         showEntity.seats!!.add(seatId)
@@ -325,19 +366,31 @@ class ShowController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
         if (dtoId != pathId) {
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Path ID conflicts with body ID"
+            )
         }
 
         if (!repo.existsById(dtoId)) {
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
         if (dto.startTime == null || dto.cinemaId == null || dto.movieId == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Missing start time, cinemaId or movieId"
+            )
         }
 
         dto.startTime = dto.startTime!!.withFixedOffsetZone().withNano(0)
@@ -370,7 +423,10 @@ class ShowController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Show not found"
+            )
         }
 
         val originalDto = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).body(
@@ -391,12 +447,18 @@ class ShowController {
             jsonNode = mapper.readValue(json, JsonNode::class.java)
         } catch (e: Exception) {
             //Invalid JSON data as input
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "JSON Malformed"
+            )
         }
 
         if (jsonNode.has("id")) {
             //shouldn't be allowed to modify the counter id
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Merge patch must not contain ID"
+            )
         }
 
         var newStartTime = originalDto.startTime
@@ -407,15 +469,24 @@ class ShowController {
         if (jsonNode.has("startTime")) {
             val startTimeNode = jsonNode.get("startTime")
             newStartTime = when {
-                startTimeNode.isNull -> return ResponseEntity.status(400).build()
+                startTimeNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "startTime can not be deleted"
+                )
                 startTimeNode.isTextual ->
                     try {
                         ZonedDateTime.parse(startTimeNode.asText()).withFixedOffsetZone().withNano(0)
                     } catch (e: Exception) {
-                        return ResponseEntity.status(400).build()
+                        return getWrappedResponse(
+                                rawStatusCode = 400,
+                                message = "startTime is wrongly formatted"
+                        )
                     }
                 else -> //Invalid JSON. Non-Integer startTime
-                    return ResponseEntity.status(400).build()
+                    return getWrappedResponse(
+                            rawStatusCode = 400,
+                            message = "Invalid node for startTime"
+                    )
             }
         }
 
@@ -423,20 +494,32 @@ class ShowController {
         if (jsonNode.has("cinemaId")) {
             val cinemaIdNode = jsonNode.get("cinemaId")
             newCinemaId = when {
-                cinemaIdNode.isNull -> return ResponseEntity.status(400).build()
+                cinemaIdNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "cinemaId can not be deleted"
+                )
                 cinemaIdNode.isInt -> cinemaIdNode.asInt().toLong()
                 else -> //Invalid JSON. Non-Long cinemaId
-                    return ResponseEntity.status(400).build()
+                     return getWrappedResponse(
+                            rawStatusCode = 400,
+                            message = "Invalid node for cinemaId"
+                    )
             }
         }
 
         if (jsonNode.has("movieId")) {
             val movieIdNode = jsonNode.get("movieId")
             newMovieId = when {
-                movieIdNode.isNull -> return ResponseEntity.status(400).build()
+                movieIdNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Missing start time, cinemaId or movieId"
+                )
                 movieIdNode.isInt -> movieIdNode.asInt().toLong()
                 else -> //Invalid JSON. Non-Long movieId
-                    return ResponseEntity.status(400).build()
+                    return getWrappedResponse(
+                            rawStatusCode = 400,
+                            message = "Invalid node for movieId"
+                    )
             }
         }
 
@@ -444,7 +527,10 @@ class ShowController {
             val seatsNode = jsonNode.get("availableSeats")
 
             if (seatsNode.isNull) {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Missing seatsNode"
+                )
             } else if (seatsNode.isArray) {
                 newSeats = mutableListOf()
                 for (seatNode in seatsNode) {
@@ -453,7 +539,10 @@ class ShowController {
                     }
                 }
             } else {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Invalid item in seats array"
+                )
             }
         }
 

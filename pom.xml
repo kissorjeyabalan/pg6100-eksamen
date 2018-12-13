@@ -15,6 +15,9 @@
         <module>movie-service</module>
         <module>ticket-service</module>
         <module>user-service</module>
+        <module>user-service</module>
+        <module>frontend</module>
+        <module>e2e-tests</module>
     </modules>
 
     <properties>
