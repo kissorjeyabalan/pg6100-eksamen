@@ -1,10 +1,6 @@
 eureka:
   client:
     enabled: false
-logging:
-  level:
-    org.springframework.security: debug
-
 spring:
   session:
     store-type: none
