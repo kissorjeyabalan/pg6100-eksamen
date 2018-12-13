@@ -72,3 +72,9 @@ services:
         - gateway
         - redis
         - movie-db
+
+    frontend:
+      build:
+        context: ./frontend
+      depends_on:
+        - gateway

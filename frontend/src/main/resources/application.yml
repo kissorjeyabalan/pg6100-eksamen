@@ -9,4 +9,3 @@ eureka:
       enabled: true
     serviceUrl:
       defaultZone: http://eureka:8761/eureka/
-    enabled: false
