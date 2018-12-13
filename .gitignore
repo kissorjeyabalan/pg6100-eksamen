@@ -31,7 +31,7 @@ hs_err_pid*
 **/target
 bundle.js
 **/node
-.bundle.js.map
+bundle.js.map
 # osx specific
 .DS_Store
 
