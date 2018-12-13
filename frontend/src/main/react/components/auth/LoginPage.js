@@ -11,7 +11,8 @@ class LoginPage extends React.Component {
         this.state = {
             userId: "",
             password: ""
-        }
+        };
+
         this.onUserIdChange = this.onUserIdChange.bind(this);
         this.onPasswordChange = this.onPasswordChange.bind(this);
         this.login = this.login.bind(this);
