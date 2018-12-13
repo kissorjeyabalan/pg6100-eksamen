@@ -57,6 +57,25 @@ class E2EDockerIT {
                                 .then()
                                 .statusCode(200)
 
+                        given()
+                                .get("/api/v1/users")
+                                .then()
+                                .statusCode(401)
+
+                        given()
+                                .get("/api/v1/movies")
+                                .then()
+                                .statusCode(200)
+
+                        given()
+                                .get("/api/v1/tickets")
+                                .then()
+                                .statusCode(401)
+
+                        given()
+                                .get("/api/v1/orders")
+                                .then()
+                                .statusCode(401)
                         true
 
                     }
@@ -64,6 +83,112 @@ class E2EDockerIT {
     }
 
     private val API_BASE = "/api/v1"
+
+    @Test
+    fun testTest() {
+
+        val name = "adminTest"
+        val seats = mutableListOf("a1", "a2", "a3")
+        val theaterDto = TheaterDto(
+                name = name,
+                seats = seats
+        )
+
+        val theaterPath = given()
+                .cookie("SESSION", getAdminSessionCookie())
+                .contentType(ContentType.JSON)
+                .body(theaterDto)
+                .post("/api/v1/kino/theaters")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val theaterObject = given()
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/kino$theaterPath")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", TheaterDto::class.java)
+
+        val movieId = 66L
+        val showDto = ShowDto(
+                movieId = movieId,
+                cinemaId = theaterObject.id,
+                startTime = ZonedDateTime.now().withFixedOffsetZone().withNano(0)
+        )
+
+        val showPath = given()
+                .cookie("SESSION", getAdminSessionCookie())
+                .contentType(ContentType.JSON)
+                .body(showDto)
+                .post("/api/v1/kino/shows")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val showObject = given()
+                .cookie("SESSION", getAdminSessionCookie())
+                .get("$API_BASE/kino$showPath")
+                .then()
+                .statusCode(200)
+                .body("data.availableSeats", hasItem("a1"))
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getObject("data", ShowDto::class.java)
+
+        val seatDto = SeatDto(
+                seat = "a1",
+                screening_id = showObject.id.toString()
+        )
+
+        val userSession = registerAuthentication("burnmango", "monsterenergy")
+
+        given().cookie("SESSION", userSession)
+                .contentType(ContentType.JSON)
+                .body(seatDto)
+                .post("$API_BASE/orders/reserve")
+                .then()
+                .statusCode(204)
+
+        val orderDto = SendOrderDto(
+                screening_id = showObject.id.toString(),
+                payment_token = "iwanttobecomeastar",
+                seats = listOf("a1")
+        )
+
+        given().cookie("SESSION", userSession)
+                .contentType(ContentType.JSON)
+                .body(orderDto)
+                .post("$API_BASE/orders")
+                .then()
+                .statusCode(201)
+                .extract().header("Location")
+
+        val ticketList = given()
+                .cookie("SESSION", userSession)
+                .get("$API_BASE/tickets?userId=burnmango&screeningId=${showObject.id}")
+                .then()
+                .statusCode(200)
+                .body("data.data.size()", equalTo(1))
+                .extract()
+                .response()
+                .body()
+                .jsonPath()
+                .getList("data.data", TicketDto::class.java)
+
+        given()
+                .cookie("SESSION", userSession)
+                .get("$API_BASE/kino$showPath")
+                .then()
+                .statusCode(200)
+                .body("data.seats", not(hasItem(ticketList[0].seat)))
+    }
 
     @Test
     fun testUnauthorizedAccess() {
@@ -897,6 +1022,8 @@ class E2EDockerIT {
                 .header("Set-Cookie", notNullValue())
                 .extract().cookie("SESSION")
     }
+
+
 
     fun registerAuthentication(username: String? = null, password: String? = null): String {
 

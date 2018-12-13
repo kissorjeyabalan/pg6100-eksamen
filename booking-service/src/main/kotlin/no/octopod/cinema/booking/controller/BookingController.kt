@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import no.octopod.cinema.booking.common.LoginDto
 import no.octopod.cinema.booking.converter.OrderConverter
 import no.octopod.cinema.common.dto.OrderDto
 import no.octopod.cinema.common.dto.SeatDto
@@ -22,10 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.netflix.ribbon.RibbonClient
 import org.springframework.http.*
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
 import java.lang.Exception
 import java.net.URI
@@ -85,15 +90,17 @@ class BookingController {
 
             // remove from seats in show dto first
             try {
-                val statusCode = client.exchange(
+                /*val statusCode = client.exchange(
                         "http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
                         HttpMethod.DELETE,
-                        getSystemAuthorizationHeader(),
+                        null,
                         Any::class.java
-                ).statusCodeValue
+                ).statusCodeValue*/
+
+                client.delete("http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}")
 
                 // if the removal was successful, save the reservation
-                if (statusCode == 204) {
+               // if (statusCode == 204) {
                     seatReserverationRepo.save(
                             SeatReservationEntity(
                                     seat = seatDto.seat,
@@ -102,23 +109,28 @@ class BookingController {
                                     screeningId = seatDto.screening_id!!.toLong()
                             )
                     )
-                }
+               // }
             } catch (e: HttpClientErrorException) {
                 return getWrappedResponse(
                         rawStatusCode = 404,
-                        message = "The requested seat does not exist or is no longer available."
+                        message = e.localizedMessage
                 )
             }
             return ResponseEntity.status(204).build()
         } else if (reservedSeat.userId == userId) {
             // add back to seats, since the seat was already reserved by this user
             try {
-                val statusCode = client.exchange(
+                /*val statusCode = client.exchange(
                         "http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
                         HttpMethod.POST,
-                        getSystemAuthorizationHeader(),
+                        null,
                         Any::class.java
-                ).statusCodeValue
+                ).statusCodeValue*/
+
+                val statusCode = client.postForEntity("http://kino-service/shows/${seatDto.screening_id}/seats/${seatDto.seat}",
+                        null, Any::class.java).statusCodeValue
+
+
 
                if (statusCode == 204) {
                     seatReserverationRepo.delete(reservedSeat)
@@ -185,19 +197,17 @@ class BookingController {
                     seat = seat
             )
 
-            val exchangeResponse = client.exchange(
-                    "http://ticket-service/tickets",
-                    HttpMethod.POST,
-                    getSystemAuthorizationHeader(mapper.writeValueAsString(ticket)),
-                    Any::class.java
-            )
-
-            val ticketId = exchangeResponse.headers.location?.toString()?.split("/")?.get(2)
-            if (ticketId?.toLongOrNull() != null) {
-                ticketIds.add(ticketId.toLong())
-            }
-
-            if (exchangeResponse.statusCodeValue != 201) {
+            try {
+               val exchangeResponse = client.postForEntity(
+                        "http://ticket-service/tickets",
+                        ticket,
+                        Any::class.java
+                )
+                val ticketId = exchangeResponse.headers.location?.toString()?.split("/")?.get(2)
+                if (ticketId?.toLongOrNull() != null) {
+                    ticketIds.add(ticketId.toLong())
+                }
+            } catch (e: Exception) {
                 success = false
             }
         }
@@ -212,12 +222,7 @@ class BookingController {
         if (!success) {
             for (ticketId in ticketIds) {
                 try {
-                    client.exchange(
-                            "http://ticket-service/tickets/$ticketId",
-                            HttpMethod.DELETE,
-                            getSystemAuthorizationHeader(),
-                            Any::class.java
-                    )
+                    client.delete("http://ticket-service/tickets/$ticketId")
                 } catch (e: Exception) {
                     // dont do anything intentionally
                 }
@@ -254,7 +259,6 @@ class BookingController {
             orderId: Long,
             authentication: Authentication
     ): ResponseEntity<WrappedResponse<OrderDto>> {
-
         val orderEntity = orderRepo.findById(orderId).orElse(null)
         if (!SecurityUtil.isAuthenticatedOrAdmin(authentication, orderEntity.userId)) {
             return getWrappedResponse(
@@ -343,6 +347,7 @@ class BookingController {
     }
 
     // For doing admin posts to ticket and show service
+
     private fun getSystemAuthorizationHeader(body: String? = null): HttpEntity<Any> {
         val headers = HttpHeaders()
         val auth = "$systemUser:$systemPwd"
@@ -356,5 +361,10 @@ class BookingController {
             headers.contentType = MediaType.APPLICATION_JSON
         }
         return HttpEntity<Any>(body, headers)
+    }
+
+    fun loginAdmin() {
+        val auth = UsernamePasswordAuthenticationToken("admin", null, listOf(SimpleGrantedAuthority("ROLE_ADMIN"), SimpleGrantedAuthority("ROLE_USER")))
+        SecurityContextHolder.getContext().authentication = auth
     }
 }
