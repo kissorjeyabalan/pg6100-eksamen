@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {MOVIE_API, SHOW_API, axios} from "../../global";
+import {MOVIE_API, SHOW_API, axios, ORDER_API, THEATER_API} from "../../global";
 
 class MoviePage extends React.Component {
 
@@ -15,29 +15,52 @@ class MoviePage extends React.Component {
         };
 
         this.movieId = new URLSearchParams(window.location.search).get("movieId");
+        this.reserveSeat = this.reserveSeat.bind(this);
 
         if(this.movieId === null){
-            this.state.error = "Unspecified book id";
+            this.state.error = "Unspecified movie id";
         }
     }
 
     componentDidMount() {
 
         axios.get(`${MOVIE_API}/${this.movieId}`).then(res => {
-
             let payload = res.data.data
-            console.log("movie api")
-            console.log(payload)
             this.setState({movie: payload})
         })
 
         axios.get(`${SHOW_API}?movieId=${this.movieId}`).then(res => {
+            let payload = res.data.data.data;
+            let screenings = [];
 
-            let payload = res.data.data.data
-            console.log("show api")
-            console.log(payload)
-            this.setState({screenings: payload})
+            payload.forEach(show => {
+                show = {...show, reservedSeats: []};
+                axios.get(`${THEATER_API}/${show.cinemaId}`).then(res => {
+
+                    show = {...show, theaterName: res.data.data.name};
+                    screenings.push(show)
+                    this.setState({screenings: screenings})
+
+                }).catch(err => {
+                    console.log(err)
+                })
+            })
         })
+    }
+
+    reserveSeat(selectedSeat, screeningId, screeningIndex) {
+
+        this.state.screenings[screeningIndex].reservedSeats.push(selectedSeat);
+        console.log(this.state.reservedSeats)
+
+        /*
+        axios.post(`${ORDER_API}/reserve`, {"seat": selectedSeat, "screening_id": screeningId}).then(res => {
+            if (res.status === 204) {
+                // add to list in state
+            }
+        }).catch(err => {
+            alert("Seat is already taken by another customer, please choose another seat")
+        })*/
     }
 
 
@@ -57,11 +80,16 @@ class MoviePage extends React.Component {
         let screenings = <div>Loading screenings</div>
 
         if(this.state.screenings !== null) {
-            screenings = <div className="container">
-                {this.state.screenings.map( s =>
-                    <div key={s.id}>
-                        <p>Starttime: {s.startTime}</p>
-                        <p>Available Seats: {s.availableSeats}</p>
+            screenings = <div>
+                {this.state.screenings.map((s, screeningIndex) =>
+                    <div key={s.id} className="screening-card">
+                        <h3>Theater: {s.theaterName}</h3>
+                        <p>Start-time: {s.startTime}</p>
+                        <p>Available Seats:</p>
+                        {s.availableSeats.map((seat, index) =>
+                            <button className="available-seat" key={index} onClick={() => this.reserveSeat(seat, s.id, screeningIndex)}>{seat}</button>
+                        )}
+                        Reserverte seter: {s.reservedSeats}
                     </div>
                 )}
             </div>
@@ -76,7 +104,6 @@ class MoviePage extends React.Component {
         );
     }
 }
-
 
 
 function mapStateToProps(state) {
