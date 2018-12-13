@@ -4,6 +4,11 @@ spring:
     # do not use Redis. Disabling SpringSession will fall-back to
     # default sessions in the servlet
     store-type: none
+  jpa:
+      database: "h2"
+      hibernate:
+        ddl-auto: "create-drop"
+      show-sql: true
 
 eureka:
   client:

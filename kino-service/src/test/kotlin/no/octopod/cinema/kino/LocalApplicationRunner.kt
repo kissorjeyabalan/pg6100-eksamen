@@ -5,5 +5,5 @@ import org.springframework.boot.runApplication
 class LocalApplicationRunner: KinoApplication()
 
 fun main(args: Array<String>) {
-    runApplication<LocalApplicationRunner>(*args, "--spring.profiles.active=test")
+    runApplication<LocalApplicationRunner>(*args, "--spring.profiles.active=test", "--server.port=8082")
 }
