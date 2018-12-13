@@ -6,9 +6,9 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>common</module>
         <module>eureka</module>
         <module>gateway</module>
-        <module>common</module>
         <module>auth-service</module>
         <module>booking-service</module>
         <module>kino-service</module>
@@ -16,7 +16,7 @@
         <module>ticket-service</module>
         <module>user-service</module>
         <module>frontend</module>
-        <module>e2e-tests</module>
+       <!-- <module>e2e-tests</module> -->
     </modules>
 
     <properties>

@@ -160,7 +160,6 @@ class UserTest {
                 .then()
                 .statusCode(404)
                 .body("code", equalTo(404))
-                .body("message", equalTo("Resource not found"))
     }
 
     @Test
@@ -440,7 +439,7 @@ class UserTest {
                 .body("{\"phone\":\"1234\"}")
                 .patch(resourcePath)
                 .then()
-                .statusCode(409)
+                .statusCode(400)
 
         given().auth()
                 .basic("admin", "admin")

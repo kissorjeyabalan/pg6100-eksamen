@@ -278,7 +278,7 @@ class TicketTest {
         given().auth().basic("bar", "123")
                 .get(resPath)
                 .then()
-                .statusCode(401)
+                .statusCode(403)
 
         given().auth().basic("foo", "123")
                 .get(resPath)

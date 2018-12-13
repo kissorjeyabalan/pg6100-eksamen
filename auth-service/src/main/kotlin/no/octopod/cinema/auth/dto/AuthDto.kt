@@ -2,7 +2,7 @@ package no.octopod.cinema.auth.dto
 
 import io.swagger.annotations.ApiModelProperty
 
-data class AuthDto(
+public data class AuthDto(
         @ApiModelProperty("Username")
         var username: String? = null,
 

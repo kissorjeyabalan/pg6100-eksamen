@@ -5,6 +5,8 @@ Master | Develop | Coverage | License
 [![Build Status](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen.svg?token=USPSPUpuhkXXxhxgdmM4&branch=master)](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen) | [![Build Status](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen.svg?token=USPSPUpuhkXXxhxgdmM4&branch=develop)](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen) | [![codecov](https://codecov.io/gh/kissorjeyabalan/pg6100-eksamen/branch/develop/graph/badge.svg?token=HInyhbQ9f1)](https://codecov.io/gh/kissorjeyabalan/pg6100-eksamen) | [![MIT Licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Link to repo: https://github.com/kissorjeyabalan/pg6100-eksamen
+Main branch is **develop**.
+Release branch is *master*, although it is not up to date due to the CORS issues. Never been merged into, as a release is not ready fully.
 
 ## KNOWN ISSUE
 The application as a whole doesn't work, due CORS, spring-security-gateway and spring-security not working well together. We assume this is some kind of bug that is on spring side, and have exhausted all options of trying to resolve this issue in time.
@@ -25,9 +27,15 @@ Again, everything works on the backend, it's just an unfortunate situation with 
 
 ## Starting the application
 Prerequisites to start the application is docker and docker-compose.
+End-to-End tests have been removed from the pom, as it adds significant load time.
+You can compile the whole project from the root directory, then feel free to run ```mvn test``` in the e2e-tests directory.
+If running tests, **make sure port 8080 is open**, as one of the tests is depenendent on this.
 To start the application, navigate to the root directory and run:
 ```mvn install -DskipTests && docker-compose up```. This will skip the tests and start the application.
 Frontend is available at `localhost:80`. It is recommended to give docker more than 2gb memory, as it might take a while to start all the services otherwise.
+We've purposefully exposedd eureka at port 8081, so you can see if instances are ready at `localhost:8081`. 
+Frontend is load balanced with two instances, so it might take up to 30 seconds on the first response.
+From our estimates, it takes about 3 - 5 minutes to load the whole system in docker container with 16gb ram allocated. Milage may vary.
 
 Admin user with username `admin` and password `admin` has been added to the authentication system, and can be used to access administrative tools in the frontend
 and backend.

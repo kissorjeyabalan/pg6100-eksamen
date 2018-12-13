@@ -63,7 +63,8 @@ spring:
       - id: frontend
         uri: lb://frontend
         predicates:
-        - Path:/**
+        - Path=/**
+        filters:
         - StripPrefix=0
 
 eureka:
