@@ -30,6 +30,10 @@ hs_err_pid*
 *.iws
 **/target
 bundle.js
+**/node
+bundle.js.map
+# osx specific
+.DS_Store
 
 # maven
 pom.xml.tag

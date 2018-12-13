@@ -1,0 +1,29 @@
+systemUser: admin
+systemPwd: admin
+
+spring:
+  application:
+    name: booking-service
+  redis:
+    host: redis
+    port: 6379
+  session:
+    store-type: redis
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/
+
+kino-service:
+  ribbon:
+    eureka:
+      enabled: true
+
+ticket-service:
+  ribbon:
+    eureka:
+      enabled: true

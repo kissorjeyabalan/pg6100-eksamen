@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: movie-service
+  datasource:
+    url: "jdbc:postgresql://movie-db:5432/postgres"
+    username: "postgres"
+    password: ""
+    driver-class-name: "org.postgresql.Driver"
+  jpa:
+    database: "postgresql"
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/
+logging:
+  level:
+    org.springframework.security: debug

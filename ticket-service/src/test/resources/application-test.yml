@@ -1,0 +1,7 @@
+spring:
+  session:
+    store-type: none
+
+eureka:
+  client:
+    enabled: false

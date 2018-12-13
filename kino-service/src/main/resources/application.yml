@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: kino-service
+  datasource:
+      url: "jdbc:postgresql://kino-db:5432/postgres"
+      username: "postgres"
+      password: ""
+      driver-class-name: "org.postgresql.Driver"
+  jpa:
+    database: "postgresql"
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+  redis:
+    host: redis
+    port: 6379
+  session:
+    store-type: redis
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/

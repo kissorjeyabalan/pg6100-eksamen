@@ -1,0 +1,88 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    width: 100%;
+    background-color: beige;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin: 0 30px;
+    padding: 0 30px;
+}
+
+.header-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: darkslategray;
+    margin-bottom: 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px;
+    color: white;
+}
+
+.black {
+    color: #000000;
+}
+
+.notLoggedInMsg {
+    display: inline-block;
+    padding: 5px;
+    color: white;
+}
+
+.movie-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.movie-list-card {
+    display: block;
+    width: 40%;
+    border: 2px solid grey;
+    padding: 40px;
+    margin: 30px;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.movie-container{
+    padding: 0 20%;
+}
+
+button {
+    margin: 5px;
+    padding: 5px;
+}
+
+.screening-card {
+    display: block;
+    width: 40%;
+    border: 2px solid grey;
+    padding: 40px;
+    margin: 30px;
+}
+
+.available-seat {
+    background-color: green;
+}
