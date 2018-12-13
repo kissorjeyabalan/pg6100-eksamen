@@ -7,6 +7,7 @@ import RegisterPage from './auth/RegisterPage';
 import HeaderBar from "./header/HeaderBar";
 import MoviePage from "./movie/MoviePage";
 import AdminPage from "./admin/AdminPage"
+import AdminEditShowPage from "./admin/AdminEditShowPage";
 
 class App extends React.Component {
     render() {
@@ -18,8 +19,9 @@ class App extends React.Component {
                         <Route exact path="/moviepage" component={MoviePage}/>
                         <Route exact path="/login" component={LoginPage} />
                         <Route exact path="/signup" component={RegisterPage} />
-                        <Route exact path="/admin" component={AdminPage} />
                         <Route exact path="/" component={HomePage}/>
+                        <Route exact path="/admin" component={AdminPage} />
+                        <Route path="/admin/EditShow/:id" component={AdminEditShowPage} />
                     </Switch>
                 </div>
             </BrowserRouter>
