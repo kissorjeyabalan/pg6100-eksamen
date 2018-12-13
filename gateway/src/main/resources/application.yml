@@ -54,6 +54,12 @@ spring:
         - Path=/api/v1/movies/**
         filters:
         - StripPrefix=2
+      - id: booking-service
+        uri: lb://booking-service
+        predicates:
+          - Path=/api/v1/orders/**
+        filters:
+          - StripPrefix=2
 
 eureka:
   instance:
