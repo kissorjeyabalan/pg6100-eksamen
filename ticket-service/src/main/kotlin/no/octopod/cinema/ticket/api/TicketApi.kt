@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.octopod.cinema.ticket.dto.DtoTransformer
 import no.octopod.cinema.common.dto.TicketDto
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.common.dto.WrappedResponse
 import no.octopod.cinema.ticket.repository.TicketRepository
 import io.swagger.annotations.Api
@@ -74,7 +75,7 @@ class TicketApi {
         val ticketList = if( screeningId.isNullOrBlank() && userId.isNullOrBlank()) {
             repo.findAll().toList()
         } else if ( !screeningId.isNullOrBlank() && !userId.isNullOrBlank()) {
-            repo.findAllByScreeningIdAndUserId(userId!!, screeningId!!)
+            repo.findAllByScreeningIdAndUserId(screeningId!!, userId!!)
         } else {
             repo.findAllByUserId(userId!!)
         }
@@ -131,12 +132,18 @@ class TicketApi {
         try {
             pathId = id.toLong()
         } catch (e: Exception) {
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Ticket does not exist"
+            )
         }
 
         val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
         if (!isAuthenticatedOrAdmin(authentication, entity.userId)) {
-            return ResponseEntity.status(401).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "Ticket does not belong to this user"
+            )
         }
 
         val dto = DtoTransformer.transform(entity)
@@ -149,18 +156,24 @@ class TicketApi {
 
     @ApiOperation("create a new ticket")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<Void> {
+    fun createTicket(@RequestBody dto: TicketDto) : ResponseEntity<WrappedResponse<Void>> {
 
 
         if(dto.userId.isNullOrEmpty()|| dto.screeningId.isNullOrEmpty() || dto.seat.isNullOrEmpty()) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "UserID, ScreeningID and SeatID can not be null or empty"
+            )
         }
 
         val id = repo.createTicket(dto.userId!!, dto.screeningId!!, dto.seat!!)
 
         return ResponseEntity.created(UriComponentsBuilder
                 .fromPath("/tickets/$id").build().toUri()
-        ).build()
+        ).body(WrappedResponse(
+                code = 201,
+                message = "Ticket successfully created"
+        ))
     }
 
     @ApiOperation("delete a ticket")
@@ -192,11 +205,7 @@ class TicketApi {
 
         repo.deleteById(id)
 
-        return ResponseEntity.status(204).body(
-                WrappedResponse<TicketDto>(
-                        code = 204
-                ).validated()
-        )
+        return ResponseEntity.status(204).build()
     }
 
     @ApiOperation("update an existing ticket")
@@ -230,11 +239,7 @@ class TicketApi {
 
         repo.updateTicket(dto.id!!.toLong(), dto.userId!!, dto.screeningId!!, dto.timeOfPurchase!!, dto.seat!!)
 
-        return ResponseEntity.status(204).body(
-                WrappedResponse<TicketDto>(
-                        code = 204
-                ).validated()
-        )
+        return ResponseEntity.status(204).build()
     }
 
     // Copied from CounterRest class in package org.tsdes.advanced.rest.patch
@@ -269,12 +274,18 @@ class TicketApi {
             jsonNode = jackson.readValue(jsonPatch, JsonNode::class.java)
         } catch (e: Exception) {
             //Invalid JSON data as input
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Malformed JSON supplied"
+            )
         }
 
         if (jsonNode.has("id")) {
             //shouldn't be allowed to modify the counter id
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Merge patch does not support changing ID"
+            )
         }
 
         //do not alter dto till all data is validated. A PATCH has to be atomic,
@@ -289,7 +300,10 @@ class TicketApi {
                 newUserId = userIdNode.asText()
             } else {
                 //Invalid JSON. Non-string name
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "userId must be of type string"
+                )
             }
         }
 
@@ -299,7 +313,10 @@ class TicketApi {
                 newScreeningId = screeningIdNode.asText()
             } else {
                 //Invalid JSON. Non-string name
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "screeningId must be of type string"
+                )
             }
         }
 
@@ -309,7 +326,10 @@ class TicketApi {
                 newSeat = seatNode.asText()
             } else {
                 //Invalid JSON. Non-string name
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "seat must be of type string"
+                )
             }
         }
 
@@ -320,10 +340,6 @@ class TicketApi {
 
         repo.save(ticket)
 
-        return ResponseEntity.status(204).body(
-                WrappedResponse<TicketDto>(
-                        code = 204
-                ).validated()
-        )
+        return ResponseEntity.status(204).build()
     }
 }

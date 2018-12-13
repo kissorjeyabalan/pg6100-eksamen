@@ -17,6 +17,8 @@ a {
     flex-direction: column;
     justify-content: center;
     text-align: center;
+    margin: 0 30px;
+    padding: 0 30px;
 }
 
 .header-bar {
@@ -66,4 +68,21 @@ a {
 
 .movie-container{
     padding: 0 20%;
+}
+
+button {
+    margin: 5px;
+    padding: 5px;
+}
+
+.screening-card {
+    display: block;
+    width: 40%;
+    border: 2px solid grey;
+    padding: 40px;
+    margin: 30px;
+}
+
+.available-seat {
+    background-color: green;
 }

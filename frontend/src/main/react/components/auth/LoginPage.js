@@ -43,7 +43,7 @@ class LoginPage extends React.Component {
             <div className="container">
                 <h1>Login</h1>
                 <div>
-                    <p>Username: </p>
+                    <p>Phone number: </p>
                     <input type="text"
                            value={this.state.userId}
                            onChange={this.onUserIdChange}/>

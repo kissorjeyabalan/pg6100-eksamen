@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Throwables
 import no.octopod.cinema.kino.converter.TheaterConverter
 import no.octopod.cinema.common.dto.TheaterDto
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.kino.repository.TheaterRepository
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiParam
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
 import no.octopod.cinema.common.hateos.HalPage
+import no.octopod.cinema.common.utility.ResponseUtil
 import javax.validation.ConstraintViolationException
 
 @Api(value = "theaters", description = "Handling of theaters")
@@ -39,10 +41,13 @@ class TheaterController {
             @ApiParam("ShowEntity dto")
             @RequestBody dto: TheaterDto
 
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
 
         if (dto.name == null || dto.seats == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Missing name or seats"
+            )
         }
 
         val theater = TheaterEntity(name = dto.name!!, seatsMax = dto.seats!!.size)
@@ -55,7 +60,10 @@ class TheaterController {
                         .fromPath("/theaters/${created.id!!}")
                         .build()
                         .toUri()
-        ).build()
+        ).body(WrappedResponse(
+                code = 201,
+                message = "Theater Created"
+        ))
     }
 
     @ApiOperation("Get all theaters")
@@ -134,7 +142,10 @@ class TheaterController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Theater not found"
+            )
         }
 
         val entity = repo.findById(pathId).orElse(null) ?: return ResponseEntity.status(404).build()
@@ -164,7 +175,10 @@ class TheaterController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Theater not found"
+            )
         }
 
         repo.deleteById(pathId)
@@ -196,19 +210,31 @@ class TheaterController {
                 invalid id. But here we return 404 instead of 400,
                 as in the API we defined the id as string instead of long
              */
-            return ResponseEntity.status(404).build()
-        }
-
-        if (dtoId != pathId) {
-            return ResponseEntity.status(409).build()
-        }
-
-        if (!repo.existsById(dtoId)) {
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Theater not found"
+            )
         }
 
         if (dto.name == null || dto.seats == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Missing required keys name and seats"
+            )
+        }
+
+        if (dtoId != pathId) {
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Path ID and object ID does not match"
+            )
+        }
+
+        if (!repo.existsById(dtoId)) {
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Theater does not exist"
+            )
         }
 
         val theater = TheaterConverter.transform(dto)
@@ -217,7 +243,10 @@ class TheaterController {
             repo.save(theater)
         } catch (e: Exception) {
             if(Throwables.getRootCause(e) is ConstraintViolationException) {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Constraints violated"
+                )
             }
             throw e
         }
@@ -265,12 +294,18 @@ class TheaterController {
             jsonNode = mapper.readValue(json, JsonNode::class.java)
         } catch (e: Exception) {
             //Invalid JSON data as input
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Malformed JSON supplied"
+            )
         }
 
         if (jsonNode.has("id")) {
             //shouldn't be allowed to modify the counter id
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Merge patch does not support replacing id"
+            )
         }
 
         var newName = originalDto.name
@@ -280,26 +315,41 @@ class TheaterController {
         if (jsonNode.has("name")) {
             val nameNode = jsonNode.get("name")
             newName = when {
-                nameNode.isNull -> return ResponseEntity.status(400).build()
+                nameNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Name can not be null"
+                )
                 nameNode.isTextual -> nameNode.asText()
                 else -> //Invalid JSON. Non-string name
-                    return ResponseEntity.status(400).build()
+                    return getWrappedResponse(
+                            rawStatusCode = 404,
+                            message = "Name is of invalid type"
+                    )
             }
         }
 
         if (jsonNode.has("seatsMax")) {
             val maxNode = jsonNode.get("seatsMax")
             newSeatsMax = when {
-                maxNode.isNull -> return ResponseEntity.status(400).build()
+                maxNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Max Seats can not be null"
+                )
                 maxNode.isNumber -> maxNode.asInt()
                 else -> //Invalid JSON. Non-int seatsMax
-                    return ResponseEntity.status(400).build()
+                    return getWrappedResponse(
+                            rawStatusCode = 400,
+                            message = "maxSeats is of invalid type"
+                    )
             }
         }
 
         if (jsonNode.has("seats")) {
             val seatsNode = jsonNode.withArray("seats")
-            if (seatsNode.isNull) return ResponseEntity.status(400).build()
+            if (seatsNode.isNull) return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Seats can not be null - Must be empty array or with items"
+            )
             if (seatsNode.isArray) {
                 var mutableArr = mutableListOf<String>()
                 seatsNode.elements().forEach { it ->
@@ -307,7 +357,10 @@ class TheaterController {
                 }
                 newSeats = mutableArr
             } else {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Seats is of wrong type"
+                )
             }
         }
 

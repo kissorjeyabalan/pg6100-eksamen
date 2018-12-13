@@ -16,9 +16,9 @@ const store = createStore(rootReducer, composeWithDevTools(
 ));
 
 axios.get(`${AUTH_API}/user`).then(res => {
-    store.dispatch({type: AUTHENTICATED, data: res.data});
+    store.dispatch({type: AUTHENTICATED, data: res});
 }).catch(() => {
-    store.dispatch(logOut())
+    store.dispatch({type: NOT_AUTHENTICATED});
 });
 
 ReactDOM.render(

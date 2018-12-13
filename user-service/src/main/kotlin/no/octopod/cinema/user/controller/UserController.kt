@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam
 import no.octopod.cinema.user.converter.UserConverter
 import no.octopod.cinema.user.repository.UserRepository
 import no.octopod.cinema.common.dto.UserInfoDto
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.common.dto.WrappedResponse
 import no.octopod.cinema.common.hateos.Format
 import no.octopod.cinema.common.hateos.HalLink
@@ -37,23 +38,35 @@ class UserController {
             @ApiParam(name = "UserInfo Object", value = "Data to persist about the user. ID must not be sent, and will be ignored.")
             @RequestBody userInfo: UserInfoDto,
             authentication: Authentication
-            ): ResponseEntity<Void> {
+            ): ResponseEntity<WrappedResponse<Void>> {
         if (userInfo.phone.isNullOrEmpty() || userInfo.name.isNullOrEmpty() ||userInfo.email.isNullOrEmpty()) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Phone, name and email can not be null or empty"
+            )
         }
 
         if (!isAuthenticatedOrAdmin(authentication, userInfo.phone!!)) {
-            return ResponseEntity.status(403).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "User does not have access to this resource"
+            )
         }
 
         val entity = UserConverter.transform(userInfo)
 
         if (repo.existsById(userInfo.phone!!)) {
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Phone already in use"
+            )
         }
 
         val saved = repo.save(entity)
-        return ResponseEntity.created(URI.create("/users/${saved.phone}")).build()
+        return ResponseEntity.created(URI.create("/users/${saved.phone}")).body(WrappedResponse(
+                code = 201,
+                message = "UserInfo created"
+        ))
     }
 
     @GetMapping(path = ["/{userId}"])
@@ -65,22 +78,23 @@ class UserController {
             authentication: Authentication
     ): ResponseEntity<WrappedResponse<UserInfoDto>> {
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(403).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "Forbidden"
+            )
         }
 
-        val userInfo = repo.findById(userId).orElse(null) ?: return ResponseEntity.status(404).body(
-                WrappedResponse<UserInfoDto>(
-                        code = 404,
-                        message = "Resource not found"
-                ).validated()
+        val userInfo = repo.findById(userId).orElse(null) ?: return getWrappedResponse(
+                rawStatusCode = 404,
+                message = "UserInfo does not exist"
         )
 
         val dto = UserConverter.transform(userInfo)
 
-        return ResponseEntity.ok(WrappedResponse(
-                code = 200,
+        return getWrappedResponse(
+                rawStatusCode = 200,
                 data = dto
-        ).validated())
+        )
     }
 
 
@@ -95,15 +109,16 @@ class UserController {
     ): ResponseEntity<WrappedResponse<HalPage<UserInfoDto>>> {
 
         if (!isAuthenticatedOrAdmin(authentication)) {
-            return ResponseEntity.status(403).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "Forbidden"
+            )
         }
 
         if (page < 1 || limit < 1) {
-            return ResponseEntity.status(400).body(
-                    WrappedResponse<HalPage<UserInfoDto>>(
-                            code = 400,
-                            message = "Malformed page or limit supplied"
-                    ).validated()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid page or limit supplied"
             )
         }
         val entityList = repo.findAll().toList()
@@ -129,11 +144,9 @@ class UserController {
                     .build().toString())
         }
 
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
+        return getWrappedResponse(
+            rawStatusCode = 200,
+            data = dto
         )
     }
 
@@ -147,17 +160,26 @@ class UserController {
             @ApiParam("The new information replace existing information with. ALL FIELDS are -REQUIRED- except created and updated")
             replacement: UserInfoDto,
             authentication: Authentication
-    ) : ResponseEntity<Void> {
+    ) : ResponseEntity<WrappedResponse<Void>> {
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(403).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "Forbidden"
+            )
         }
 
         if (replacement.name.isNullOrEmpty() || replacement.phone.isNullOrEmpty() || replacement.email.isNullOrEmpty()) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Name, phone and email can not be null or empty"
+            )
         }
 
         if (userId != replacement.phone) {
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 409,
+                    message = "Can not replace phone"
+            )
         }
 
         var entity = repo.findById(userId).orElse(null)
@@ -174,10 +196,19 @@ class UserController {
         try {
             repo.save(entity)
         } catch (e: Exception) {
-            responseCode = 400
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Constraints failure"
+            )
         }
 
-        return ResponseEntity.status(responseCode).build()
+        if (responseCode == 201) {
+            return ResponseEntity.created(URI.create("/users/${entity.phone}")).body(WrappedResponse(
+                    code = 201,
+                    message = "UserInfo created"
+            ))
+        }
+        return ResponseEntity.status(204).build()
     }
 
     /*
@@ -195,13 +226,19 @@ class UserController {
             @ApiParam("JSON Object with items to patch. Accepted nodes: name (string), email (string)")
             jsonPatch: String,
             authentication: Authentication
-    ) : ResponseEntity<Void> {
+    ) : ResponseEntity<WrappedResponse<Void>> {
         if (!isAuthenticatedOrAdmin(authentication, userId)) {
-            return ResponseEntity.status(403).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "Forbidden"
+            )
         }
 
         val entity = repo.findById(userId).orElse(null)
-                ?: return ResponseEntity.status(404).build()
+                ?: return getWrappedResponse(
+                        rawStatusCode = 404,
+                        message = "UserInfo not found"
+                )
 
         val jackson = ObjectMapper()
 
@@ -209,11 +246,17 @@ class UserController {
         try {
             jsonNode = jackson.readValue(jsonPatch, JsonNode::class.java)
         } catch (e: Exception) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Malformed JSON supplied"
+            )
         }
 
         if (jsonNode.has("phone")) {
-            return ResponseEntity.status(409).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Merge patch does not support changing phone"
+            )
         }
 
         var newName = entity.name
@@ -221,33 +264,47 @@ class UserController {
 
         if (jsonNode.has("name")) {
             val nameNode = jsonNode.get("name")
-            if (nameNode.isNull) {
-                return ResponseEntity.status(400).build()
-            } else if (nameNode.isTextual) {
-                newName = nameNode.asText()
+            when {
+                nameNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Name can not be null"
+                )
+                nameNode.isTextual -> newName = nameNode.asText()
+                else -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Name must be of type string"
+                )
             }
         }
 
         if (jsonNode.has("email")) {
             val emailNode = jsonNode.get("email")
-            if (emailNode.isNull) {
-                return ResponseEntity.status(400).build()
-            } else {
-                newEmail = emailNode.asText()
+            when {
+                emailNode.isNull -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Email can not be null"
+                )
+                emailNode.isTextual -> newEmail = emailNode.asText()
+                else -> return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Email must be of type string"
+                )
             }
         }
 
         entity.name = newName
         entity.email = newEmail
 
-        var responseCode = 204
         try {
             repo.save(entity)
         } catch (e: Exception) {
-            responseCode = 400
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Constraints failure"
+            )
         }
 
-        return ResponseEntity.status(responseCode).build()
+        return ResponseEntity.status(204).build()
     }
 
     @DeleteMapping(path = ["/{userId}"])
@@ -256,13 +313,16 @@ class UserController {
             @PathVariable
             @ApiParam("User ID to delete")
             userId: String
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
         val userInfoExists = repo.existsById(userId)
         return if (userInfoExists) {
             repo.deleteById(userId)
             ResponseEntity.status(204).build()
         } else {
-            ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "UserInfo not found"
+            )
         }
     }
 }
