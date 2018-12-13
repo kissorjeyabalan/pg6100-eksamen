@@ -8,6 +8,7 @@ import no.octopod.cinema.booking.converter.OrderConverter
 import no.octopod.cinema.common.dto.OrderDto
 import no.octopod.cinema.common.dto.SeatDto
 import no.octopod.cinema.common.dto.SendOrderDto
+import no.octopod.cinema.common.utility.ResponseUtil.getWrappedResponse
 import no.octopod.cinema.booking.entity.OrderEntity
 import no.octopod.cinema.booking.entity.SeatReservationEntity
 import no.octopod.cinema.booking.repository.OrderRepository
@@ -59,9 +60,12 @@ class BookingController {
                     value = "An object containing the seat to reserve, and which screening to reserve the seat for.")
             @RequestBody seatDto: SeatDto,
             authentication: Authentication
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
         if (seatDto.seat.isNullOrEmpty() || seatDto.screening_id?.toLongOrNull() == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid Request Body: Seat or Screening_ID malformed."
+            )
         }
 
         val userId = SecurityUtil.getUserId(authentication)
@@ -73,7 +77,10 @@ class BookingController {
                     seatReserverationRepo.countByUserIdAndScreeningId(userId, seatDto.screening_id!!.toLong())
 
             if (currentUserReservations >= MAX_RESERVATIONS_PER_USER) {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "Exceeded max reservation limit for user."
+                )
             }
 
             // remove from seats in show dto first
@@ -97,7 +104,10 @@ class BookingController {
                     )
                 }
             } catch (e: HttpClientErrorException) {
-                return ResponseEntity.status(404).build()
+                return getWrappedResponse(
+                        rawStatusCode = 404,
+                        message = "The requested seat does not exist or is no longer available."
+                )
             }
             return ResponseEntity.status(204).build()
         } else if (reservedSeat.userId == userId) {
@@ -115,11 +125,17 @@ class BookingController {
                     return ResponseEntity.status(204).build()
                 }
             } catch (e: Exception) {
-                return ResponseEntity.status(400).build()
+                return getWrappedResponse(
+                        rawStatusCode = 400,
+                        message = "The seat supplied does not belong to this theater."
+                )
             }
         } else if (reservedSeat.userId != null && reservedSeat.userId != userId) {
             // this seat does not exist anymore
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "This seat is already reserved and is not available"
+            )
         }
 
         /**
@@ -136,11 +152,14 @@ class BookingController {
             @ApiParam(name = "Purchase Object", value = "An object to represent a paid for purchase, used to create the tickets")
             @RequestBody sendOrderDto: SendOrderDto,
             authentication: Authentication
-    ) : ResponseEntity<Void> {
+    ) : ResponseEntity<WrappedResponse<Void>> {
         if (sendOrderDto.payment_token.isNullOrEmpty() ||
                 sendOrderDto.screening_id?.toLongOrNull() == null ||
                 sendOrderDto.seats == null) {
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Invalid request body: Missing payment_token, screening_id or seats"
+            )
         }
 
         val ticketIds: MutableList<Long> = mutableListOf()
@@ -203,7 +222,10 @@ class BookingController {
                     // dont do anything intentionally
                 }
             }
-            return ResponseEntity.status(400).build()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Order has been reversed due to invalid data supplied"
+            )
         }
 
         val orderEntity = OrderEntity(
@@ -216,7 +238,12 @@ class BookingController {
         )
 
         val saved = orderRepo.save(orderEntity)
-        return ResponseEntity.created(URI.create("/orders/${saved.id}")).build()
+        return ResponseEntity.created(URI.create("/orders/${saved.id}")).body(
+                WrappedResponse<Void>(
+                        code = 201,
+                        message = "Order successfully created"
+                ).validated()
+        )
     }
 
     @GetMapping(path = ["/{orderId}"])
@@ -230,19 +257,25 @@ class BookingController {
 
         val orderEntity = orderRepo.findById(orderId).orElse(null)
         if (!SecurityUtil.isAuthenticatedOrAdmin(authentication, orderEntity.userId)) {
-            return ResponseEntity.status(403).build()
+            return getWrappedResponse(
+                    rawStatusCode = 403,
+                    message = "Forbidden"
+            )
         }
 
         if (orderEntity == null) {
-            return ResponseEntity.status(404).build()
+            return getWrappedResponse(
+                    rawStatusCode = 404,
+                    message = "Resource not found."
+            )
         }
 
         val dto = OrderConverter.transform(orderEntity)
 
-        return ResponseEntity.ok(WrappedResponse(
-                code = 200,
+        return getWrappedResponse(
+                rawStatusCode = 200,
                 data = dto
-        ).validated())
+        )
     }
 
     @GetMapping
@@ -262,11 +295,9 @@ class BookingController {
         }
 
         if (page < 1 || limit < 1) {
-            return ResponseEntity.status(400).body(
-                    WrappedResponse<HalPage<OrderDto>>(
-                            code = 400,
-                            message = "Malformed page or limit supplied"
-                    ).validated()
+            return getWrappedResponse(
+                    rawStatusCode = 400,
+                    message = "Malformed page or limit supplied"
             )
         }
 
@@ -305,11 +336,9 @@ class BookingController {
                     .build().toString())
         }
 
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
+        return getWrappedResponse(
+                rawStatusCode = 200,
+                data = dto
         )
     }
 

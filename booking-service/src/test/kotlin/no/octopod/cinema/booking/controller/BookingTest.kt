@@ -207,7 +207,7 @@ class BookingTest {
                 .body(seatDto)
                 .post("/orders/reserve")
                 .then()
-                .statusCode(404)
+                .statusCode(400)
     }
 
     @Test
