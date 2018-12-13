@@ -48,13 +48,38 @@ class MoviePage extends React.Component {
         })
     }
 
+    placeOrder(screeningId, screeningIndex) {
+        let obj = {
+            "screening_id": screeningId.toString(),
+            "payment_token": "234adsf",
+            "seats": this.state.screenings[screeningIndex].reservedSeats
+        }
+
+        // place order, uncomment if spring security works
+        /*axios.post(`${ORDER_API}`, obj).then(res => {
+            alert("Order successfully placed")
+        }).catch(err => {
+            alert("Something went wrong. You've been refunded.")
+        })*/
+    }
+
+
     reserveSeat(selectedSeat, screeningId, screeningIndex) {
 
-        this.state.screenings[screeningIndex].reservedSeats.push(selectedSeat);
-        console.log(this.state.reservedSeats)
 
-        /*
-        axios.post(`${ORDER_API}/reserve`, {"seat": selectedSeat, "screening_id": screeningId}).then(res => {
+        let resSeats = this.state.screenings[screeningIndex].reservedSeats;
+        let index = resSeats.indexOf(selectedSeat);
+
+        if (index > -1) {
+            resSeats.push(selectedSeat);
+        } else {
+            resSeats.splice(index, 1)
+        }
+        this.setState({reservedSeats: resSeats})
+
+        // IF SPRING-SECURITY WORKED, CONTENT OF THIS METHOD WOULD GO INSIDE THIS
+
+        /*axios.post(`${ORDER_API}/reserve`, {"seat": selectedSeat, "screening_id": screeningId}).then(res => {
             if (res.status === 204) {
                 // add to list in state
             }
@@ -89,7 +114,10 @@ class MoviePage extends React.Component {
                         {s.availableSeats.map((seat, index) =>
                             <button className="available-seat" key={index} onClick={() => this.reserveSeat(seat, s.id, screeningIndex)}>{seat}</button>
                         )}
-                        Reserverte seter: {s.reservedSeats}
+                        <p>Reserverte seter: {s.reservedSeats.map(rs =>
+                            <p>{rs}</p>
+                        )}</p>
+                        <button className={"btn"} onClick={() => this.placeOrder(s.id, screeningIndex)}>PLACE ORDER</button>
                     </div>
                 )}
             </div>
