@@ -5,6 +5,24 @@ Master | Develop | Coverage | License
 [![Build Status](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen.svg?token=USPSPUpuhkXXxhxgdmM4&branch=master)](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen) | [![Build Status](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen.svg?token=USPSPUpuhkXXxhxgdmM4&branch=develop)](https://travis-ci.com/kissorjeyabalan/pg6100-eksamen) | [![codecov](https://codecov.io/gh/kissorjeyabalan/pg6100-eksamen/branch/develop/graph/badge.svg?token=HInyhbQ9f1)](https://codecov.io/gh/kissorjeyabalan/pg6100-eksamen) | [![MIT Licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Link to repo: https://github.com/kissorjeyabalan/pg6100-eksamen
+
+## KNOWN ISSUE
+The application as a whole doesn't work, due CORS, spring-security-gateway and spring-security not working well together. We assume this is some kind of bug that is on spring side, and have exhausted all options of trying to resolve this issue in time.
+
+Therefore, unless web security is disabled - it is not possible to do any POST requests on the website. This makes the frontend pretty useless, however, everything is working -just fine- on the backend side of things (and when calling everything through postman and restassured (in i.e. e2e tests))
+
+This is unfortunate for us, but it is what it is. LocalApplicationRunner still mocks all dependencies, so the API can be tested there, or by running it all in docker and calling the following endpoints in postman:
+- localhost/api/v1/auth/
+- localhost/api/v1/movies/
+- localhost/api/v1/kino/shows/
+- localhost/api/v1/kino/theaters/
+- localhost/api/v1/kino/theaters/
+- localhost/api/v1/kino/users/
+- localhost/api/v1/kino/tickets/
+
+First a login post must be done to auth/login, to acquire session cookie - then the session can be used with all other endpoints.
+Again, everything works on the backend, it's just an unfortunate situation with spring-gateway-cloud at its current state.
+
 ## Starting the application
 Prerequisites to start the application is docker and docker-compose.
 To start the application, navigate to the root directory and run:
