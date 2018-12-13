@@ -10,6 +10,9 @@ services:
     movie-db:
       image: "postgres:10"
 
+    kino-db:
+      image: "postgres:10"
+
     eureka:
       ports:
         - "8081:8761"
@@ -26,6 +29,8 @@ services:
       depends_on:
         - eureka
         - redis
+
+
 
     kino_service:
       build:
